@@ -2,13 +2,17 @@
 using System.Collections;
 
 public class HUD : MonoBehaviour {
-	
-	const string MENU = "MENU";
-	string collected = "0";
 
-	bool displayVictory;
+	private readonly Rect menuButtonRect = new Rect (15, 15, Screen.width * 0.20f, Screen.height * 0.05f);
+	private readonly Rect statusTextRect = new  Rect (15, Screen.height * 0.05f + 15, Screen.width * 0.20f, Screen.height * 0.05f);
 
-	float timeDisplayingVictoryMessage;
+	private const int VICTORY_MESSAGE_DELAY_SECONDS = 3;
+	private const string MENU = "MENU";
+	private string collected = "0";
+
+
+	bool shouldDisplayVictory;
+	float timeDisplayingVictoryMessageSeconds;
 
 	// Use this for initialization
 	void Start () {
@@ -18,12 +22,16 @@ public class HUD : MonoBehaviour {
 	void OnGUI() {
 		GUI.skin.button.fontSize = (int)(Screen.height * 0.04f);
 
-		if (GUI.Button (new Rect (15, 15, Screen.width * 0.20f, Screen.height * 0.05f), MENU)) {
+		if (GUI.Button (menuButtonRect, MENU)) {
 			Application.LoadLevel("menu");
 		}
 
-		GUI.TextArea(new Rect (15, Screen.height * 0.05f + 15, Screen.width * 0.20f, Screen.height * 0.05f), "Collected: " + collected);
+		string statusText  = "Collected: " + collected;
+		if (shouldDisplayVictory) {
+			statusText = "VICTORY!";
+		}
 
+		GUI.TextArea(statusTextRect, statusText);
 	}
 
 
@@ -31,6 +39,14 @@ public class HUD : MonoBehaviour {
 	void Update () {
 		if (Input.GetKeyDown(KeyCode.Escape)) { 
 			Application.LoadLevel("menu");
+		}
+
+		if (shouldDisplayVictory) {
+			timeDisplayingVictoryMessageSeconds += Time.deltaTime;
+			
+			if (timeDisplayingVictoryMessageSeconds > VICTORY_MESSAGE_DELAY_SECONDS) {
+				goToNextLevel();
+			}
 		}
 	}
 
@@ -45,14 +61,16 @@ public class HUD : MonoBehaviour {
 	}
 
 	void OnVictory() {
-		displayVictory = true;
+		shouldDisplayVictory = true;
 
 	}
 
 	void goToNextLevel ()
 	{
 		if (Application.loadedLevelName == "level1") {
-
+			Application.LoadLevel("level2");
+		} else {
+			Application.LoadLevel("menu");
 		}
 	}
 }
