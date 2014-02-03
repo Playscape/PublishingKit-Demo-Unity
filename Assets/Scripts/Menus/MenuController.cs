@@ -28,7 +28,7 @@ public class MenuController : MonoBehaviour {
 		float marginTop = 80;
 
 		if(GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, marginTop, buttonWidth, buttonHeight), PLAY)) {
-			Application.LoadLevel(1);
+			Application.LoadLevel("level1");
 		}
 
 		if(GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight + marginTop * 1.2f, buttonWidth, buttonHeight), PLAY_A_RANDOM_GAME)) {
@@ -36,7 +36,7 @@ public class MenuController : MonoBehaviour {
 		}
 
 		if(GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 2 + marginTop * 1.4f, buttonWidth, buttonHeight), PLAY_WITH_FRIENDS)) {
-			Application.LoadLevel(1);
+			Application.LoadLevel("invite_screen");
 		}
 		
 		if(GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop * 1.6f, buttonWidth, buttonHeight), QUIT)) {

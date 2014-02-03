@@ -26,12 +26,14 @@ public class HUD : MonoBehaviour {
 			Application.LoadLevel("menu");
 		}
 
-		string statusText  = "Collected: " + collected;
-		if (shouldDisplayVictory) {
-			statusText = "VICTORY!";
+		// Only levels displaying status
+		if (Application.loadedLevelName.StartsWith("level")) {
+			string statusText  = "Collected: " + collected;
+			if (shouldDisplayVictory) {
+				statusText = "VICTORY!";
+			}
+			GUI.TextArea(statusTextRect, statusText);
 		}
-
-		GUI.TextArea(statusTextRect, statusText);
 	}
 
 
@@ -57,12 +59,10 @@ public class HUD : MonoBehaviour {
 	/// <param name="amount">Amount.</param>
 	void OnCollected(string amount) {
 		collected = amount.ToString();
-		
 	}
 
 	void OnVictory() {
 		shouldDisplayVictory = true;
-
 	}
 
 	void goToNextLevel ()
