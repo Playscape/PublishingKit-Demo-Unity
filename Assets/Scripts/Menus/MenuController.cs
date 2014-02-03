@@ -32,7 +32,7 @@ public class MenuController : MonoBehaviour {
 		}
 
 		if(GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight + marginTop * 1.2f, buttonWidth, buttonHeight), PLAY_A_RANDOM_GAME)) {
-			Application.LoadLevel(1);
+			Application.LoadLevel("lobby");
 		}
 
 		if(GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 2 + marginTop * 1.4f, buttonWidth, buttonHeight), PLAY_WITH_FRIENDS)) {

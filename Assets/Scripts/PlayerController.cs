@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour {
 	public float speed;
 	
 	public GameObject MyHUD;
+	public bool isLocal = false;
 
 	private const string PICKUP_TAG = "PickUp";
 	private int collected = 0;
@@ -16,6 +17,11 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
+		if (isLocal == false)
+		{
+			return;
+		}
+
 		float moveHortizontal = Input.GetAxis ("Horizontal");
 		float moveVertical = Input.GetAxis ("Vertical");
 
@@ -34,10 +40,10 @@ public class PlayerController : MonoBehaviour {
 		if (other.gameObject.tag == "PickUp") {
 			other.gameObject.SetActive(false);
 			collected ++;
-			MyHUD.SendMessage("OnCollected", collected.ToString());
+			// MyHUD.SendMessage("OnCollected", collected.ToString());
 
 			if (collected == total) {
-				MyHUD.SendMessage("OnVictory");
+				// MyHUD.SendMessage("OnVictory");
 			}
 		}
 	}
