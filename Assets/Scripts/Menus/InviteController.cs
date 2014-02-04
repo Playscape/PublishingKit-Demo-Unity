@@ -10,11 +10,9 @@ public class InviteController : MonoBehaviour {
 	private readonly Rect PlayerRect = new Rect(0, 0, Screen.width - 50, 128);
 	private Vector2 mScrollPosition = Vector2.zero;
 	private const string FRIENDS_GRAPH_QUERY = "me?fields=id,friends.limit(5000).fields(first_name,last_name,picture.type(square).width(120).height(120),devices,scores.limit(5000).fields(score,application),installed),scores.limit(5000).fields(score,application),first_name,last_name,picture.type(square),installed,devices";
-
 	private Dictionary<string, Texture>  mFriendIdToFriendImage = new Dictionary<string, Texture>();
 
-	
-	class FacebookFriend {
+	private class FacebookFriend {
 		public string Name { get; private set;}
 		public string FacebookId { get; private set; }
 
@@ -30,8 +28,8 @@ public class InviteController : MonoBehaviour {
 		if (sInstance == this && sInstance != null) {
 			Destroy(gameObject);
 		}
-
 		DontDestroyOnLoad(gameObject);
+
 		sInstance = this;
 		enabled = false;
 		FB.Init(SetInit, OnHideUnity);
@@ -52,16 +50,21 @@ public class InviteController : MonoBehaviour {
 		}
 	}
 
+	#region FB.Init Callbacks
 	void SetInit ()
 	{
 		enabled = true;
 		if (FB.IsLoggedIn) {
 			OnLoggedIn();
+			Debug.Log("w00t facebook logged in!");
+		} else {
+			Debug.Log("w00t facebook logged NOT in!");
 		}
 	}
 
 	void OnHideUnity(bool isGameShown) {
 	}
+	#endregion
 
 	void OnGUI() {
 		if (!FB.IsLoggedIn) {
@@ -78,22 +81,25 @@ public class InviteController : MonoBehaviour {
 		float marginTop = 15;
 		for (int i = 0; i < mFriends.Count; ++i) {
 			Rect groupRect = PlayerRect;
-			Rect textAreaRect = PlayerRect;
+			Rect buttonRect = PlayerRect;
 
-			textAreaRect.width = Screen.width * 0.75f;
+			buttonRect.width = Screen.width * 0.75f;
 
 			groupRect.y = i * groupRect.height + i * marginTop;
 			GUI.BeginGroup(groupRect);
-				GUI.TextField(textAreaRect, "Invite: " + mFriends[i].Name);
+				
+				if (GUI.Button(buttonRect, "Invite: " + mFriends[i].Name)) {
+					inviteFriend(mFriends[i]);
+				}
 
 			GUI.EndGroup();
 			
 			Texture friendImage = null;
 			if (mFriendIdToFriendImage.TryGetValue(mFriends[i].FacebookId, out friendImage)) {
-				Rect textureRect = textAreaRect;
+				Rect textureRect = buttonRect;
 				textureRect.width = 128;
 				textureRect.height = 128;
-				textureRect.x =  textAreaRect.width;
+				textureRect.x =  buttonRect.width;
 				textureRect.y = groupRect.y;
 				GUI.DrawTexture(textureRect, friendImage);
 			}
@@ -101,19 +107,12 @@ public class InviteController : MonoBehaviour {
 		GUI.EndScrollView();
 	}
 
-	private void facebookLogin() {
-		FB.Login("user_friends", delegate(FBResult result) {
-			Debug.Log (result.Error);
-			OnLoggedIn();
-		});
-	}
-
 	void OnLoggedIn ()
 	{
 		retrieveFriends();
 	}
 
-	void retrieveFriends ()
+	private void retrieveFriends ()
 	{
 		if (mFriends.Count == 0) {
 			FB.API(FRIENDS_GRAPH_QUERY, Facebook.HttpMethod.GET, delegate(FBResult result) {
@@ -145,8 +144,21 @@ public class InviteController : MonoBehaviour {
 				}
 		};
 	}
-	
 
+	private void inviteFriend (FacebookFriend facebookFriend)
+	{
+		FB.AppRequest("Let's play Roll A Ball multiplayer", new string[] {facebookFriend.FacebookId}, "", null, null, "", "Invite", 
+			delegate(FBResult result) {
+			Debug.Log ("Invite finished");
+		});
+	}	
+
+	private void facebookLogin() {
+		FB.Login("", delegate(FBResult result) {
+			Debug.Log (result.Error);
+			OnLoggedIn();
+		});
+	}
 		
 	#region Facebook Utils
 	private void DeserializeJSONFriends(string response)
@@ -196,14 +208,5 @@ public class InviteController : MonoBehaviour {
 	}
 
 	#endregion
-	
-	// Use this for initialization
-	void Start () {
 
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }
