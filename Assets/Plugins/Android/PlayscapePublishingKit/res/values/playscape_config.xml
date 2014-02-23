@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="playscape_remote_logger_url">%{REMOTE_LOGGER_URL}</string>
+    <string name="playscape_remote_logger_campaign_id">campaign_id</string>
+    <string name="playscape_remote_logger_dump_size_threshold_bytes">2048</string>
+    <string name="playscape_remote_logger_file_size_limit_bytes">2097152</string>
+    <string name="playscape_remote_logger_entry_size_limit_bytes">2048</string>
+    <string name="playscape_remote_logger_force_dump_now">false</string>
+    <string name="playscape_publishing_kit_version">Kit Trunk</string>
+    <string name="playscape_debug_mode">true</string>
+    <string name="playscape_reporter_id">reporterNotSet</string>
+    <string name="playscape_is_alive_service_reschedule_delay_seconds">86400</string>
+</resources>

@@ -4,12 +4,27 @@ using System.Collections;
 public class HUD : MonoBehaviour {
 
 	private readonly Rect menuButtonRect = new Rect (15, 15, Screen.width * 0.20f, Screen.height * 0.05f);
-	private readonly Rect statusTextRect = new  Rect (15, Screen.height * 0.05f + 15, Screen.width * 0.20f, Screen.height * 0.05f);
+	private readonly Rect statusTextRect = new  Rect (15, Screen.height * 0.05f + 15, Screen.width /2, Screen.height * 0.05f);
+
+	string mWinnerName;
 
 	private const int VICTORY_MESSAGE_DELAY_SECONDS = 3;
 	private const string MENU = "MENU";
-	private string collected = "0";
 
+	int mHisAmount = -1;
+	int mMyAmount;
+
+	private static HUD mInstance;
+	public static HUD Instance { get {
+			if (mInstance == null) {
+				var go = GameObject.Find("HUD");
+				if (go != null) {
+					mInstance = go.GetComponent<HUD>();
+				}
+			}
+			return mInstance;
+		}
+	}
 
 	bool shouldDisplayVictory;
 	float timeDisplayingVictoryMessageSeconds;
@@ -17,6 +32,10 @@ public class HUD : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	
+	}
+
+	void Destroy() {
+		mInstance = null;
 	}
 
 	void OnGUI() {
@@ -28,9 +47,16 @@ public class HUD : MonoBehaviour {
 
 		// Only levels displaying status
 		if (Application.loadedLevelName.StartsWith("level")) {
-			string statusText  = "Collected: " + collected;
+			string statusText  = "You Collected: " + mMyAmount;
+			if (mHisAmount != -1) {
+				statusText += " your opponent collected: " + mHisAmount; 
+			}
 			if (shouldDisplayVictory) {
-				statusText = "VICTORY!";
+				if (mWinnerName != null) {
+					statusText = mWinnerName + " Wins!";
+				} else {
+					statusText = "You Win!";
+				}
 			}
 			GUI.TextArea(statusTextRect, statusText);
 		}
@@ -47,30 +73,24 @@ public class HUD : MonoBehaviour {
 			timeDisplayingVictoryMessageSeconds += Time.deltaTime;
 			
 			if (timeDisplayingVictoryMessageSeconds > VICTORY_MESSAGE_DELAY_SECONDS) {
-				goToNextLevel();
+				GameController.Instnace.GoToNextLevel();
 			}
 		}
 	}
 
 
+	public void OnCollected(int myAmount, int hisAmount = -1) {
+		mMyAmount = myAmount;
+		mHisAmount = hisAmount;
+	}
+
 	/// <summary>
-	/// Raises the collected event.
+	/// Victory the specified winnerName.
 	/// </summary>
-	/// <param name="amount">Amount.</param>
-	void OnCollected(string amount) {
-		collected = amount.ToString();
-	}
-
-	void OnVictory() {
-		shouldDisplayVictory = true;
-	}
-
-	void goToNextLevel ()
+	/// <param name="winnerName">Winner name, if left out it means you are the winner.</param>
+	public void Victory (string winnerName = null)
 	{
-		if (Application.loadedLevelName == "level1") {
-			Application.LoadLevel("level2");
-		} else {
-			Application.LoadLevel("menu");
-		}
+		mWinnerName = winnerName;
+		shouldDisplayVictory = true;
 	}
 }

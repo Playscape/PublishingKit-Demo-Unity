@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Playscape.Analytics;
+using System.Collections.Generic;
 
 public class LobbyMenuController : MonoBehaviour {
+	private const int PLAYERS_COUNT = 2;
+	private static int mMyPlayerId = MPUtils.GeneratePlayerId();
 
 	abstract class IConnectionStateMachine
 	{
@@ -15,19 +19,66 @@ public class LobbyMenuController : MonoBehaviour {
 
 	class ConnectToPhoton: IConnectionStateMachine
 	{
+		private string mRoomName;
+
 		public override string Message
 		{
 			get { return "Connecting..."; }
 		}
 
-		public ConnectToPhoton()
+		public ConnectToPhoton (string roomName)
 		{
+			mRoomName = roomName;
 			PhotonNetwork.ConnectUsingSettings("1.0");
+			Report.Instance.ReportMPServerConnect(PhotonNetwork.ServerAddress);
+		}
+
+		public ConnectToPhoton() : this(null)
+		{
+
 		}
 
 		public override IConnectionStateMachine Connected()
 		{
-			return new TryJoiningExistingRoom();
+			if (mRoomName != null) {
+				if (GameState.IsHost) {
+					return new TryCreatingRoom(mRoomName);
+				} else {
+					return new TryJoiningExistingRoom(mRoomName);
+				}
+			} else {
+				return new TryJoiningExistingRoom();
+			}
+		}
+	}
+
+	static class MPUtils {
+		private static System.Random mRandom = new System.Random();
+		public static long GenerateNetSessionId() {
+			return System.Math.Abs(mRandom.Next() | (mRandom.Next() << 31));
+		}
+
+		public static int GeneratePlayerId() {
+			return mRandom.Next();
+		}
+
+		public static string CreateRoomName(string roomName, bool isPrivate) {
+			return string.Format("room_{0}_{1}", roomName, isPrivate ? "private" : "public");
+		}
+
+		/// <summary>
+		/// Determines if the given room name is a private room.
+		/// </summary>
+		/// <returns><c>true</c> if the room is a private room; otherwise, <c>false</c>.</returns>
+		/// <param name="roomName">Room name.</param>
+		public static bool IsPrivateRoom(string roomName) {
+			return roomName != null && roomName.EndsWith("private");
+		}
+
+		public static string CurrentRoomName {
+			get {
+				return PhotonNetwork.room != null ? PhotonNetwork.room.name : "null";
+			}
 		}
 	}
 
@@ -38,8 +89,16 @@ public class LobbyMenuController : MonoBehaviour {
 			get { return "Looking for existing rooms..."; }
 		}
 
+		public TryJoiningExistingRoom (string roomName)
+		{
+			Report.Instance.ReportMPJoinedPrivateGame(roomName, mMyPlayerId);
+			PhotonNetwork.JoinRoom(roomName);
+		}
+
 		public TryJoiningExistingRoom()
 		{
+
+			Report.Instance.ReportMPJoinedPublicGame("randomGame", mMyPlayerId);
 			PhotonNetwork.JoinRandomRoom();
 		}
 
@@ -57,16 +116,36 @@ public class LobbyMenuController : MonoBehaviour {
 
 	class TryCreatingRoom: IConnectionStateMachine
 	{
+		private const string SESSION_ID = "sessionId";
 		public override string Message
 		{
 			get { return "Creating new room..."; }
 		}
-		
+
+		private ExitGames.Client.Photon.Hashtable CreateCustomProperties() {
+			ExitGames.Client.Photon.Hashtable customProperties = new ExitGames.Client.Photon.Hashtable();
+			customProperties[SESSION_ID] = MPUtils.GenerateNetSessionId();
+			return customProperties;
+		}
+
+		/// <summary>
+		/// Creates a private game room
+		/// </summary>
+		/// <param name="roomName">Room name.</param>
+		public TryCreatingRoom(string roomName) {
+			Report.Instance.ReportMPCreatePrivateGame(roomName, PLAYERS_COUNT);
+
+			PhotonNetwork.CreateRoom(roomName, false, true, PLAYERS_COUNT, CreateCustomProperties(), new string[]{ SESSION_ID });
+		}
+
 		public TryCreatingRoom()
 		{
-			string roomName = string.Format("GameRoom_{0}", (int) (Random.value * 100000));
+			string roomName = MPUtils.CreateRoomName((Random.value * 100000).ToString(), true);
 
-			PhotonNetwork.CreateRoom(roomName, true, true, 2);
+			Report.Instance.ReportMPCreatePublicGame(PLAYERS_COUNT, new Dictionary<string, string>());
+
+			PhotonNetwork.CreateRoom(roomName, true, true, PLAYERS_COUNT,  CreateCustomProperties(), new string[]{ SESSION_ID });
+
 		}
 
 		public override IConnectionStateMachine RoomJoined()
@@ -118,15 +197,66 @@ public class LobbyMenuController : MonoBehaviour {
 
 	private IConnectionStateMachine currentState;
 
+	class MultiplayerAnalyticsProvider : MPAnalyticsProvider {
+		public long CurrentNetworkTime { get { return -1 /*network time is unused in this game.*/;} }
+	}
+
 	void Awake()
 	{
-		if (PhotonNetwork.insideLobby)
-		{
-			currentState = new TryJoiningExistingRoom();
+		Report.Instance.InitMultiplayer(new MultiplayerAnalyticsProvider());
+
+
+		if (GameState.CurrentGameType == GameState.GameType.MultiplayerPrivateGame) {
+			StartPrivateMultiplayerGame ();
+		} else if (GameState.CurrentGameType == GameState.GameType.MultiplayerPublicGame) {
+			StartPublicMultiplayerGame ();
+		} else {
+			throw new System.ArgumentException("Invalid game type: " + GameState.CurrentGameType);
 		}
-		else
-		{
-			currentState = new ConnectToPhoton();
+	}
+
+	void StartPrivateMultiplayerGame ()
+	{
+		if (SocialController.Instance.OpponentFacebookUser == null) {
+			Debug.LogError ("Opponent is null!!!!");
+		}
+		if (SocialController.Instance.MyFacebookUser == null) {
+			Debug.LogError ("FacebookId is null!!!!");
+		}
+		string roomName = "Invalid";
+		if (GameState.IsHost) {
+			roomName = MPUtils.CreateRoomName (SocialController.Instance.MyFacebookUser.FacebookId, true);
+		}
+		else {
+			roomName = MPUtils.CreateRoomName (SocialController.Instance.OpponentFacebookUser.FacebookId, true);
+		}
+		Debug.Log ("Initiating private game");
+		if (PhotonNetwork.insideLobby) {
+			if (GameState.IsHost) {
+				Debug.Log ("Private-Game: Starting as host");
+				currentState = new TryCreatingRoom (roomName);
+			}
+			else {
+				Debug.Log ("Private-Game: Starting as client");
+				currentState = new TryJoiningExistingRoom (roomName);
+			}
+		}
+		else {
+			Debug.Log ("Private-Game: Connecting to photon");
+			currentState = new ConnectToPhoton (roomName);
+		}
+	}
+
+	void StartPublicMultiplayerGame ()
+	{
+		Debug.Log ("Initiating public game");
+		if (PhotonNetwork.insideLobby) {
+			Debug.Log ("Public-Game: Attempting to join room");
+			currentState = new TryJoiningExistingRoom ();
+		}
+		else {
+			Debug.Log ("Public-Game: Connecting to photon");
+			currentState = new ConnectToPhoton ();
 		}
 	}
 
@@ -153,20 +283,34 @@ public class LobbyMenuController : MonoBehaviour {
 	{
 		Debug.Log("OnConnectedToPhoton");
 		currentState = currentState.Connected();
+		Report.Instance.ReportMPServerConnectSuccess(PhotonNetwork.ServerAddress, System.TimeSpan.FromMilliseconds(100)/*Dummy ping should be replaced with real ping*/);
 	}
 	
 	public void OnCreatedRoom()
 	{
+		GameState.IsHost = PhotonNetwork.isMasterClient;
 		Debug.Log("OnCreatedRoom");
 		currentState = currentState.RoomJoined();
+
 	}
 	
 	public void OnJoinedRoom()
 	{
+		GameState.IsHost = PhotonNetwork.isMasterClient;
 		Debug.Log("OnJoinedRoom");
 		currentState = currentState.RoomJoined();
+		if (GameState.CurrentGameType == GameState.GameType.MultiplayerPrivateGame) {
+			Report.Instance.ReportMPJoinedPrivateGame(MPUtils.CurrentRoomName, mMyPlayerId);
+		} else {
+			Report.Instance.ReportMPJoinPublicGame(MPUtils.CurrentRoomName, mMyPlayerId, new Dictionary<string, string>());
+		}
 	}
-	
+
+	public void OnPlayerDisconnected() {
+		Debug.Log("OnPhotonPlayerDisconnected");
+		GameState.IsHost = PhotonNetwork.isMasterClient;
+	}
+
 	public void OnPhotonPlayerConnected()
 	{
 		Debug.Log("OnPhotonPlayerConnected");
@@ -177,12 +321,14 @@ public class LobbyMenuController : MonoBehaviour {
 	{
 		Debug.Log("OnLeftRoom");
 		currentState = currentState.Failed();
+		Report.Instance.ReportMPLeaveGame(MPUtils.CurrentRoomName);
 	}
 	
 	public void OnPhotonCreateRoomFailed()
 	{
 		Debug.Log("OnPhotonCreateRoomFailed");
 		currentState = currentState.Failed();
+
 	}
 	
 	public void OnPhotonRandomJoinFailed()
@@ -195,11 +341,13 @@ public class LobbyMenuController : MonoBehaviour {
 	{
 		Debug.Log("OnDisconnectedFromPhoton");
 		currentState = currentState.Failed();
+		Report.Instance.ReportMPServerDisconnect();
 	}
 	
 	public void OnFailedToConnectToPhoton()
 	{
 		Debug.Log("OnFailedToConnectToPhoton");
 		currentState = currentState.Failed();
+		Report.Instance.ReportMPServerError("OnFailedToConnectToPhoton");
 	}
 }

@@ -3,24 +3,43 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour {
 	public float speed;
-	
-	public GameObject MyHUD;
-	public bool isLocal = false;
+	private string mPlayerName = null;
+	private bool mIsMe = true;
 
-	private const string PICKUP_TAG = "PickUp";
-	private int collected = 0;
-	private int total = 0;
-
+	GameController.PlayerDescriptor mPlayerDescriptor;
 
 	void Start() {
-		total = GameObject.FindGameObjectsWithTag(PICKUP_TAG).Length;
+
+		if (GameState.CurrentGameType != GameState.GameType.SinglePlayer) {
+			MultiplayerStart();
+		}
+
+		mPlayerDescriptor = GameController.Instnace.RegisterPlayer(mPlayerName, mIsMe);
 	}
 
-	void FixedUpdate() {
-		if (isLocal == false)
-		{
-			return;
+	void MultiplayerStart ()
+	{
+		if (!PhotonView.Get (this).owner.isMasterClient) {
+			var material = Resources.Load<Material>("PlayerTwoMaterial");
+			gameObject.renderer.material = material;
+
+
 		}
+
+		if (!PhotonView.Get (this).owner.isLocal) {
+			mIsMe = false;
+
+			if (GameState.CurrentGameType == GameState.GameType.MultiplayerPrivateGame) {
+				mPlayerName = SocialController.Instance.OpponentFacebookUser.Name;
+			} else {
+				mPlayerName = "Nemesis";
+			}
+		}
+
+	}
+
+
+	void FixedUpdate() {
 
 		float moveHortizontal = Input.GetAxis ("Horizontal");
 		float moveVertical = Input.GetAxis ("Vertical");
@@ -37,15 +56,12 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider other) {
+
 		if (other.gameObject.tag == "PickUp") {
 			other.gameObject.SetActive(false);
-			collected ++;
-			// MyHUD.SendMessage("OnCollected", collected.ToString());
-
-			if (collected == total) {
-				// MyHUD.SendMessage("OnVictory");
-			}
+			mPlayerDescriptor.Score ++;
 		}
 	}
+
 
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Text;
 
 public class MenuController : MonoBehaviour {
 
@@ -9,9 +10,26 @@ public class MenuController : MonoBehaviour {
 	const string PLAY_WITH_FRIENDS = "PLAY GAME WITH FRIENDS";
 	const string QUIT = "QUIT";
 
+	bool mSocialRequestReceived;
+
 	// Use this for initialization
 	void Start () {
-	
+		SocialController.Instance.OnSocialRequestReceived += HandleOnSocialRequestReceived;
+
+
+	}
+
+	void Destroy() {
+		StopCoroutine( "ChangeLoadChar" );
+		SocialController.Instance.OnSocialRequestReceived -= HandleOnSocialRequestReceived;
+	}
+
+	void HandleOnSocialRequestReceived ()
+	{
+		if (SocialController.Instance.IsLoggedIn) {
+			mSocialRequestReceived = true;
+			StartCoroutine( ChangeLoadChar());
+		}
 	}
 
 	void OnGUI () {
@@ -27,28 +45,57 @@ public class MenuController : MonoBehaviour {
 		float buttonHeight = boxHeight / 6;
 		float marginTop = 80;
 
-		if(GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, marginTop, buttonWidth, buttonHeight), PLAY)) {
-			Application.LoadLevel("level1");
-		}
 
-		if(GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight + marginTop * 1.2f, buttonWidth, buttonHeight), PLAY_A_RANDOM_GAME)) {
-			Application.LoadLevel("lobby");
+		if (!mSocialRequestReceived) {
+			DrawMenu (buttonWidth, buttonHeight, marginTop);
+		} else {
+			DrawStartingGameWithFriendsBox();
 		}
+	}
 
-		if(GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 2 + marginTop * 1.4f, buttonWidth, buttonHeight), PLAY_WITH_FRIENDS)) {
-			Application.LoadLevel("invite_screen");
-		}
-		
-		if(GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop * 1.6f, buttonWidth, buttonHeight), QUIT)) {
-			Application.Quit();
-		}
 
+	void DrawStartingGameWithFriendsBox ()
+	{
+
+
+		GUI.Box(new Rect(0, Screen.height/2 - Screen.height/8, Screen.width, Screen.height/4), "Starting Game " + loadChars[currLoadChar]);
+	}
+
+	static void DrawMenu (float buttonWidth, float buttonHeight, float marginTop)
+	{
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, marginTop, buttonWidth, buttonHeight), PLAY)) {
+			GameState.CurrentGameType = GameState.GameType.SinglePlayer;
+			Application.LoadLevel ("level1");
+		}
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight + marginTop * 1.2f, buttonWidth, buttonHeight), PLAY_A_RANDOM_GAME)) {
+			GameState.IsHost = true;
+			GameState.CurrentGameType = GameState.GameType.MultiplayerPublicGame;
+			Application.LoadLevel ("lobby");
+		}
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 2 + marginTop * 1.4f, buttonWidth, buttonHeight), PLAY_WITH_FRIENDS)) {
+			GameState.IsHost = false;
+			GameState.CurrentGameType = GameState.GameType.MultiplayerPrivateGame;
+			Application.LoadLevel ("invite_screen");
+		}
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop * 1.6f, buttonWidth, buttonHeight), QUIT)) {
+			Application.Quit ();
+		}
 	}
 
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown(KeyCode.Escape)) { 
 			Application.Quit(); 
+		}
+
+	}
+
+	char[] loadChars = {'/', '-', '\\'};
+	int currLoadChar = 0;
+	private IEnumerator ChangeLoadChar() {
+		for (;;) {
+			currLoadChar = (currLoadChar + 1 ) %  (loadChars.Length);
+			yield return new WaitForSeconds(.2f);
 		}
 	}
 }
