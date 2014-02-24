@@ -18,12 +18,21 @@ public class StoreController : MonoBehaviour {
 
 	#endregion
 
+	/// <summary>
+	/// Analytics flow type for the store
+	/// </summary>
 	const string STORE_FLOW_TYPE = "Store";
+
+	#region Store Analytics Flow Steps
+
 	const string OPEN_STORE_FLOW_STEP = "OpenStore";
 	const string SELECT_CATEGORY_FLOW_STEP = "SelectCategory";
 	const string SELECT_ITEM_FLOW_STEP = "SelectItem";
 	const string PURCHASED_FLOW_STEP = "Purchased";
-	const string CANCELED_FLOW_STEP = "Canceled";
+	const string CANCELLED_FLOW_STEP = "Cancelled";
+	const string CLOSED_STORE_FLOW_STEP = "ClosedStore";
+
+	#endregion
 
 	
 	const double PREMIUM_CURRENCY = 1000;
@@ -76,10 +85,11 @@ public class StoreController : MonoBehaviour {
 		stepNameToId [SELECT_CATEGORY_FLOW_STEP] = 2;
 		stepNameToId [SELECT_ITEM_FLOW_STEP] = 3;
 		stepNameToId [PURCHASED_FLOW_STEP] = 4;
-		stepNameToId [CANCELED_FLOW_STEP] = 5;
+		stepNameToId [CANCELLED_FLOW_STEP] = 5;
+		stepNameToId[CLOSED_STORE_FLOW_STEP] = 6;
+
 		Report.Instance.RegisterFlow(STORE_FLOW_TYPE, stepNameToId);
 		mStoreFlow = Report.Instance.StartNewFlow(STORE_FLOW_TYPE);
-
 	}
 
 	static IDictionary<string, double> MakeFlowDetails(double premiumCurrency, double trashCurrency, double category, double itemId) {
@@ -89,6 +99,7 @@ public class StoreController : MonoBehaviour {
 		details["TrashCurrency"] = trashCurrency;
 		details["Category"] = category;
 		details["ItemID"] = itemId;
+		details["Source"] = 42;
 
 		return details;
 	}
@@ -130,11 +141,15 @@ public class StoreController : MonoBehaviour {
 				bool confirm = GUI.Button(new Rect(Screen.width/2 - buttonWidth/2, Screen.height/4, buttonWidth, buttonHeight), "Confirm"); 
 				if (confirm) {
 					if (mShouldPurchaseFail) {
+						Report.Instance.ReportFlowStep(mStoreFlow, CLOSED_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
+
 						Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
 						Report.Instance.ReportPurchaseFailed(mCurrentItemPurchasing, "User Canceled");
+
 						CurrentState = State.Failed;
 					} else {
 						Report.Instance.ReportFlowStep(mStoreFlow, PURCHASED_FLOW_STEP, "ok", mDummyFlowDetails);
+						Report.Instance.ReportFlowStep(mStoreFlow, CLOSED_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
 
 						Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
 						Report.Instance.ReportPurchaseSuccess(mCurrentItemPurchasing, mCurrentItemPrice, "USD", Utils.CurrentTimeMillis, "fake-tranaction-id");
@@ -148,10 +163,13 @@ public class StoreController : MonoBehaviour {
 	            // Cancel
 				bool cancel = GUI.Button(new Rect(Screen.width/2 - buttonWidth/2,10+ Screen.height/4 + buttonHeight, buttonWidth, buttonHeight), "Cancel"); 
 				if (cancel) {
-					Report.Instance.ReportFlowStep(mStoreFlow, CANCELED_FLOW_STEP, "ok", mDummyFlowDetails);
+					Report.Instance.ReportFlowStep(mStoreFlow, CANCELLED_FLOW_STEP, "ok", mDummyFlowDetails);
+					Report.Instance.ReportFlowStep(mStoreFlow, CLOSED_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
 
 					Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
 					Report.Instance.ReportPurchaseCancelled(mCurrentItemPurchasing);
+
+
 
 					CurrentState = State.None;
 				}

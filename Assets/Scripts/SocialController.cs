@@ -79,6 +79,7 @@ public class SocialController : MonoBehaviour {
 		// Singleton object
 		if (mInitialized) {
 			Destroy(gameObject);
+			return;
 		}
 		mInitialized = true;
 		DontDestroyOnLoad(gameObject);

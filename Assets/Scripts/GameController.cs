@@ -131,6 +131,8 @@ public class GameController : MonoBehaviour {
 			Application.LoadLevel("menu");
 		}
 
+		Report.Instance.ReportLevelCompleted(Application.loadedLevelName, null);
+
 		#if UNITY_IPHONE || UNITY_ANDROID
 		CBBinding.showInterstitial(null);
 		#endif

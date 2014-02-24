@@ -9,7 +9,7 @@ namespace Playscape.Internal
 
 	public class PlayscapeUtilities
 	{
-
+		private static IDictionary<string, double> EMPTY_DICT = new Dictionary<string, double>();
 		private static System.Random sRandom = new System.Random();
 
 		public static string GenerateRandomId()
@@ -22,6 +22,7 @@ namespace Playscape.Internal
 		public static string FormatGameplayRelatedAdditionalParams(
 			IDictionary<string, double> additionalParams)
 		{
+			additionalParams = additionalParams ?? EMPTY_DICT;
 			StringBuilder formattedText = new StringBuilder();
 			
 			foreach (var item in additionalParams)
