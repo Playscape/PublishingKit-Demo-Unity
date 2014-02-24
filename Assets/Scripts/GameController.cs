@@ -65,6 +65,10 @@ public class GameController : MonoBehaviour {
 	void Update() {
 		CheckVictoryConditions();
 		UpdateHud();
+
+		if (Input.GetKeyDown(KeyCode.Escape)) { 
+			PhotonNetwork.Disconnect();
+		}
 	}
 
 	public class PlayerDescriptor {
@@ -126,8 +130,10 @@ public class GameController : MonoBehaviour {
 		} else {
 			Application.LoadLevel("menu");
 		}
-		
+
+		#if UNITY_IPHONE || UNITY_ANDROID
 		CBBinding.showInterstitial(null);
+		#endif
 	}
 
 	void UpdateHud ()

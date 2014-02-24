@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Playscape.Analytics;
 
 public class PlayerController : MonoBehaviour {
 	public float speed;
@@ -41,17 +42,19 @@ public class PlayerController : MonoBehaviour {
 
 	void FixedUpdate() {
 
-		float moveHortizontal = Input.GetAxis ("Horizontal");
-		float moveVertical = Input.GetAxis ("Vertical");
+		if (mIsMe) {
+			float moveHortizontal = Input.GetAxis ("Horizontal");
+			float moveVertical = Input.GetAxis ("Vertical");
 
-		if (Application.platform == RuntimePlatform.Android ||  Application.platform == RuntimePlatform.IPhonePlayer) {
-			moveHortizontal = Input.acceleration.x;
-			moveVertical = Input.acceleration.y + 0.5f;
-		} 
+			if (Application.platform == RuntimePlatform.Android ||  Application.platform == RuntimePlatform.IPhonePlayer) {
+				moveHortizontal = Input.acceleration.x;
+				moveVertical = Input.acceleration.y + 0.5f;
+			} 
 
-		if (rigidbody != null) {
-			Vector3 movement = new Vector3 (moveHortizontal, 0.0f, moveVertical);
-			rigidbody.AddForce (movement * speed * Time.deltaTime);
+			if (rigidbody != null) {
+				Vector3 movement = new Vector3 (moveHortizontal, 0.0f, moveVertical);
+				rigidbody.AddForce (movement * speed * Time.deltaTime);
+			}
 		}
 	}
 
@@ -60,6 +63,8 @@ public class PlayerController : MonoBehaviour {
 		if (other.gameObject.tag == "PickUp") {
 			other.gameObject.SetActive(false);
 			mPlayerDescriptor.Score ++;
+
+			Report.Instance.ReportEvent(string.Format("Collected/PlayerName:{0}/IsMe:{1}/Score:{2}", mPlayerDescriptor.Name ?? "Me", mPlayerDescriptor.IsMe, mPlayerDescriptor.Score));
 		}
 	}
 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class LobbyMenuController : MonoBehaviour {
 	private const int PLAYERS_COUNT = 2;
 	private static int mMyPlayerId = MPUtils.GeneratePlayerId();
+	private const string SESSION_ID = "sessionId";
 
 	abstract class IConnectionStateMachine
 	{
@@ -91,13 +92,11 @@ public class LobbyMenuController : MonoBehaviour {
 
 		public TryJoiningExistingRoom (string roomName)
 		{
-			Report.Instance.ReportMPJoinedPrivateGame(MPUtils.GenerateNetSessionId(), roomName, mMyPlayerId);
 			PhotonNetwork.JoinRoom(roomName);
 		}
 
 		public TryJoiningExistingRoom()
 		{
-			Report.Instance.ReportMPJoinedPublicGame(MPUtils.GenerateNetSessionId(), "randomGame", mMyPlayerId);
 			PhotonNetwork.JoinRandomRoom();
 		}
 
@@ -115,7 +114,6 @@ public class LobbyMenuController : MonoBehaviour {
 
 	class TryCreatingRoom: IConnectionStateMachine
 	{
-		private const string SESSION_ID = "sessionId";
 		public override string Message
 		{
 			get { return "Creating new room..."; }
@@ -132,18 +130,21 @@ public class LobbyMenuController : MonoBehaviour {
 		/// </summary>
 		/// <param name="roomName">Room name.</param>
 		public TryCreatingRoom(string roomName) {
-			Report.Instance.ReportMPCreatePrivateGame(MPUtils.GenerateNetSessionId(), roomName, PLAYERS_COUNT);
+			var customProperties = CreateCustomProperties();
 
-			PhotonNetwork.CreateRoom(roomName, false, true, PLAYERS_COUNT, CreateCustomProperties(), new string[]{ SESSION_ID });
+			Report.Instance.ReportMPCreatePrivateGame(customProperties[SESSION_ID].ToString(), roomName, PLAYERS_COUNT);
+
+			PhotonNetwork.CreateRoom(roomName, false, true, PLAYERS_COUNT, customProperties, new string[]{ SESSION_ID });
 		}
 
 		public TryCreatingRoom()
 		{
+			var customProeprties = CreateCustomProperties();
 			string roomName = MPUtils.CreateRoomName((Random.value * 100000).ToString(), true);
 
-			Report.Instance.ReportMPCreatePublicGame(MPUtils.GenerateNetSessionId(), PLAYERS_COUNT, new Dictionary<string, string>());
+			Report.Instance.ReportMPCreatePublicGame(customProeprties[SESSION_ID].ToString(), PLAYERS_COUNT, new Dictionary<string, string>());
 
-			PhotonNetwork.CreateRoom(roomName, true, true, PLAYERS_COUNT,  CreateCustomProperties(), new string[]{ SESSION_ID });
+			PhotonNetwork.CreateRoom(roomName, true, true, PLAYERS_COUNT,  customProeprties, new string[]{ SESSION_ID });
 
 		}
 
@@ -197,7 +198,7 @@ public class LobbyMenuController : MonoBehaviour {
 	private IConnectionStateMachine currentState;
 
 	class MultiplayerAnalyticsProvider : MPAnalyticsProvider {
-		public long CurrentNetworkTime { get { return -1 /*network time is unused in this game.*/;} }
+		public int CurrentNetworkTime { get { return -1 /*network time is unused in this game.*/;} }
 	}
 
 	void Awake()
@@ -271,7 +272,7 @@ public class LobbyMenuController : MonoBehaviour {
 
 	void OnGUI()
 	{
-		GUILayout.BeginArea(new Rect(Screen.width / 2 - 250, 80, 500, 50));
+		GUILayout.BeginArea(new Rect(0, 80, Screen.width, 100));
 		GUILayout.Box(currentState.Message);
 		GUILayout.EndArea();
 	}
@@ -297,11 +298,15 @@ public class LobbyMenuController : MonoBehaviour {
 	{
 		GameState.IsHost = PhotonNetwork.isMasterClient;
 		Debug.Log("OnJoinedRoom");
+
 		currentState = currentState.RoomJoined();
+
+		var sessionId = PhotonNetwork.room.customProperties[SESSION_ID].ToString();
+
 		if (GameState.CurrentGameType == GameState.GameType.MultiplayerPrivateGame) {
-			Report.Instance.ReportMPJoinedPrivateGame(MPUtils.GenerateNetSessionId(), MPUtils.CurrentRoomName, mMyPlayerId);
+			Report.Instance.ReportMPJoinedPrivateGame(sessionId, MPUtils.CurrentRoomName, mMyPlayerId);
 		} else {
-			Report.Instance.ReportMPJoinPublicGame(MPUtils.CurrentRoomName, mMyPlayerId, new Dictionary<string, string>());
+			Report.Instance.ReportMPJoinPublicGame(sessionId, MPUtils.CurrentRoomName, mMyPlayerId, new Dictionary<string, string>());
 		}
 	}
 

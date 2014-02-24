@@ -67,6 +67,7 @@ namespace Playscape.Internal {
 		/// </summary>
 		/// <param name="sessionId">Session identifier.</param>
 		public static void SetGameSessionId(string sessionId) {
+			L.D("GMSID updated: {0}", sessionId);
 	#if !UNITY_EDITOR
 	#if UNITY_ANDROID
 			initializeAndroidRemoteLogger();
@@ -83,6 +84,7 @@ namespace Playscape.Internal {
 		/// </summary>
 		/// <param name="sessionId">Session identifier.</param>
 		public static void SetNetSessionId(string sessionId) {
+			L.D("NETSID updated: {0}", sessionId);
 	#if !UNITY_EDITOR
 	#if UNITY_ANDROID
 			initializeAndroidRemoteLogger();
@@ -99,6 +101,7 @@ namespace Playscape.Internal {
 		/// </summary>
 		/// <param name="varsJsonInStringified">Variables json in stringified.</param>
 		public static void SetGameAuxVars(string varsJsonInStringified) {
+			L.D("GMAUX updated: {0}", varsJsonInStringified);
 	#if !UNITY_EDITOR
 	#if UNITY_ANDROID
 			initializeAndroidRemoteLogger();
@@ -114,6 +117,7 @@ namespace Playscape.Internal {
 		/// </summary>
 		/// <param name="networkTime">Network time.</param>
 		public static void SetNetworkTime(int networkTime) {
+			L.D("NETTIME updated: {0}", networkTime);
 	#if !UNITY_EDITOR
 	#if UNITY_ANDROID
 			initializeAndroidRemoteLogger();
@@ -130,6 +134,7 @@ namespace Playscape.Internal {
 		/// </summary>
 		/// <param name="levelSessionId">Variables json in stringified.</param>
 		public static void SetLevelSessionId(string levelSessionId) {
+			L.D("LVSID updated: {0}", levelSessionId);
 	    #if !UNITY_EDITOR
 	    #if UNITY_ANDROID
 	            initializeAndroidRemoteLogger();

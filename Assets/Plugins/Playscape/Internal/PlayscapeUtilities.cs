@@ -39,6 +39,25 @@ namespace Playscape.Internal
 		{
 			return value ? "true" : "false";
 		}
+
+		/// <summary>
+		/// Returns a string suitable for the "conn" analytic field.
+		/// </summary>
+		/// <returns>"wifi", "mobile" or "offline"</returns>
+		public static string GetConnectivityAnalyticsReport()
+		{
+			switch (Application.internetReachability)
+			{
+			case NetworkReachability.NotReachable:
+				return "offline";
+			case NetworkReachability.ReachableViaCarrierDataNetwork:
+				return "mobile";
+			case NetworkReachability.ReachableViaLocalAreaNetwork:
+				return "wifi";
+			default:
+				return "uknown";
+			}
+		}
 	}
 
 }

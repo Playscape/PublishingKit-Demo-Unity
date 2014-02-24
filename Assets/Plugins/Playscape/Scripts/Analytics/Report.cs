@@ -41,7 +41,7 @@ namespace Playscape.Analytics
         /// <value>
         /// The current network time.
         /// </value>
-        long CurrentNetworkTime { get; }
+        int CurrentNetworkTime { get; }
 	}
 
     /// <summary>
@@ -394,7 +394,9 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialLoadFailed(string location) {
-            RemoteLogger.ReportAnalytics("ad:Interstitial/event:RequestFailed/sdk:Chartboost/id:{0}/conn:[?]", location);
+			RemoteLogger.ReportAnalytics("ad:Interstitial/event:RequestFailed/sdk:Chartboost/id:{0}/conn:{1}",
+			                             location,
+			                             PlayscapeUtilities.GetConnectivityAnalyticsReport());
 		}
 
         /// <summary>
@@ -404,7 +406,9 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialDismissed(string location) {
-            RemoteLogger.ReportAnalytics("ad:Interstitial/event:Dismissed/sdk:Chartboost/id:{0}/conn:[?]", location);
+			RemoteLogger.ReportAnalytics("ad:Interstitial/event:Dismissed/sdk:Chartboost/id:{0}/conn:{1}",
+			                             location,
+			                             PlayscapeUtilities.GetConnectivityAnalyticsReport());
 		}
 
         /// <summary>
@@ -414,17 +418,21 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialClicked(string location) {
-            RemoteLogger.ReportAnalytics("ad:Interstitial/event:Clicked/sdk:Chartboost/id:{0}/conn:[?]", location);
+			RemoteLogger.ReportAnalytics("ad:Interstitial/event:Clicked/sdk:Chartboost/id:{0}/conn:{1}",
+			                             location,
+			                             PlayscapeUtilities.GetConnectivityAnalyticsReport());
 		}
 
         /// <summary>
-        /// Report when interstitital has been shown
+        /// Re	port when interstitital has been shown
         /// </summary>
         /// <param name="location">
         /// The location.
         /// </param>
         public void ReportInterstitialShown(string location) {
-            RemoteLogger.ReportAnalytics("ad:Interstitial/event:Impression/impression_type:Unknown/sdk:Chartboost/id:{0}/conn:[?]", location);
+			RemoteLogger.ReportAnalytics("ad:Interstitial/event:Impression/impression_type:Unknown/sdk:Chartboost/id:{0}/conn:{1}",
+			                             location,
+			                             PlayscapeUtilities.GetConnectivityAnalyticsReport());
 		}
 		#endregion
 		
@@ -1134,6 +1142,9 @@ namespace Playscape.Analytics
         /// Note: gameName must be unique in the world, but the same for all
         /// players in the same room
 		/// </summary>
+		/// <param name="sessionId">
+		/// Session identifier for create room.
+		/// </param>
         /// <param name="gameName">
         /// The game Name.
         /// </param>
@@ -1144,10 +1155,11 @@ namespace Playscape.Analytics
         /// The game Parameters.
         /// </param>
 		public void ReportMPJoinPublicGame(
+			string sessionId,
             string gameName,
 			int maxPlayers,
 			IDictionary<string, string> gameParameters) {
-
+			RemoteLogger.SetNetSessionId(sessionId);
 			RemoteLogger.ReportAnalytics ("Networking/StartRandomGame/MaxPlayers:{0}/CustomProperties:{1}",
 			                              maxPlayers,
 			                              GetCustomProperties(gameParameters));

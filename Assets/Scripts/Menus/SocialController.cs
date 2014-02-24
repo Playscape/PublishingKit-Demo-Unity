@@ -387,7 +387,9 @@ public class SocialController : MonoBehaviour {
 				Debug.LogError (result.Error);
 
 			} else {
-				actionToPerformAfterLogin();
+				if (actionToPerformAfterLogin != null) {
+					actionToPerformAfterLogin();
+				}
 				Report.Instance.ReportSocialLoginSuccess(false, FB.UserId);
 			}
 
