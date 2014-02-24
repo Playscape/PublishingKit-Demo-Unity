@@ -5,6 +5,7 @@ using Playscape.Analytics;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Playscape;
 
 public class StoreController : MonoBehaviour {
 
@@ -136,7 +137,7 @@ public class StoreController : MonoBehaviour {
 						Report.Instance.ReportFlowStep(mStoreFlow, PURCHASED_FLOW_STEP, "ok", mDummyFlowDetails);
 
 						Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
-						Report.Instance.ReportPurchaseSuccess(mCurrentItemPurchasing, mCurrentItemPrice, "USD", CurrentTimeMillis(), "fake-tranaction-id");
+						Report.Instance.ReportPurchaseSuccess(mCurrentItemPurchasing, mCurrentItemPrice, "USD", Utils.CurrentTimeMillis, "fake-tranaction-id");
 
 
 						CurrentState = State.None;
@@ -167,26 +168,4 @@ public class StoreController : MonoBehaviour {
 
 		}
 	}
-
-	#region Utils
-	
-	private static readonly DateTime Jan1st1970 = new DateTime
-		(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-	
-	public static long CurrentTimeMillis()
-	{
-		// iOS's DateTime subtraction is b0n3d so we used this workaround instead...
-		#if !UNITY_IPHONE
-		return (long) (DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
-		#else
-		return PlayscapeUtils_currentTimeMillis();
-		#endif
-	}
-
-	#if UNITY_IPHONE
-	[DllImport("__Internal")]
-	private static extern long PlayscapeUtils_currentTimeMillis();
-	#endif
-
-	#endregion
 }

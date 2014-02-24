@@ -37,7 +37,7 @@ public class StoreItemController : MonoBehaviour {
 
 		// Buy Button
 		var screenPoint = mCurrentCamera.WorldToScreenPoint(gameObject.transform.position);
-		var gameObjectSize = mCurrentCamera.WorldToScreenPoint(gameObject.transform.localScale);
+
 		Rect buyButtonRect = new Rect(screenPoint.x - 65, screenPoint.y + 10, 130, 50);
 		bool buyClicked = false;
 		if (!ShouldFail) {

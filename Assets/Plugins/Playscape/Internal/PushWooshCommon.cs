@@ -75,7 +75,7 @@ namespace Playscape.Internal {
 				}
 			}
 
-			var lastNotificationReceived = (int)(CurrentTimeMillis () / 1000 / 60 / 60);
+			var lastNotificationReceived = (int)(Utils.CurrentTimeMillis / 1000 / 60 / 60);
 			SetTag(PUSHWOOSH_LAST_NOTIFICATION_ID_TAG, numericNotificationId);
 			SetTag(PUSHWOOSH_LAST_NOTIFICATION_RECEIVED_TAG, lastNotificationReceived);
 
@@ -132,18 +132,6 @@ namespace Playscape.Internal {
 			return ((Math.Abs(guid.GetHashCode()))%100) + 1;
 		}
 		
-		private static readonly DateTime Jan1st1970 = new DateTime
-			(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-		
-		public static long CurrentTimeMillis()
-		{
-			// iOS's DateTime subtraction is b0n3d so we used this workaround instead...
-			#if !UNITY_IPHONE
-			return (long) (DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
-			#else
-			return PlayscapeUtils_currentTimeMillis();
-			#endif
-		}
 
 		public void SetTag(string name, string value)
 		{
@@ -166,9 +154,6 @@ namespace Playscape.Internal {
 		protected abstract void SetTagImpl(string name, string value);
 		protected abstract void SetTagImpl(string name, int value); 
 
-		#if UNITY_IPHONE
-		[DllImport("__Internal")]
-		private static extern long PlayscapeUtils_currentTimeMillis();
-		#endif
+
 	}
 }
