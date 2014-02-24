@@ -32,6 +32,9 @@ namespace Playscape
 			if (Debug.isDebugBuild) {
 				L.CurrentLogLevel = L.LogLevel.Debug;
 			}
+			#if UNITY_EDITOR
+			L.CurrentLogLevel = L.LogLevel.Debug;
+			#endif
 
 			if (mInitialized)
 			{

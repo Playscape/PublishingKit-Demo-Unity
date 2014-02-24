@@ -14,7 +14,7 @@ namespace Playscape.Editor {
 
 	class AndroidPostProcessor : IPostProcessor {
 
-		private const string PLAYSCAPE_CONFIG_XML_PATH = CommonConsts.ANDROID_PATH + "/res/values/playscape_config.xml";
+		private const string PLAYSCAPE_CONFIG_XML_PATH = CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/res/values/playscape_config.xml";
 		private const string PUSH_WOOSH_GCM_SENDER_TOKEN = "%{GCM_SENDER_ID}";
 		private const string PUSH_WOOSH_APP_ID_TOKEN = "%{PUSH_WOOSH_APP_ID}";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH = "/libs/android-support-v4.jar";
@@ -22,9 +22,11 @@ namespace Playscape.Editor {
 
 		private readonly string mPathToMainProjcetSources;
 		private readonly string mTargetPath;
+		private readonly string mPathToPublishingKitLibSources;
 
 		public AndroidPostProcessor(string targetPath) {
 			mPathToMainProjcetSources = targetPath + "/" + PlayerSettings.productName;
+			mPathToPublishingKitLibSources = targetPath + "/PlayscapePublishingKit";
 			mTargetPath = targetPath;
 		}
 
@@ -104,7 +106,7 @@ namespace Playscape.Editor {
 			
 			var writerSettings = new XmlWriterSettings();
 			writerSettings.Indent = true;
-			using (var writer = XmlWriter.Create(mPathToMainProjcetSources + "/res/values/" + configBaseName, writerSettings)) {
+			using (var writer = XmlWriter.Create(mPathToPublishingKitLibSources + "/res/values/" + configBaseName, writerSettings)) {
 				configDoc.Save(writer);
 			}
 		}
