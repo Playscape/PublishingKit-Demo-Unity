@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Chartboost;
+using Playscape.Analytics;
 
 public class GameController : MonoBehaviour {
 
@@ -31,6 +32,9 @@ public class GameController : MonoBehaviour {
 	// Use this for initialization
 	void Start()
 	{
+		Report.Instance.ReportLevelStarted(Application.loadedLevelName, new Dictionary<string, double>());
+
+
 		mTotalCollectibles = GameObject.FindGameObjectsWithTag(PICKUP_TAG).Length;
 
 		GameObject player = null;

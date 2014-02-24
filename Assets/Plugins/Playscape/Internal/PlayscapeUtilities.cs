@@ -35,6 +35,10 @@ namespace Playscape.Internal
 			return formattedText.ToString();
 		}
 
+		public static string JsonBool(bool value)
+		{
+			return value ? "true" : "false";
+		}
 	}
 
 }

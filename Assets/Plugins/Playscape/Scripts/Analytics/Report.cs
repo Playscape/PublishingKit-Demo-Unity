@@ -290,12 +290,10 @@ namespace Playscape.Analytics
 		public void ReportActivation(string referrer) {
 
 			RemoteLogger.ReportAnalytics ("activation/SD=1/{0}", referrer);
-			// TODO-nissan-Ask about SD
 		}
 		
 		/// <summary>
 		/// Analytics bible section: 5.09
-		/// TODO- implement broadcast receiver - see mominis.common.analytics.MarketReferrerReceiver in platform
 		/// </summary>
 		/// <param name="referrer">
 		/// The referrer.
@@ -389,7 +387,6 @@ namespace Playscape.Analytics
 		#endregion
 		
 		#region Interstitials (Analytics bible section: 5.30)
-        //TODO-max - connection 
         /// <summary>
         /// Report when interstitial load has failed.
         /// </summary>
@@ -397,7 +394,7 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialLoadFailed(string location) {
-            RemoteLogger.ReportAnalytics("ad:Interstitial/event:RequestFailed/impression_type:House/sdk:Chartboost/id:{0}/conn:[?]", location);
+            RemoteLogger.ReportAnalytics("ad:Interstitial/event:RequestFailed/sdk:Chartboost/id:{0}/conn:[?]", location);
 		}
 
         /// <summary>
@@ -407,7 +404,7 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialDismissed(string location) {
-            RemoteLogger.ReportAnalytics("ad:Interstitial/event:Dismissed/impression_type:House/sdk:Chartboost/id:{0}/conn:[?]", location);
+            RemoteLogger.ReportAnalytics("ad:Interstitial/event:Dismissed/sdk:Chartboost/id:{0}/conn:[?]", location);
 		}
 
         /// <summary>
@@ -417,7 +414,7 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialClicked(string location) {
-            RemoteLogger.ReportAnalytics("ad:Interstitial/event:Clicked/impression_type:House/sdk:Chartboost/id:{0}/conn:[?]", location);
+            RemoteLogger.ReportAnalytics("ad:Interstitial/event:Clicked/sdk:Chartboost/id:{0}/conn:[?]", location);
 		}
 
         /// <summary>
@@ -427,7 +424,7 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialShown(string location) {
-            RemoteLogger.ReportAnalytics("ad:Interstitial/event:ImpressionShown/impression_type:House/sdk:Chartboost/id:{0}/conn:[?]", location);
+            RemoteLogger.ReportAnalytics("ad:Interstitial/event:Impression/impression_type:Unknown/sdk:Chartboost/id:{0}/conn:[?]", location);
 		}
 		#endregion
 		
@@ -675,8 +672,8 @@ namespace Playscape.Analytics
                 long currencyTimestamp,
                 string transactionId)
         {
-            RemoteLogger.ReportAnalytics("{0}/BuyProductResult/Success/currency={1}/amount={2}/currencyTimestamp={3}", 
-                item.Name, currency, amount, currencyTimestamp);
+            RemoteLogger.ReportAnalytics("{0}/BuyProductResult/Success/currency={1}/amount={2:0.00}/currencyTimestamp={3}/orderId={4}", 
+                item.Name, currency, amount, currencyTimestamp, transactionId);
         }
         /// <summary>
         /// Should be called by purchase plugin
@@ -746,14 +743,13 @@ namespace Playscape.Analytics
             
             mIsLoggedIn = true;
 			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/Login/success/silent={1}/User={2}",
+				RemoteLogger.ReportAnalytics ("{0}/Login/success/silent={1}/User:{2}",
 				                          mSocialAnalyticsProvider.CurrentNetwork,
-			                              isSilentLogin,
+			                              PlayscapeUtilities.JsonBool(isSilentLogin),
 			                              whichUserLoggedIn);
 			}
 		}
 
-        // TODO - maybe we should kill isSilentLogin argument - always pass false
         /// <summary>
         /// Reports failure in login
         /// </summary>
@@ -764,7 +760,7 @@ namespace Playscape.Analytics
 			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
 				RemoteLogger.ReportAnalytics ("{0}/Login/failed/silent={1}",
 				                             mSocialAnalyticsProvider.CurrentNetwork,
-				                             isSilentLogin);
+				                             PlayscapeUtilities.JsonBool(isSilentLogin));
 			}
 		}
 
@@ -778,7 +774,7 @@ namespace Playscape.Analytics
 			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
 				RemoteLogger.ReportAnalytics ("{0}/Login/canceled/silent={1}",
 				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              isSilentLogin);
+				                              PlayscapeUtilities.JsonBool(isSilentLogin));
 			}
 		}
 
@@ -1064,15 +1060,15 @@ namespace Playscape.Analytics
 		/// The failure Reason.
 		/// </param>
 		public void ReportMPServerConnectFailed(string failureReason) {
-			// TODO-max convert failureReason to enum
+			RemoteLogger.SetNetSessionId(null);
 			RemoteLogger.ReportAnalytics ("Networking/ConnectToOptimalServer/Failure/{0}", failureReason);
 		}
 		
 		/// <summary>
 		/// Bible section 10.34
-		/// TODO-nissan- should add connect state?
 		/// </summary>
 		public void ReportMPServerDisconnect() {
+			RemoteLogger.SetNetSessionId(null);
 			RemoteLogger.ReportAnalytics ("Networking/ConnectToOptimalServer/ConnectionStateChanged/Disconnected");
 		}
 		/// <summary>
@@ -1082,6 +1078,7 @@ namespace Playscape.Analytics
 		/// The error Reason.
 		/// </param>
 		public void ReportMPServerError(string errorReason) {
+			RemoteLogger.SetNetSessionId(null);
 			RemoteLogger.ReportAnalytics ("Networking/ConnectToOptimalServer/Failure/ErrorCode:{0}", errorReason);
 		}
 		#endregion
@@ -1109,6 +1106,10 @@ namespace Playscape.Analytics
 		/// Bible section 10.11 with parameters
 		/// 
 		/// </summary>
+		/// <param name="sessionID">
+		/// The session ID, must be the same value for all players playing together.
+		/// Must be globally unique (i.e. it should never be reused by any future game session).
+		/// </param>
 		/// <param name="maxPlayers">
 		/// The max Players.
 		/// </param>
@@ -1116,9 +1117,12 @@ namespace Playscape.Analytics
 		/// The game Parameters.
 		/// </param>
         public void ReportMPCreatePublicGame(
+			string sessionId,
             int maxPlayers,
             IDictionary<string, string> gameParameters)
         {
+			RemoteLogger.SetNetSessionId(sessionId);
+
             RemoteLogger.ReportAnalytics("Networking/StartRandomGame/CreateRoom/MaxPlayers:{0}/CustomProperties:{1}",
                                           maxPlayers,
                                           GetCustomProperties(gameParameters));
@@ -1129,7 +1133,7 @@ namespace Playscape.Analytics
         /// 
         /// Note: gameName must be unique in the world, but the same for all
         /// players in the same room
-        /// </summary>
+		/// </summary>
         /// <param name="gameName">
         /// The game Name.
         /// </param>
@@ -1140,9 +1144,10 @@ namespace Playscape.Analytics
         /// The game Parameters.
         /// </param>
 		public void ReportMPJoinPublicGame(
-            string gameName, // TODO - gameName doesn't appear in the bible, waiting for anwser from Duv
+            string gameName,
 			int maxPlayers,
 			IDictionary<string, string> gameParameters) {
+
 			RemoteLogger.ReportAnalytics ("Networking/StartRandomGame/MaxPlayers:{0}/CustomProperties:{1}",
 			                              maxPlayers,
 			                              GetCustomProperties(gameParameters));
@@ -1154,6 +1159,7 @@ namespace Playscape.Analytics
 		/// <returns>string in the format of {key:value,..}</returns>
 		/// <param name="parameters">Room Parameters.</param>
 		private string GetCustomProperties (IDictionary<string, string> parameters){
+			parameters = parameters ?? new Dictionary<string, string>();
 
 			StringBuilder temp = new StringBuilder("{");
 			string sep = "";
@@ -1163,7 +1169,7 @@ namespace Playscape.Analytics
 				temp.Append (entry.Key);
 				temp.Append (":");
 				temp.Append (entry.Value);
-				sep = ", ";
+				sep = ",";
 			}
 			temp.Append ("}");
 			return temp.ToString ();
@@ -1172,12 +1178,12 @@ namespace Playscape.Analytics
 		/// <summary>
 		/// Networking/StartRandomGame/Failure/[reason]
 		/// 
-		/// TODO-max doesn't appear in bible
 		/// </summary>
 		/// <param name="failureReason">
 		/// The failure Reason.
 		/// </param>
 		public void ReportMPJoinPublicGameFailure(string failureReason) {
+            RemoteLogger.SetNetSessionId(null);
 			RemoteLogger.ReportAnalytics ("Networking/StartRandomGame/Failure/{0}", failureReason);
 		}
         /// <summary>
@@ -1185,15 +1191,19 @@ namespace Playscape.Analytics
         /// 
         /// Note: gameName must be unique in the world, but the same for all
         /// players in the same room
-        /// </summary>
+		/// </summary>
+		/// <param name="sessionID">
+		/// The session ID, must be the same value for all players playing together.
+		/// Must be globally unique (i.e. it should never be reused by any future game session).
+		/// </param>
         /// <param name="gameName">
         /// The game Name.
         /// </param>
         /// <param name="playerId">
         /// The player Id.
         /// </param>
-		public void ReportMPJoinedPublicGame(string gameName, int playerId) {
-            // TODO- in every JoinedRoom set net session id
+		public void ReportMPJoinedPublicGame(string sessionId, string gameName, int playerId) {
+			RemoteLogger.SetNetSessionId(sessionId);
 			RemoteLogger.ReportAnalytics ("Networking/StartRandomGame/JoinedRoom/RoomName:{0}/PlayerId:{1}",
 			                              gameName,
 			                              playerId);
@@ -1204,13 +1214,18 @@ namespace Playscape.Analytics
 		/// <summary>
 		/// Bible section 10.19
 		/// </summary>
+		/// <param name="sessionID">
+		/// The session ID, must be the same value for all players playing together.
+		/// Must be globally unique (i.e. it should never be reused by any future game session).
+		/// </param>
 		/// <param name="gameName">
 		/// The game Name.
 		/// </param>
 		/// <param name="maxPlayers">
 		/// The max Players.
 		/// </param>
-		public void ReportMPCreatePrivateGame(string gameName, int maxPlayers) {
+		public void ReportMPCreatePrivateGame(string sessionId, string gameName, int maxPlayers) {
+			RemoteLogger.SetNetSessionId(sessionId);
 			RemoteLogger.ReportAnalytics ("Networking/StartGameWithFriends/CreateRoom/RoomName:{0}/MaxPlayers:{1}",
 			                              gameName,
 			                              maxPlayers);
@@ -1222,9 +1237,13 @@ namespace Playscape.Analytics
 		/// <param name="gameName">
 		/// The game Name.
 		/// </param>
-		public void ReportMPJoinPrivateGame(string gameName) {
-            RemoteLogger.ReportAnalytics("Networking/StartGameWithFriends/RoomName{0}",
-                                            gameName);
+		/// <param name="friendIds">
+		/// List of friends invited to the private game.
+		/// </param>
+		public void ReportMPJoinPrivateGame(string gameName, List<string> friendIds) {
+			RemoteLogger.ReportAnalytics("Networking/StartGameWithFriends/RequestId:{0}/FriendIds:{1}",
+                                         gameName,
+			                             string.Join(",", friendIds.ToArray()));
 		}
 		
 		/// <summary>
@@ -1239,8 +1258,8 @@ namespace Playscape.Analytics
 		public void ReportMPJoinPrivateGameFailure(
 			string gameName,
 			string failureReason) {
-			RemoteLogger.ReportAnalytics ("Networking/StartGameWithFriends/JoinedRoom/Failure/RoomName:{0}/Reason:{1}",
-			                              gameName,
+			RemoteLogger.SetNetSessionId(null);
+            RemoteLogger.ReportAnalytics ("Networking/StartGameWithFriends/Failure/{0}",
 			                              failureReason);
 		}
 		
@@ -1250,10 +1269,15 @@ namespace Playscape.Analytics
 		/// <param name="gameName">
 		/// The game Name.
 		/// </param>
+		/// <param name="sessionID">
+		/// The session ID, must be the same value for all players playing together.
+		/// Must be globally unique (i.e. it should never be reused by any future game session).
+		/// </param>
 		/// <param name="playerId">
 		/// The player Id.
 		/// </param>
-		public void ReportMPJoinedPrivateGame(string gameName, int playerId) {
+		public void ReportMPJoinedPrivateGame(string sessionId, string gameName, int playerId) {
+			RemoteLogger.SetNetSessionId(sessionId);
 			RemoteLogger.ReportAnalytics ("Networking/StartGameWithFriends/JoinedRoom/RoomName:{0}/PlayerId:{1}",
 			                              gameName,
 			                              playerId);
@@ -1279,6 +1303,7 @@ namespace Playscape.Analytics
 		/// </param>
 		public void ReportMPLeaveGame(string gameName) {
 			RemoteLogger.ReportAnalytics ("Networking/LeaveRoom/RoomName:{0}", gameName);
+            RemoteLogger.SetNetSessionId(null);
 		}
 		#endregion
 
@@ -1299,6 +1324,8 @@ namespace Playscape.Analytics
         /// Registers a new flow and all its steps.
         /// 
         /// Doesn't report anything.
+		/// 
+		/// If the same flow type is registered again then then the previous one is replaced.
         /// </summary>
         /// <param name="type">
         /// The type.
@@ -1309,7 +1336,7 @@ namespace Playscape.Analytics
         public void RegisterFlow(
             string type,
             IDictionary<string, int> stepNameToId) {
-			mTypeToFlowInstance.Add(type, new DefaultFlowInstance(type, stepNameToId));
+			mTypeToFlowInstance[type] = new DefaultFlowInstance(type, stepNameToId);
 		}
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class HUD : MonoBehaviour {
 
@@ -29,6 +30,8 @@ public class HUD : MonoBehaviour {
 	bool shouldDisplayVictory;
 	float timeDisplayingVictoryMessageSeconds;
 
+	public event Action OnClickedMenu;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -42,6 +45,10 @@ public class HUD : MonoBehaviour {
 		GUI.skin.button.fontSize = (int)(Screen.height * 0.04f);
 
 		if (GUI.Button (menuButtonRect, MENU)) {
+			if (OnClickedMenu != null) {
+				OnClickedMenu();
+			}
+
 			Application.LoadLevel("menu");
 		}
 
@@ -77,7 +84,6 @@ public class HUD : MonoBehaviour {
 			}
 		}
 	}
-
 
 	public void OnCollected(int myAmount, int hisAmount = -1) {
 		mMyAmount = myAmount;

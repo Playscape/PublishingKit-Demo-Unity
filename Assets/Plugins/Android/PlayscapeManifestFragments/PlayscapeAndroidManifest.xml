@@ -39,9 +39,9 @@
       </receiver>
       
       <!-- Used for install referrer tracking -->
-      <receiver android:name="mominis.common.analytics.MarketReferrerReceiver" android:exported="true">
+      <receiver android:name="com.playscape.analytics.MarketReferrerReceiver" android:exported="true">
           <intent-filter>
-              <action android:name="com.playscape.analytics.MarketReferrerReceiver" />
+              <action android:name="com.android.vending.INSTALL_REFERRER" />
           </intent-filter>
       </receiver>
         

@@ -54,8 +54,8 @@ public class LobbyMenuController : MonoBehaviour {
 
 	static class MPUtils {
 		private static System.Random mRandom = new System.Random();
-		public static long GenerateNetSessionId() {
-			return System.Math.Abs(mRandom.Next() | (mRandom.Next() << 31));
+		public static string GenerateNetSessionId() {
+			return (System.Math.Abs(mRandom.Next() | (mRandom.Next() << 31))).ToString();
 		}
 
 		public static int GeneratePlayerId() {
@@ -91,14 +91,13 @@ public class LobbyMenuController : MonoBehaviour {
 
 		public TryJoiningExistingRoom (string roomName)
 		{
-			Report.Instance.ReportMPJoinedPrivateGame(roomName, mMyPlayerId);
+			Report.Instance.ReportMPJoinedPrivateGame(MPUtils.GenerateNetSessionId(), roomName, mMyPlayerId);
 			PhotonNetwork.JoinRoom(roomName);
 		}
 
 		public TryJoiningExistingRoom()
 		{
-
-			Report.Instance.ReportMPJoinedPublicGame("randomGame", mMyPlayerId);
+			Report.Instance.ReportMPJoinedPublicGame(MPUtils.GenerateNetSessionId(), "randomGame", mMyPlayerId);
 			PhotonNetwork.JoinRandomRoom();
 		}
 
@@ -133,7 +132,7 @@ public class LobbyMenuController : MonoBehaviour {
 		/// </summary>
 		/// <param name="roomName">Room name.</param>
 		public TryCreatingRoom(string roomName) {
-			Report.Instance.ReportMPCreatePrivateGame(roomName, PLAYERS_COUNT);
+			Report.Instance.ReportMPCreatePrivateGame(MPUtils.GenerateNetSessionId(), roomName, PLAYERS_COUNT);
 
 			PhotonNetwork.CreateRoom(roomName, false, true, PLAYERS_COUNT, CreateCustomProperties(), new string[]{ SESSION_ID });
 		}
@@ -142,7 +141,7 @@ public class LobbyMenuController : MonoBehaviour {
 		{
 			string roomName = MPUtils.CreateRoomName((Random.value * 100000).ToString(), true);
 
-			Report.Instance.ReportMPCreatePublicGame(PLAYERS_COUNT, new Dictionary<string, string>());
+			Report.Instance.ReportMPCreatePublicGame(MPUtils.GenerateNetSessionId(), PLAYERS_COUNT, new Dictionary<string, string>());
 
 			PhotonNetwork.CreateRoom(roomName, true, true, PLAYERS_COUNT,  CreateCustomProperties(), new string[]{ SESSION_ID });
 
@@ -300,7 +299,7 @@ public class LobbyMenuController : MonoBehaviour {
 		Debug.Log("OnJoinedRoom");
 		currentState = currentState.RoomJoined();
 		if (GameState.CurrentGameType == GameState.GameType.MultiplayerPrivateGame) {
-			Report.Instance.ReportMPJoinedPrivateGame(MPUtils.CurrentRoomName, mMyPlayerId);
+			Report.Instance.ReportMPJoinedPrivateGame(MPUtils.GenerateNetSessionId(), MPUtils.CurrentRoomName, mMyPlayerId);
 		} else {
 			Report.Instance.ReportMPJoinPublicGame(MPUtils.CurrentRoomName, mMyPlayerId, new Dictionary<string, string>());
 		}

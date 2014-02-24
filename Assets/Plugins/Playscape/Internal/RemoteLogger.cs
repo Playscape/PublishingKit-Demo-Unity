@@ -35,7 +35,7 @@ namespace Playscape.Internal {
 
 		public static void Log(LogLevel logLevel, string tag, string message) {
 
-			L.I(string.Format("[{0}] {1}: {2}", logLevel, tag, message));
+			L.I("[{0}] {1}: {2}", logLevel, tag, message);
 	
 
 	#if !UNITY_EDITOR
