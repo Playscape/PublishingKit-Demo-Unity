@@ -4,7 +4,7 @@ using UnityEngine;
 using Playscape.Internal;
 using System;
 
-namespace Playscape
+namespace Playscape.Internal
 {
     /// <summary>
     /// Initialization script for the Playscape Publishing Kit
@@ -47,7 +47,7 @@ namespace Playscape
 			RemoteLogger.Init();
 			GenerateGMSID();
 			AddPushWooshScripts();
-			ReportLaunch();
+			ReportLaunchOnIos();
 
 			// Makes this game object live forever
 			DontDestroyOnLoad(gameObject);
@@ -59,10 +59,29 @@ namespace Playscape
 		/// <summary>
 		/// Start this instance.
 		/// </summary>
-		void Start() {
+		public void Start() {
 			if (GameObject.Find(REAL_CHARTBOOST_MANAGER_GAME_OBJECT_NAME) == null) {
 				L.W(Warnings.CHARTBOOST_NOT_INITIALIZED);
 			}
+		}
+
+		/// <summary>
+		/// </summary>
+		public void OnApplicationPause(bool pauseStatus)
+		{
+			if (pauseStatus == false)
+			{
+				// On iOS, this means app gained focus
+				ReportLaunchOnIos();
+			}
+
+		}
+
+		/// <summary>
+		/// </summary>
+		public void OnApplicationQuit()
+		{
+			RemoteLogger.DumpNow();
 		}
 
 	    /// <summary>
@@ -95,21 +114,20 @@ namespace Playscape
 	    /// <summary>
 	    /// Reports game launch, relevant for iOS only.
 	    /// </summary>
-	    private void ReportLaunch()
+	    private void ReportLaunchOnIos()
 		{
 			#if UNITY_IPHONE
 			int launchCount = PlayerPrefs.GetInt("playscape_launch_count", 0);
 			launchCount++;
 
 			if (launchCount == 1) {
-				Report.Instance.ReportActivation("TODO TODO");
+				Report.Instance.ReportActivation("iOS");
 			}
 
 			Report.Instance.ReportLaunch(launchCount);
 			PlayerPrefs.SetInt("playscape_launch_count", launchCount);
 			PlayerPrefs.Save();
 			#endif
-
 		}
 
 	}
