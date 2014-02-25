@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Chartboost;
 
 public class MenuController : MonoBehaviour {
 
@@ -11,6 +12,7 @@ public class MenuController : MonoBehaviour {
 	const string STORE = "STORE";
 	const string QUIT = "QUIT";
 
+	const string SHOW_INTERSTITIAL = "SHOW CHARTBOOST INTERSTITIAL";
 
 	bool mSocialRequestReceived;
 
@@ -84,7 +86,14 @@ public class MenuController : MonoBehaviour {
 			Application.LoadLevel ("store");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop * 1.8f, buttonWidth, buttonHeight), QUIT)) {
+		
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop * 1.8f, buttonWidth, buttonHeight), SHOW_INTERSTITIAL)) {
+			#if (UNITY_IPHONE || UNITY_ANDROID) && !UNITY_EDITOR
+			CBBinding.showInterstitial(null);
+			#endif
+		}
+
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 2.0f, buttonWidth, buttonHeight), QUIT)) {
 			Application.Quit ();
 		}
 	}

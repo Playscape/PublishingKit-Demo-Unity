@@ -31,7 +31,15 @@ namespace Playscape.Internal {
 	        PlayscapeRemoteLogger_init();
 	#endif
 	#endif
+			Application.RegisterLogCallback(OnLog);
 	    }
+
+		static void OnLog (string condition, string stackTrace, LogType type)
+		{
+			if (type == LogType.Error || type == LogType.Exception || type == LogType.Assert) {
+				Log (LogLevel.Error, "Unity-Error", string.Format(mUsCulture, "Unity-OnLog: Type: {0}\nCondition:{1}\nstackTrace:\n{2}\n", type, condition, stackTrace));
+			}
+		}
 
 		public static void Log(LogLevel logLevel, string tag, string message) {
 

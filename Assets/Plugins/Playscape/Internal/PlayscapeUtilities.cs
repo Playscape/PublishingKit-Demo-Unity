@@ -50,13 +50,13 @@ namespace Playscape.Internal
 			switch (Application.internetReachability)
 			{
 			case NetworkReachability.NotReachable:
-				return "offline";
+				return "Offline";
 			case NetworkReachability.ReachableViaCarrierDataNetwork:
-				return "mobile";
+				return "Mobile";
 			case NetworkReachability.ReachableViaLocalAreaNetwork:
-				return "wifi";
+				return "Wifi";
 			default:
-				return "uknown";
+				return "Unknown";
 			}
 		}
 	}

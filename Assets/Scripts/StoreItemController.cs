@@ -23,7 +23,25 @@ public class StoreItemController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+
+		RaycastHit hit;
+
+		if (StoreController.Instance.CurrentState == StoreController.State.None) {
+
+			bool isMouseHit =  gameObject.collider.Raycast(mCurrentCamera.ScreenPointToRay(Input.mousePosition), out hit, 10f) && Input.GetMouseButtonUp(0);
+			bool isTouchHit =  Input.touchCount > 0 && 
+							   gameObject.collider.Raycast(mCurrentCamera.ScreenPointToRay(Input.GetTouch(0).position), out hit, 10f) && 
+							   Input.GetTouch(0).phase == TouchPhase.Ended;
+
+			if (isMouseHit || isTouchHit) {
+				onBuyClicked();
+			}
+		}
+	}
+
+
+	void onBuyClicked() {
+		StoreController.Instance.StartPurchase(ItemName, mPurchaseItem, Price, ShouldFail);
 	}
 
 	void OnGUI() {
@@ -33,7 +51,7 @@ public class StoreItemController : MonoBehaviour {
 
 		// Skin
 		GUI.skin.button.fontSize = 20;
-		GUI.skin.textArea.fontSize = 20;
+		GUI.skin.textField.fontSize = 20;
 
 		// Buy Button
 		var screenPoint = mCurrentCamera.WorldToScreenPoint(gameObject.transform.position);
@@ -47,16 +65,16 @@ public class StoreItemController : MonoBehaviour {
 		}
 
 		if (buyClicked) {
-			StoreController.Instance.StartPurchase(ItemName, mPurchaseItem, Price, ShouldFail);
+			onBuyClicked();
 		}
 
 		// Name
 		buyButtonRect.y += 50;
-		GUI.TextArea(buyButtonRect, ItemName);
+		GUI.TextField(buyButtonRect, ItemName);
 
 		// Price
 		buyButtonRect.y += 50;
-		GUI.TextArea(buyButtonRect, "$" + Price);
+		GUI.TextField(buyButtonRect, "$" + Price);
 
 
 	}

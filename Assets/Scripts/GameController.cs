@@ -133,7 +133,7 @@ public class GameController : MonoBehaviour {
 
 		Report.Instance.ReportLevelCompleted(Application.loadedLevelName, null);
 
-		#if UNITY_IPHONE || UNITY_ANDROID
+		#if (UNITY_IPHONE || UNITY_ANDROID) && !UNITY_EDITOR
 		CBBinding.showInterstitial(null);
 		#endif
 	}

@@ -48,6 +48,12 @@ public class StoreController : MonoBehaviour {
 
 	public State CurrentState { private set; get; }
 
+	/// <summary>
+	/// State in the next update.
+	/// </summary>
+	private State NextState = State.None;
+
+
 	static StoreController mInstance;
 
 	IDictionary<string, double> mDummyFlowDetails = MakeFlowDetails(PREMIUM_CURRENCY, TRASH_CURRENCY, CATEGORY, ITEM_ID);
@@ -115,7 +121,7 @@ public class StoreController : MonoBehaviour {
 		Report.Instance.ReportFlowStep(mStoreFlow, SELECT_ITEM_FLOW_STEP, "ok", mDummyFlowDetails);
 
 
-		CurrentState = State.PurchaseStarted;
+		NextState = State.PurchaseStarted;
 		mCurrentItemPurchasing = purchaseItem;
 		mCurrentItemName = name;
 		mShouldPurchaseFail = shouldFail;
@@ -124,8 +130,8 @@ public class StoreController : MonoBehaviour {
 
 	}
 
-
 	void OnGUI() {
+		CurrentState = NextState;
 		if (CurrentState != State.None) {
 			float boxWidth = Screen.width * 0.80f;
 			GUI.Box(new Rect(Screen.width/2 - boxWidth/2, 15, boxWidth, Screen.height * 0.8f), "Buy " + mCurrentItemName);
@@ -146,7 +152,7 @@ public class StoreController : MonoBehaviour {
 						Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
 						Report.Instance.ReportPurchaseFailed(mCurrentItemPurchasing, "User Canceled");
 
-						CurrentState = State.Failed;
+						NextState = State.Failed;
 					} else {
 						Report.Instance.ReportFlowStep(mStoreFlow, PURCHASED_FLOW_STEP, "ok", mDummyFlowDetails);
 						Report.Instance.ReportFlowStep(mStoreFlow, CLOSED_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
@@ -155,7 +161,7 @@ public class StoreController : MonoBehaviour {
 						Report.Instance.ReportPurchaseSuccess(mCurrentItemPurchasing, mCurrentItemPrice, "USD", Utils.CurrentTimeMillis, "fake-tranaction-id");
 
 
-						CurrentState = State.None;
+						NextState = State.None;
 					}
 
 				}
@@ -171,7 +177,7 @@ public class StoreController : MonoBehaviour {
 
 
 
-					CurrentState = State.None;
+					NextState = State.None;
 				}
 			} else if (CurrentState == State.Failed) {
 				// Failed
@@ -180,7 +186,7 @@ public class StoreController : MonoBehaviour {
 				// OK
 				bool ok = GUI.Button(new Rect(Screen.width/2 - buttonWidth/2,10+ Screen.height/4 + buttonHeight, buttonWidth, buttonHeight), "OK"); 
 				if (ok) {
-					CurrentState = State.None;
+					NextState = State.None;
 				}
 			}
 
