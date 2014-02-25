@@ -26,13 +26,18 @@ namespace Playscape.Internal {
 		
 		private const string PREF_PREFIX = "Playscape.PushWooshCommon";
 		private const string PREF_RANDOM_ID = PREF_PREFIX + "." + PUSHWOOSH_RANDOM_ID_TAG;
+		private const string PREF_LAST_NOTIFICATION_RECEIVED = PREF_PREFIX + "." + PUSHWOOSH_LAST_NOTIFICATION_RECEIVED_TAG;
+		private const string PREF_LAST_NOTIFICATION_ID = PREF_PREFIX + "." + PUSHWOOSH_LAST_NOTIFICATION_ID_TAG;
+
 		private const string TAG = "PushWooshCommon-Unity";
 
 
 		void onRegisteredForPushNotifications(string token)
 		{
 			int randomId = PlayerPrefs.GetInt(PREF_RANDOM_ID, 0);
-			
+			int lastNotificationReceived = PlayerPrefs.GetInt(PREF_LAST_NOTIFICATION_RECEIVED, 0);
+			int lastNotificationId = PlayerPrefs.GetInt(PREF_LAST_NOTIFICATION_ID, 0);
+
 			if (randomId == 0) {
 				randomId = generateRandomId();
 				PlayerPrefs.SetInt(PREF_RANDOM_ID, randomId);
@@ -41,8 +46,8 @@ namespace Playscape.Internal {
 			}
 			
 			SetTag(PUSHWOOSH_RANDOM_ID_TAG, randomId);
-			SetTag(PUSHWOOSH_LAST_NOTIFICATION_ID_TAG, 0);
-			SetTag(PUSHWOOSH_LAST_NOTIFICATION_RECEIVED_TAG, 0);
+			SetTag(PUSHWOOSH_LAST_NOTIFICATION_ID_TAG, lastNotificationId);
+			SetTag(PUSHWOOSH_LAST_NOTIFICATION_RECEIVED_TAG, lastNotificationReceived);
 
 			L.D ("GCM and PushWoosh registered successfully!");
 		}
@@ -59,6 +64,7 @@ namespace Playscape.Internal {
 			string action = "NotSet";
 			string notificationId = "0";
 			int numericNotificationId = 0;
+			int lastNotificationReceived = 0;
 
 			if (payload != null) {
 				var payloadParsed = parseJson(payload);
@@ -70,14 +76,20 @@ namespace Playscape.Internal {
 						promotedGame = getValueFromJson(customData, "promotedPackageName") ?? promotedGame;
 						action = getValueFromJson(customData, "action") ?? action;
 						notificationId = getValueFromJson(customData, "notificationId") ?? notificationId;
-						int.TryParse(notificationId, out numericNotificationId);
+						if (int.TryParse(notificationId, out numericNotificationId)) {
+							PlayerPrefs.SetInt(PREF_LAST_NOTIFICATION_ID, numericNotificationId);
+							lastNotificationReceived = (int)(Utils.CurrentTimeMillis / 1000 / 60 / 60);
+
+							PlayerPrefs.SetInt(PUSHWOOSH_LAST_NOTIFICATION_ID_TAG, numericNotificationId);
+							PlayerPrefs.SetInt(PUSHWOOSH_LAST_NOTIFICATION_RECEIVED_TAG, lastNotificationReceived);
+							PlayerPrefs.Save();
+
+							SetTag(PUSHWOOSH_LAST_NOTIFICATION_ID_TAG, numericNotificationId);
+							SetTag(PUSHWOOSH_LAST_NOTIFICATION_RECEIVED_TAG, lastNotificationReceived);
+						}
 					}
 				}
 			}
-
-			var lastNotificationReceived = (int)(Utils.CurrentTimeMillis / 1000 / 60 / 60);
-			SetTag(PUSHWOOSH_LAST_NOTIFICATION_ID_TAG, numericNotificationId);
-			SetTag(PUSHWOOSH_LAST_NOTIFICATION_RECEIVED_TAG, lastNotificationReceived);
 
 			#if UNITY_IPHONE
 			Report.Instance.ReportNotificationClicked(promotedGame, "default", action, notificationId);
