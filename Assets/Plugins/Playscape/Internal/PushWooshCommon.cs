@@ -60,7 +60,7 @@ namespace Playscape.Internal {
 		
 		void onPushNotificationsReceived(string payload)
 		{
-			string promotedGame = "NotSet";
+			string promotedGame = Configuration.Instance.ReporterId;
 			string action = "NotSet";
 			string notificationId = "0";
 			int numericNotificationId = 0;
