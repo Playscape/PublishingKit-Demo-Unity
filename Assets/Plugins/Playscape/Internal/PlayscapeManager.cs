@@ -25,6 +25,12 @@ namespace Playscape.Internal
 	    /// </summary>
 	    private static bool mInitialized;
 
+		/// <summary>
+		/// Gets the scene number this object created at.
+		/// </summary>
+		/// <value>The scene number created at.</value>
+		public int SceneNumberCreatedAt { get; private set; }
+
 	    /// <summary>
 	    /// </summary>
 	    public void Awake()
@@ -51,6 +57,8 @@ namespace Playscape.Internal
 
 			// Makes this game object live forever
 			DontDestroyOnLoad(gameObject);
+
+			SceneNumberCreatedAt = Application.loadedLevel;
 
 			L.D ("PlayscapeManager Initialized");
 			mInitialized = true;

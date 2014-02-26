@@ -55,7 +55,7 @@ namespace Playscape.Internal {
 		void onFailedToRegisteredForPushNotifications(string error)
 		{
 			RemoteLogger.Log(RemoteLogger.LogLevel.Error, TAG, "***PushWoosh Registration error occurred - PushWoosh initialization failed");
-			L.E(error);
+			L.E("{0}", error);
 		}
 		
 		void onPushNotificationsReceived(string payload)

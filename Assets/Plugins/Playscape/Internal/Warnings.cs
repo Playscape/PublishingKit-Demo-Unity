@@ -59,9 +59,6 @@ namespace Playscape.Internal {
 
 
 		#region iOS Warnings
-		public static readonly string CHARTBOOST_NOT_INITIALIZED = 
-			MakeWarning("Chartboost was not initialized, did you integrate Chartboost?", "WARN-C001");
-
 		public static readonly string PUSH_WOOSH_APP_ID_NOT_SET_IOS = MakeWarning(
 			"Pushwood iOS Id is not set",
 			"WARN-I001");
@@ -69,6 +66,17 @@ namespace Playscape.Internal {
 		public static readonly string CHARTBOOT_ID_NOT_SET_IOS = MakeWarning(
 			"Chartboost iOS Id is not set",
 			"WARN-I002");
+
+		#endregion
+
+		#region Common Warnings
+
+		public static readonly string CHARTBOOST_NOT_INITIALIZED = 
+			MakeWarning("Chartboost was not initialized, did you integrate Chartboost?", "WARN-C001");
+
+		public static readonly string PLAYSCAPE_MANAGER_NOT_IN_FIRST_SCENE = MakeWarning(
+			"PlayscapeManager prefab must be added to the first scene! Drag and Drop Plugins/Playscape/Resources/PlayscapeManager into the Hierarchy window.",
+			"WARN-C002");
 
 		#endregion
 
