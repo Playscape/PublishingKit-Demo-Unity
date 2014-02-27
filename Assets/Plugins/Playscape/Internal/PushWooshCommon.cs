@@ -77,11 +77,10 @@ namespace Playscape.Internal {
 						action = getValueFromJson(customData, "action") ?? action;
 						notificationId = getValueFromJson(customData, "notificationId") ?? notificationId;
 						if (int.TryParse(notificationId, out numericNotificationId)) {
-							PlayerPrefs.SetInt(PREF_LAST_NOTIFICATION_ID, numericNotificationId);
 							lastNotificationReceived = (int)(Utils.CurrentTimeMillis / 1000 / 60 / 60);
 
-							PlayerPrefs.SetInt(PUSHWOOSH_LAST_NOTIFICATION_ID_TAG, numericNotificationId);
-							PlayerPrefs.SetInt(PUSHWOOSH_LAST_NOTIFICATION_RECEIVED_TAG, lastNotificationReceived);
+							PlayerPrefs.SetInt(PREF_LAST_NOTIFICATION_ID, numericNotificationId);
+							PlayerPrefs.SetInt(PREF_LAST_NOTIFICATION_RECEIVED, lastNotificationReceived);
 							PlayerPrefs.Save();
 
 							SetTag(PUSHWOOSH_LAST_NOTIFICATION_ID_TAG, numericNotificationId);

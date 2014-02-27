@@ -75,7 +75,7 @@ namespace Playscape.Internal {
 			MakeWarning("Chartboost was not initialized, did you integrate Chartboost?", "WARN-C001");
 
 		public static readonly string PLAYSCAPE_MANAGER_NOT_IN_FIRST_SCENE = MakeWarning(
-			"PlayscapeManager prefab must be added to the first scene! Drag and Drop Plugins/Playscape/Resources/PlayscapeManager into the Hierarchy window.",
+			"PlayscapeManager prefab must be added ONLY to the first scene! Remove it from any other scenes, but the first and Drag and Drop Plugins/Playscape/Resources/PlayscapeManager into the Hierarchy window in the first scene.",
 			"WARN-C002");
 
 		#endregion
