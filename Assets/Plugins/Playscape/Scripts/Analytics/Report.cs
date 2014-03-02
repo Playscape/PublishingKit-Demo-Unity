@@ -1308,15 +1308,17 @@ namespace Playscape.Analytics
 		}
 		
 		/// <summary>
-		/// Networking/LeaveRoom/RoomName:[roomName]
+		/// Player is leaving the game.
 		/// </summary>
 		/// <param name="gameName">
 		/// The game Name.
 		/// </param>
 		public void ReportMPLeaveGame(string gameName) {
-			RemoteLogger.ReportAnalytics ("Networking/LeaveRoom/RoomName:{0}", gameName);
+			RemoteLogger.ReportAnalytics ("Networking/ConnectionStateChanged/LEAVING/RoomName:{0}", gameName);
             RemoteLogger.SetNetSessionId(null);
 		}
+
+
 		#endregion
 
 		#endregion

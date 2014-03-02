@@ -73,6 +73,9 @@ public class HUD : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown(KeyCode.Escape)) { 
+			if (GameState.CurrentGameType != GameState.GameType.SinglePlayer) {
+				PhotonNetwork.Disconnect();
+			}
 			Application.LoadLevel("menu");
 		}
 

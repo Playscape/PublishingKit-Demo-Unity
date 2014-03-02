@@ -55,6 +55,7 @@ public class LobbyMenuController : MonoBehaviour {
 
 	static class MPUtils {
 		private static System.Random mRandom = new System.Random();
+		private static string  mCurrentRoomName = "null";
 		public static string GenerateNetSessionId() {
 			return (System.Math.Abs(mRandom.Next() | (mRandom.Next() << 31))).ToString();
 		}
@@ -78,7 +79,11 @@ public class LobbyMenuController : MonoBehaviour {
 
 		public static string CurrentRoomName {
 			get {
-				return PhotonNetwork.room != null ? PhotonNetwork.room.name : "null";
+				return mCurrentRoomName;
+			}
+
+			set {
+				mCurrentRoomName = value;
 			}
 		}
 	}
@@ -202,17 +207,39 @@ public class LobbyMenuController : MonoBehaviour {
 		public int CurrentNetworkTime { get { return -1 /*network time is unused in this game.*/;} }
 	}
 
+
+	private static LobbyMenuController mInstance;
+
 	void Awake()
+	{		
+		// This is not pretty, we made this class singleton so that it would capture events coming from Photon and report them
+		// it should've been refactored into two separate classes, one representing the lobby logic and the other maintaining the multiplayer game state.
+		if (mInstance != null)
+		{
+			mInstance.StartMultiplayerSessionIfInLobby();
+			Destroy(gameObject);
+			return;
+		}
+
+		DontDestroyOnLoad(gameObject);
+
+		mInstance = this;
+		StartMultiplayerSessionIfInLobby();
+
+	}
+
+	void StartMultiplayerSessionIfInLobby ()
 	{
-		Report.Instance.InitMultiplayer(new MultiplayerAnalyticsProvider());
-
-
-		if (GameState.CurrentGameType == GameState.GameType.MultiplayerPrivateGame) {
-			StartPrivateMultiplayerGame ();
-		} else if (GameState.CurrentGameType == GameState.GameType.MultiplayerPublicGame) {
-			StartPublicMultiplayerGame ();
-		} else {
-			throw new System.ArgumentException("Invalid game type: " + GameState.CurrentGameType);
+		if (Application.loadedLevelName == "lobby") {
+			Report.Instance.InitMultiplayer(new MultiplayerAnalyticsProvider());
+			
+			if (GameState.CurrentGameType == GameState.GameType.MultiplayerPrivateGame) {
+				StartPrivateMultiplayerGame ();
+			} else if (GameState.CurrentGameType == GameState.GameType.MultiplayerPublicGame) {
+				StartPublicMultiplayerGame ();
+			} else {
+				throw new System.ArgumentException("Invalid game type: " + GameState.CurrentGameType);
+			}
 		}
 	}
 
@@ -273,9 +300,11 @@ public class LobbyMenuController : MonoBehaviour {
 
 	void OnGUI()
 	{
-		GUILayout.BeginArea(new Rect(0, 80, Screen.width, 100));
-		GUILayout.Box(currentState.Message);
-		GUILayout.EndArea();
+		if (Application.loadedLevelName == "lobby") {
+			GUILayout.BeginArea(new Rect(0, 80, Screen.width, 100));
+			GUILayout.Box(currentState.Message);
+			GUILayout.EndArea();
+		}
 	}
 
 	// Handle connection events
@@ -297,6 +326,7 @@ public class LobbyMenuController : MonoBehaviour {
 	
 	public void OnJoinedRoom()
 	{
+		MPUtils.CurrentRoomName = PhotonNetwork.room.name;
 		GameState.IsHost = PhotonNetwork.isMasterClient;
 		Debug.Log("OnJoinedRoom");
 
@@ -327,6 +357,7 @@ public class LobbyMenuController : MonoBehaviour {
 		Debug.Log("OnLeftRoom");
 		currentState = currentState.Failed();
 		Report.Instance.ReportMPLeaveGame(MPUtils.CurrentRoomName);
+		MPUtils.CurrentRoomName = "null";
 	}
 	
 	public void OnPhotonCreateRoomFailed()

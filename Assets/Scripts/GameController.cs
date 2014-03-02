@@ -128,7 +128,7 @@ public class GameController : MonoBehaviour {
 		if (Application.loadedLevelName == "level1") {
 			Application.LoadLevel("level2");
 		} else {
-			Application.LoadLevel("menu");
+			SwitchLevel("menu");
 		}
 
 		Report.Instance.ReportLevelCompleted(Application.loadedLevelName, null);
@@ -136,6 +136,23 @@ public class GameController : MonoBehaviour {
 		#if (UNITY_IPHONE || UNITY_ANDROID) && !UNITY_EDITOR
 		CBBinding.showInterstitial(null);
 		#endif
+	}
+
+	public void SwitchLevel (string level)
+	{
+		if (GameState.CurrentGameType != GameState.GameType.SinglePlayer) {
+			StartCoroutine (DoSwitchLevel(level));
+		} else {
+			Application.LoadLevel(level);
+		}
+	}
+	
+	IEnumerator DoSwitchLevel (string level)
+	{
+		PhotonNetwork.Disconnect ();
+		while (PhotonNetwork.connected)
+			yield return null;
+		Application.LoadLevel(level);
 	}
 
 	void UpdateHud ()
