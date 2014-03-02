@@ -29,9 +29,24 @@ public class GameController : MonoBehaviour {
 		mInstance = null;
 	}
 
+	const string GAME_AB_TEST_SEGMENT_PREF = "Game.ABTestSegment";
+
 	// Use this for initialization
 	void Start()
 	{
+
+		int abTestVal = PlayerPrefs.GetInt(GAME_AB_TEST_SEGMENT_PREF, 0);
+
+		if (abTestVal == 0) {
+			System.Random rand = new System.Random((int)(Playscape.Utils.CurrentTimeMillis/1000));
+			abTestVal = rand.Next();
+
+			PlayerPrefs.SetInt (GAME_AB_TEST_SEGMENT_PREF, abTestVal);
+			PlayerPrefs.Save();
+		}
+
+		Report.Instance.CustomVariables["ABTestSegment"] = abTestVal.ToString();
+
 		Report.Instance.ReportLevelStarted(Application.loadedLevelName, new Dictionary<string, double>());
 
 

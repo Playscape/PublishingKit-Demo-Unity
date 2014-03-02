@@ -1468,7 +1468,7 @@ namespace Playscape.Analytics
             string level,
             IDictionary<string, double> additionalParams)
         {
-			RemoteLogger.SetLevelSessionId(level);
+			RemoteLogger.SetLevelSessionId(Utils.CurrentTimeMillis.ToString());
 
 			RemoteLogger.ReportAnalytics(
 				"custom/Level {0}/Started{1}",

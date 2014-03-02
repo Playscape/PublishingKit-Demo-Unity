@@ -204,7 +204,14 @@ public class LobbyMenuController : MonoBehaviour {
 	private IConnectionStateMachine currentState;
 
 	class MultiplayerAnalyticsProvider : MPAnalyticsProvider {
-		public int CurrentNetworkTime { get { return -1 /*network time is unused in this game.*/;} }
+		public int CurrentNetworkTime { get { 
+				if (PhotonNetwork.connected) {
+					return (int)PhotonNetwork.time;
+				} else {
+					return -1; // Return -1 if you wish to ommit network time.
+				}
+			
+		} }
 	}
 
 

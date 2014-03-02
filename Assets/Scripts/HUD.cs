@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using Playscape.Analytics;
+using System.Collections.Generic;
 
 public class HUD : MonoBehaviour {
 
@@ -76,6 +78,10 @@ public class HUD : MonoBehaviour {
 			if (GameState.CurrentGameType != GameState.GameType.SinglePlayer) {
 				PhotonNetwork.Disconnect();
 			}
+
+			var dict = new Dictionary<string, double>();
+			dict["QuitToMenu"] = 1.0;
+			Report.Instance.ReportLevelFailed(Application.loadedLevelName, dict);
 			Application.LoadLevel("menu");
 		}
 
