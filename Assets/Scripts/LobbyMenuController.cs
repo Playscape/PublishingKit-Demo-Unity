@@ -191,6 +191,7 @@ public class LobbyMenuController : MonoBehaviour {
 		{
 			PhotonNetwork.room.open = false;
 			PhotonNetwork.room.visible = false;
+			Report.Instance.ReportMPStartGame(PLAYERS_COUNT);
 			Application.LoadLevel("level1");
 		}
 	}
