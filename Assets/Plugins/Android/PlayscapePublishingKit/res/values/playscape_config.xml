@@ -6,8 +6,10 @@
     <string name="playscape_remote_logger_file_size_limit_bytes">2097152</string>
     <string name="playscape_remote_logger_entry_size_limit_bytes">2048</string>
     <string name="playscape_remote_logger_force_dump_now">false</string>
-    <string name="playscape_publishing_kit_version">Kit Trunk</string>
-    <string name="playscape_debug_mode">true</string>
+    <string name="playscape_publishing_kit_version">Kit 1.0.1</string>
+    <string name="playscape_debug_mode">false</string>
     <string name="playscape_reporter_id">reporterNotSet</string>
     <string name="playscape_is_alive_service_reschedule_delay_seconds">86400</string>
+    <string name="playscape_pushwoosh_id">DC9EC-2B8CD</string> <!-- Cocos 2D-x specific -->
+	<string name="playscape_google_sender_id">786132690907</string> <!-- Cocos 2D-x specific -->
 </resources>

@@ -90,10 +90,6 @@ namespace Playscape.Internal {
 				}
 			}
 
-			#if UNITY_IPHONE
-			Report.Instance.ReportNotificationClicked(promotedGame, "default", action, notificationId);
-			#endif
-			
 			L.D("PushWoosh Payload: {0}", payload);
 		}
 

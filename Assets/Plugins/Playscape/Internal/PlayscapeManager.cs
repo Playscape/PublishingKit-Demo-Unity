@@ -51,9 +51,9 @@ namespace Playscape.Internal
 			}
             
 			RemoteLogger.Init();
+			NativeReport.Init();
 			GenerateGMSID();
 			AddPushWooshScripts();
-			ReportLaunchOnIos();
 
 			// Makes this game object live forever
 			DontDestroyOnLoad(gameObject);
@@ -71,18 +71,6 @@ namespace Playscape.Internal
 			if (GameObject.Find(REAL_CHARTBOOST_MANAGER_GAME_OBJECT_NAME) == null) {
 				L.W(Warnings.CHARTBOOST_NOT_INITIALIZED);
 			}
-		}
-
-		/// <summary>
-		/// </summary>
-		public void OnApplicationPause(bool pauseStatus)
-		{
-			if (pauseStatus == false)
-			{
-				// On iOS, this means app gained focus
-				ReportLaunchOnIos();
-			}
-
 		}
 
 		/// <summary>
@@ -119,24 +107,6 @@ namespace Playscape.Internal
 			RemoteLogger.SetGameSessionId(PlayscapeUtilities.GenerateRandomId());
 		}
 
-	    /// <summary>
-	    /// Reports game launch, relevant for iOS only.
-	    /// </summary>
-	    private void ReportLaunchOnIos()
-		{
-			#if UNITY_IPHONE
-			int launchCount = PlayerPrefs.GetInt("playscape_launch_count", 0);
-			launchCount++;
-
-			if (launchCount == 1) {
-				Report.Instance.ReportActivation("iOS");
-			}
-
-			Report.Instance.ReportLaunch(launchCount);
-			PlayerPrefs.SetInt("playscape_launch_count", launchCount);
-			PlayerPrefs.Save();
-			#endif
-		}
 
 	}
 

@@ -26,11 +26,6 @@ namespace Playscape.Internal {
 		}
 
 	    public static void Init() {
-	#if !UNITY_EDITOR
-	#if UNITY_IPHONE
-	        PlayscapeRemoteLogger_init();
-	#endif
-	#endif
 			Application.RegisterLogCallback(OnLog);
 	    }
 
@@ -46,13 +41,9 @@ namespace Playscape.Internal {
 			L.D("[{0}] {1}: {2}", logLevel, tag, message);
 	
 
-	#if !UNITY_EDITOR
-	#if UNITY_ANDROID
+	#if UNITY_ANDROID && !UNITY_EDITOR
 	        initializeAndroidRemoteLogger();
 			remoteLoggerClass.CallStatic("log", (int) logLevel, tag, message);
-	#elif UNITY_IPHONE
-	        PlayscapeRemoteLogger_log((int) logLevel, tag, message);
-	#endif
 	#endif
 	    }
 
@@ -60,13 +51,9 @@ namespace Playscape.Internal {
 		/// Dumps log to server.
 		/// </summary>
 	    public static void DumpNow() {
-	#if !UNITY_EDITOR
-	#if UNITY_ANDROID
+	#if !UNITY_EDITOR && UNITY_ANDROID
 	        initializeAndroidRemoteLogger();
 			remoteLoggerClass.CallStatic("dumpNow");
-	#elif UNITY_IPHONE
-	        PlayscapeRemoteLogger_dumpNow();
-	#endif
 	#endif
 	    }
 
@@ -76,13 +63,9 @@ namespace Playscape.Internal {
 		/// <param name="sessionId">Session identifier.</param>
 		public static void SetGameSessionId(string sessionId) {
 			L.D("GMSID updated: {0}", sessionId);
-	#if !UNITY_EDITOR
-	#if UNITY_ANDROID
+	#if !UNITY_EDITOR && UNITY_ANDROID
 			initializeAndroidRemoteLogger();
 			remoteLoggerClass.CallStatic("setGameSessionId", sessionId);
-	#elif UNITY_IPHONE
-			PlayscapeRemoteLogger_setGameSessionId(sessionId);
-	#endif
 	#endif
 		}
 		
@@ -93,13 +76,9 @@ namespace Playscape.Internal {
 		/// <param name="sessionId">Session identifier.</param>
 		public static void SetNetSessionId(string sessionId) {
 			L.D("NETSID updated: {0}", sessionId);
-	#if !UNITY_EDITOR
-	#if UNITY_ANDROID
+	#if !UNITY_EDITOR && UNITY_ANDROID
 			initializeAndroidRemoteLogger();
 			remoteLoggerClass.CallStatic("setNetSessionId", sessionId);
-	#elif UNITY_IPHONE
-			PlayscapeRemoteLogger_setNetSessionId(sessionId);
-	#endif	
 	#endif
 		}
 		
@@ -110,13 +89,9 @@ namespace Playscape.Internal {
 		/// <param name="varsJsonInStringified">Variables json in stringified.</param>
 		public static void SetGameAuxVars(string varsJsonInStringified) {
 			L.D("GMAUX updated: {0}", varsJsonInStringified);
-	#if !UNITY_EDITOR
-	#if UNITY_ANDROID
+	#if !UNITY_EDITOR && UNITY_ANDROID
 			initializeAndroidRemoteLogger();
 			remoteLoggerClass.CallStatic("setGameAuxVars", varsJsonInStringified);
-	#elif UNITY_IPHONE
-			PlayscapeRemoteLogger_setGameAuxVars(varsJsonInStringified);
-	#endif
 	#endif
 		}
 		
@@ -143,13 +118,9 @@ namespace Playscape.Internal {
 		/// <param name="levelSessionId">Variables json in stringified.</param>
 		public static void SetLevelSessionId(string levelSessionId) {
 			L.D("LVSID updated: {0}", levelSessionId);
-	    #if !UNITY_EDITOR
-	    #if UNITY_ANDROID
+	    #if !UNITY_EDITOR && UNITY_ANDROID
 	            initializeAndroidRemoteLogger();
 	            remoteLoggerClass.CallStatic("setLevelSessionId", levelSessionId);
-	    #elif UNITY_IPHONE
-	            PlayscapeRemoteLogger_setLevelSessionId(levelSessionId);
-	    #endif
 	    #endif
 	    }
 	    
@@ -175,31 +146,10 @@ namespace Playscape.Internal {
 	    }
 	#elif UNITY_IPHONE
 		[DllImport("__Internal")]
-		private static extern void PlayscapeRemoteLogger_init();
-
-		[DllImport("__Internal")]
-		private static extern void PlayscapeRemoteLogger_log(
-		int logLevel,
-		string tag,
-		string message);
-
-		[DllImport("__Internal")]
 		private static extern void PlayscapeRemoteLogger_dumpNow();
-
-		[DllImport("__Internal", CharSet = CharSet.Ansi)]
-		private static extern void PlayscapeRemoteLogger_setGameSessionId(string sessionId);
-
-		[DllImport("__Internal", CharSet = CharSet.Ansi)]
-		private static extern void PlayscapeRemoteLogger_setNetSessionId(string sessionId);
-
-		[DllImport("__Internal", CharSet = CharSet.Ansi)]
-		private static extern void PlayscapeRemoteLogger_setGameAuxVars(string varsJsonInStringified);
 
 		[DllImport("__Internal")]
 		private static extern void PlayscapeRemoteLogger_setNetworkTime(System.Int32 networkTime);
-	    
-	    [DllImport("__Internal")]
-		private static extern void PlayscapeRemoteLogger_setLevelSessionId(string levelSessionId);
 	#endif
 	#endif
 

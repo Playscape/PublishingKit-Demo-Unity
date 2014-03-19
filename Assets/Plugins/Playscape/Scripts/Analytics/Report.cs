@@ -12,9 +12,10 @@ namespace Playscape.Analytics
     /// </summary>
     public enum SocialNetwork
 	{
-		Facebook,
-		GooglePlus,
-        GameSpecific
+		// Don't use zero, it means 'NoSocialNetwork' in C API.
+		Facebook = 1,
+		GooglePlus = 2,
+        GameSpecific = 3
 	}
 
     /// <summary>
@@ -59,186 +60,30 @@ namespace Playscape.Analytics
     /// <summary>
     /// Represents an instance of a flow (see Generic flows below)
     /// </summary>
-    public interface FlowInstance
+    public class FlowInstance
     {
         /// <summary>
-        /// Flow instance globally unique identifier
-        /// </summary>
-        string Id { get; }
-
-        /// <summary>
-        /// Flow type, as given to RegisterFlow()
-        /// </summary>
-        string Type { get; }
-
-        /// <summary>
-        /// Retrieves the step identifier by name.
-        /// 
-        /// Throws an ArgumentException in DEBUG compilations, and returns -1 in
-        /// release compilations (without throwing an exception).
-        /// </summary>
-        /// <param name="stepName">
-        /// The step Name.
-        /// </param>
-        /// <returns>
-        /// The get step id.
-        /// </returns>
-        int GetStepId(string stepName);
-    }
-
-	#region FlowInstance implementation
-
-    /// <summary>
-    /// Default flow implementation.
-    /// </summary>
-    internal class DefaultFlowInstance : FlowInstance {
-        /// <summary>
-        /// Flow type
-        /// </summary>
-        private readonly string mType;
-
-        /// <summary>
-        /// Flow id
-        /// </summary>
-        private readonly string mId;
-
-        /// <summary>
-        /// Maps step names to their corresponding id
-        /// </summary>
-        private readonly IDictionary<string, int> mStepNameToStepId;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultFlowInstance"/> class.
-        /// </summary>
-        /// <param name="type">
-        /// The type.
-        /// </param>
-        /// <param name="stepNameToStepId">
-        /// The step name to step id.
-        /// </param>
-        internal DefaultFlowInstance(string type, IDictionary<string, int> stepNameToStepId) {
-			mId = Guid.NewGuid().ToString();
-			mType = type;
-			mStepNameToStepId = stepNameToStepId;
+		/// Constructs a new FlowInstance of the given type
+		/// </summary>
+		/// <param name="provider">
+		/// The provider.
+		/// </param>
+		public FlowInstance(string type)
+		{
+			Type = type;
 		}
 
-		/// <summary>
-		/// Flow instance globally unique identifier
+        /// <summary>
+		/// Gets current type.
 		/// </summary>
-		public string Id { get { return mId; } }
-		
-		/// <summary>
-		/// Flow type, as given to RegisterFlow()
-		/// </summary>
-		public string Type { get { return mType; } }
-
-        /// <summary>
-        /// Gets Steps.
-        /// </summary>
-        /// <value>
-        /// The steps.
-        /// </value>
-        public IDictionary<string, int> Steps
-	    {
-	        get { return mStepNameToStepId; }
-	        
-	    }
-
-	    /// <summary>
-	    /// Retrieves the step identifier by name.
-	    /// 
-	    /// Throws an ArgumentException in DEBUG compilations, and returns -1 in
-	    /// release compilations (without throwing an exception).
-	    /// </summary>
-	    /// <param name="stepName">
-	    /// The step Name.
-	    /// </param>
-	    /// <returns>
-	    /// The get step id.
-	    /// </returns>
-		public int GetStepId(string stepName) {
-			if (mStepNameToStepId.ContainsKey(stepName)) {
-				return mStepNameToStepId[stepName];
-			}
-		 
-            if (Debug.isDebugBuild) {
-		        throw new ArgumentException(string.Format("Invalid stepName: '{0}' given", stepName));
-		    }
-
-		    return -1;
-		}
-	}
-
-    /// <summary>
-    /// A stub flow, used as placeholder so that NPE's won't occur.
-    /// </summary>
-    internal class StubFlowInstance : FlowInstance
-    {
-        /// <summary>
-        /// stub id
-        /// </summary>
-        private const string STUB_FLOW_ID = "StubFlowId";
-
-        /// <summary>
-        /// stub flow type
-        /// </summary>
-        private const string STUB_FLOW_TYPE = "StubFlowType";
-
-        /// <summary>
-        /// Gets Id.
-        /// </summary>
-        /// <value>
-        /// The id.
-        /// </value>
-        public string Id
-        {
-            get { return STUB_FLOW_ID; }
-        }
-
-        /// <summary>
-        /// Gets Type.
-        /// </summary>
-        /// <value>
-        /// The type.
-        /// </value>
-        public string Type
-        {
-            get { return STUB_FLOW_TYPE; }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="stepName">
-        /// The step name.
-        /// </param>
-        /// <returns>
-        /// Step id
-        /// </returns>
-        /// <exception cref="ArgumentException">
-        /// Thrown if running in debug mode
-        /// </exception>
-        public int GetStepId(string stepName)
-        {
-            if (Debug.isDebugBuild)
-            {
-                throw new ArgumentException("This is a stub flow, there are no steps!");
-            }
-
-            return -1;
-        }
+		public string Type { get; private set; }
     }
-
-	#endregion
 
     /// <summary>
     /// Report analytics to Playscape for BI Analysis
     /// </summary>
     public class Report
 	{
-        /// <summary>
-        /// Provides information about the currently used social network
-        /// </summary>
-        private SocialAnalyticsProvider mSocialAnalyticsProvider;
 
         /// <summary>
         /// Prevents a default instance of the <see cref="Report"/> class from being created.
@@ -253,7 +98,15 @@ namespace Playscape.Analytics
         /// Singleton instance
         /// </summary>
         public static Report Instance = new Report();
-		
+        
+        /// <summary>
+        /// </summary>
+		private object mMpAnalyticsProvider;
+        
+        /// <summary>
+        /// </summary>
+		private object mSocialAnalyticsProvider;
+
 		/// <summary>
 		/// If this is a multiplayer game, the reporter will try to
 		/// report some multiplayer related fields, which are provided
@@ -262,8 +115,12 @@ namespace Playscape.Analytics
 		/// <param name="provider">
 		/// The provider.
 		/// </param>
-		public void InitMultiplayer (MPAnalyticsProvider provider) {
-			NetworkTimeUpdate.mMPAnalyticsProvider = provider;
+		public void InitMultiplayer(MPAnalyticsProvider provider) {
+            NativeReport.GetCurrentNetworkTimeCallback callback = provider.ToCType();
+			NativeReport.playscape_report_InitMultiplayer(callback);
+
+			// To keep the object alive.
+			mMpAnalyticsProvider = callback;
 		}
 
         /// <summary>
@@ -274,9 +131,13 @@ namespace Playscape.Analytics
         /// The provider.
         /// </param>
         public void InitSocial(SocialAnalyticsProvider provider) {
-			mSocialAnalyticsProvider = provider;
+            NativeReport.GetCurrentSocialNetworkCallback callback = provider.ToCType();        
+			NativeReport.playscape_report_InitSocial(callback);
+
+			// To keep the object alive.
+			mSocialAnalyticsProvider = callback;
 		}
-		
+
 		#region Lifecycle
 		
 		/// <summary>
@@ -288,8 +149,7 @@ namespace Playscape.Analytics
 		/// Resolved automatically by plugin
 		/// </param>
 		public void ReportActivation(string referrer) {
-
-			RemoteLogger.ReportAnalytics ("activation/SD=1/{0}", referrer);
+			NativeReport.playscape_report_ReportActivation(referrer);
 		}
 		
 		/// <summary>
@@ -299,7 +159,7 @@ namespace Playscape.Analytics
 		/// The referrer.
 		/// </param>
 		public void ReportReferrer(string referrer) {
-			RemoteLogger.ReportAnalytics ("Install_Referrer_Intent/{0}", referrer);
+			NativeReport.playscape_report_ReportReferrer(referrer);
 		}
 
         /// <summary>
@@ -309,7 +169,7 @@ namespace Playscape.Analytics
         /// The referrer.
         /// </param>
         public void ReportAppsFlyerReferrer(string referrer) {
-			RemoteLogger.ReportAnalytics ("Install_Referrer_Intent/AppsFlyer/{0}", referrer);
+			NativeReport.playscape_report_ReportAppsFlyerReferrer(referrer);
 		}
 		
 		/// <summary>
@@ -322,7 +182,7 @@ namespace Playscape.Analytics
 		/// Resolved automatically by plugin
 		/// </param>
 		public void ReportLaunch(int launchCount) {
-			RemoteLogger.ReportAnalytics ("Launches/{0}", launchCount);
+			NativeReport.playscape_report_ReportLaunch(launchCount);
 		}
 		
 		#endregion
@@ -349,8 +209,7 @@ namespace Playscape.Analytics
                 string action,
                 string notificationId)
         {
-            RemoteLogger.ReportAnalytics("PS2/notification_displayed/{0}/{1}/{2}/{3}/PW",
-                                         promotedGame, icon, action, notificationId);
+            NativeReport.playscape_report_ReportNotificationDisplayed(promotedGame, icon, action, notificationId);
         }
 
 		
@@ -375,13 +234,11 @@ namespace Playscape.Analytics
 			string action,
 			string notificationId) 
         {
-
-			RemoteLogger.ReportAnalytics ("PS2/notification_clicked/{0}/{1}/{2}/{3}/PW", 
-			                              promotedGame,
-			                              icon,
-			                              action,
-			                              notificationId);
-
+			NativeReport.playscape_report_ReportNotificationClicked(
+                    promotedGame,
+			        icon,
+			        action,
+			        notificationId);
 		}
 		
 		#endregion
@@ -394,9 +251,7 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialLoadFailed(string location) {
-			RemoteLogger.ReportAnalytics("ad:Interstitial/event:RequestFailed/sdk:Chartboost/id:{0}/conn:{1}",
-			                             location,
-			                             PlayscapeUtilities.GetConnectivityAnalyticsReport());
+			NativeReport.playscape_report_ReportInterstitialLoadFailed(location);
 		}
 
         /// <summary>
@@ -406,9 +261,7 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialDismissed(string location) {
-			RemoteLogger.ReportAnalytics("ad:Interstitial/event:Dismissed/sdk:Chartboost/id:{0}/conn:{1}",
-			                             location,
-			                             PlayscapeUtilities.GetConnectivityAnalyticsReport());
+			NativeReport.playscape_report_ReportInterstitialDismissed(location);
 		}
 
         /// <summary>
@@ -418,9 +271,7 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialClicked(string location) {
-			RemoteLogger.ReportAnalytics("ad:Interstitial/event:Clicked/sdk:Chartboost/id:{0}/conn:{1}",
-			                             location,
-			                             PlayscapeUtilities.GetConnectivityAnalyticsReport());
+			NativeReport.playscape_report_ReportInterstitialClicked(location);
 		}
 
         /// <summary>
@@ -430,9 +281,7 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialShown(string location) {
-			RemoteLogger.ReportAnalytics("ad:Interstitial/event:Impression/impression_type:Unknown/sdk:Chartboost/id:{0}/conn:{1}",
-			                             location,
-			                             PlayscapeUtilities.GetConnectivityAnalyticsReport());
+			NativeReport.playscape_report_ReportInterstitialShown(location);
 		}
 		#endregion
 		
@@ -445,7 +294,7 @@ namespace Playscape.Analytics
 		/// The custom Event.
 		/// </param>
 		public void ReportEvent(string customEvent) {
-			RemoteLogger.ReportAnalytics ("custom/{0}", customEvent);
+			NativeReport.playscape_report_ReportEvent(customEvent);
 		}
 
 		#region Custom Analyics
@@ -455,11 +304,6 @@ namespace Playscape.Analytics
         /// </summary>
         public class CustomVariablesMap
         {
-            /// <summary>
-            /// Map of aux vars
-            /// </summary>
-            private IDictionary<string, string> mAuxVariables = new Dictionary<string, string>();
-
             /// <summary>
             /// Get/Set custom var by it's name.
             /// </summary>
@@ -471,158 +315,29 @@ namespace Playscape.Analytics
             {
                 get
                 {
-                    if (mAuxVariables.ContainsKey(key))
-                    {
-                        return mAuxVariables[key];
+                    StringBuilder buffer = new StringBuilder(2048);
+                    NativeReport.playscape_report_getCustomVariable(key, buffer.Capacity, buffer);
+                    string theValue = buffer.ToString();
+                    
+                    if (theValue == "") {
+                        theValue = null;
                     }
-
-                    return null;
+                    
+                    return theValue;
                 }
 
                 set
                 {
                     if (value != null)
                     {
-                        SetAuxVar(key, value);
+                        NativeReport.playscape_report_setCustomVariable(key, value);
                     }
                     else
                     {
-                        RemoveAuxVar(key);
+						NativeReport.playscape_report_removeCustomVariable(key);
                     }
                 }
             }
-
-            /// <summary>
-            /// Sets a custom auxilary variable
-            /// </summary>
-            /// <param name="name">Name.</param>
-            /// <param name="value">Value.</param>
-            private void SetAuxVar(string name, string value)
-            {
-                mAuxVariables[name] = value;
-
-                setAuxVariablesInRemoteLogger();
-            }
-
-            /// <returns><c>true</c> if aux var is set
-            /// <param name="name">Name.</param>
-            private Boolean IsAuxVarSet(string name)
-            {
-                return mAuxVariables.ContainsKey(name);
-            }
-
-            /// <summary>
-            /// Removes the aux variable.
-            /// </summary>
-            /// <param name="name">Name.</param>
-            private void RemoveAuxVar(string name)
-            {
-                if (IsAuxVarSet(name))
-                {
-                    mAuxVariables.Remove(name);
-                    setAuxVariablesInRemoteLogger();
-                }
-            }
-
-            /// <summary>
-            /// Compares keys of KeyValuePairs using standard string's compareTo.
-            /// </summary>
-            private class SimpleStringComparer : IComparer<KeyValuePair<string, string>>
-            {
-                /// <summary>
-                /// Compares strings in given key/value pairs
-                /// </summary>
-                /// <param name="x">
-                /// First KeyValuePair.
-                /// </param>
-                /// <param name="y">
-                /// Second KeyValuePair.
-                /// </param>
-                /// <returns>
-                /// CompareTo method result.
-                /// </returns>
-                public int Compare(KeyValuePair<string, string> x, KeyValuePair<string, string> y)
-                {
-                    return x.Key.CompareTo(y.Key);
-                }
-            }
-
-            /// <summary>
-            /// Comparer
-            /// </summary>
-            private SimpleStringComparer mSimpleStringComparer = new SimpleStringComparer();
-
-            /// <summary>
-            /// Updates aux variables in the remote logger.
-            /// </summary>
-            private void setAuxVariablesInRemoteLogger()
-            {
-                if (mAuxVariables.Count > 0)
-                {
-                    SimpleJson.JsonObject jsonObject = new SimpleJson.JsonObject();
-                    foreach (var variable in mAuxVariables)
-                    {
-                        jsonObject.Add(variable.Key, variable.Value);
-                    }
-
-                    string json = jsonObject.ToString();
-
-                    // We replace double quotes with single quote to make big query parsing easier and remove any escape characters (which shouldn't be anyway as we disallow this in lua)
-
-                    json = json.Replace("\"", "'").Replace("\\", "");
-                    json = json.Substring(1, json.Length - 2); // stip { and }
-                    // Now our json string looks like this: 'key':'value', 'key2':value2', ..., 'keyN':valueN
-                    // we have to sort it
-
-                    var entriesVector = new List<KeyValuePair<string, string>>();
-
-                    string[] keysAndValuesSplit = json.Split(',');
-
-                    foreach (var keyValueJoined in keysAndValuesSplit)
-                    {
-                        string[] keyValueSplit = keyValueJoined.Split(':');
-
-                        if (keyValueSplit.Length == 2)
-                        {
-                            string key = keyValueSplit[0];
-                            string value = keyValueSplit[1];
-                            var entry = new KeyValuePair<string, string>(key, value);
-
-                            entriesVector.Add(entry);
-                        }
-                    }
-
-                    entriesVector.Sort(mSimpleStringComparer);
-
-                    var auxVars = new StringBuilder();
-
-                    bool isFirst = true;
-                    auxVars.Append("{");
-                    foreach (var item in entriesVector)
-                    {
-
-                        if (!isFirst)
-                        {
-                            auxVars.Append(",");
-                        }
-
-                        auxVars.Append(item.Key);
-                        auxVars.Append(":");
-                        auxVars.Append(item.Value);
-
-                        isFirst = false;
-                    }
-                    auxVars.Append("}");
-
-                    RemoteLogger.SetGameAuxVars(auxVars.ToString());
-
-                }
-                else
-                {
-                    RemoteLogger.SetGameAuxVars(null);
-                }
-            }
-
         }
 
         /// <summary>
@@ -645,7 +360,7 @@ namespace Playscape.Analytics
         /// </param>
         public void ReportPurchaseStarted(PurchaseItem item)
         {
-            RemoteLogger.ReportAnalytics("{0}/BuyProduct", item.Name);
+            NativeReport.playscape_report_ReportPurchaseStarted(item.ToCType());
         }
 
         #region Bible Section 5.08
@@ -680,8 +395,12 @@ namespace Playscape.Analytics
                 long currencyTimestamp,
                 string transactionId)
         {
-            RemoteLogger.ReportAnalytics("{0}/BuyProductResult/Success/currency={1}/amount={2:0.00}/currencyTimestamp={3}/orderId={4}", 
-                item.Name, currency, amount, currencyTimestamp, transactionId);
+            NativeReport.playscape_report_ReportPurchaseSuccess(
+                item.ToCType(),
+                amount,
+				currency,
+                currencyTimestamp,
+                transactionId);
         }
         /// <summary>
         /// Should be called by purchase plugin
@@ -691,8 +410,7 @@ namespace Playscape.Analytics
         /// </param>
         public void ReportPurchaseCancelled(PurchaseItem item)
         {
-            RemoteLogger.ReportAnalytics("{0}/BuyProductResult/Cancelled",
-                item.Name);
+            NativeReport.playscape_report_ReportPurchaseCancelled(item.ToCType());
         }
         /// <summary>
         /// Should be called by purchase plugin
@@ -706,8 +424,9 @@ namespace Playscape.Analytics
         public void ReportPurchaseFailed(PurchaseItem item,
                 string failureReason)
         {
-            RemoteLogger.ReportAnalytics("{0}/BuyProductResult/Failed/{1}",
-                item.Name, failureReason);
+            NativeReport.playscape_report_ReportPurchaseFailed(
+                item.ToCType(),
+                failureReason);
         }
         /// <summary>
         /// Should be called by purchase plugin
@@ -717,8 +436,8 @@ namespace Playscape.Analytics
         /// </param>
         public void ReportPurchaseAlreadyPurchased(PurchaseItem item)
         {
-            RemoteLogger.ReportAnalytics("{0}/BuyProductResult/Already_purchased",
-                item.Name);
+            NativeReport.playscape_report_ReportPurchaseAlreadyPurchased(
+                item.ToCType());
         }
 
         #endregion
@@ -728,11 +447,6 @@ namespace Playscape.Analytics
 		#region Social
 		
 		#region Bible Section 5.20
-
-        /// <summary>
-        /// true if called ReportSocialLoginSuccess() method.
-        /// </summary>
-        private bool mIsLoggedIn = false;
 
         /// <summary>
         /// Reports a succesful login to a social network.
@@ -749,13 +463,7 @@ namespace Playscape.Analytics
 			bool isSilentLogin,
 			string whichUserLoggedIn) {
             
-            mIsLoggedIn = true;
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/Login/success/silent={1}/User:{2}",
-				                          mSocialAnalyticsProvider.CurrentNetwork,
-			                              PlayscapeUtilities.JsonBool(isSilentLogin),
-			                              whichUserLoggedIn);
-			}
+            NativeReport.playscape_report_ReportSocialLoginSuccess(isSilentLogin, whichUserLoggedIn);
 		}
 
         /// <summary>
@@ -765,11 +473,7 @@ namespace Playscape.Analytics
         /// The is silent login, without any user interventoin (e.g restoring a login session using a stored token)
         /// </param>
         public void ReportSocialLoginFailed(bool isSilentLogin) {
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/Login/failed/silent={1}",
-				                             mSocialAnalyticsProvider.CurrentNetwork,
-				                             PlayscapeUtilities.JsonBool(isSilentLogin));
-			}
+			NativeReport.playscape_report_ReportSocialLoginFailed(isSilentLogin);
 		}
 
         /// <summary>
@@ -779,11 +483,7 @@ namespace Playscape.Analytics
         /// The is silent login, without any user interventoin (e.g restoring a login session using a stored token)
         /// </param>
         public void ReportSocialLoginCancelled(bool isSilentLogin) {
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/Login/canceled/silent={1}",
-				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              PlayscapeUtilities.JsonBool(isSilentLogin));
-			}
+			NativeReport.playscape_report_ReportSocialLoginCancelled(isSilentLogin);
 		}
 
 		#endregion
@@ -794,30 +494,21 @@ namespace Playscape.Analytics
         /// Reports implicit social share, without a dialog.
         /// </summary>
         public void ReportSocialShareNoDialog() { // "Auto" in bible
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/Share/Auto",
-				                              mSocialAnalyticsProvider.CurrentNetwork);
-			}
+			NativeReport.playscape_report_ReportSocialShareNoDialog();
 		}
 
         /// <summary>
         /// Reports a social share done through a dialog.
         /// </summary>
         public void ReportSocialShareDialog() {
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/Share/Dialog",
-				                              mSocialAnalyticsProvider.CurrentNetwork);
-			}
+			NativeReport.playscape_report_ReportSocialShareDialog();
 		}
 
         /// <summary>
         /// Reports social share canceled, e.g user clicked cancel in the share dialog.
         /// </summary>
         public void ReportSocialShareCancelled() {
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/Share/Dialog/Canceled",
-				                              mSocialAnalyticsProvider.CurrentNetwork);
-			}
+			NativeReport.playscape_report_ReportSocialShareCancelled();
 		}
 		#endregion
 		
@@ -830,25 +521,14 @@ namespace Playscape.Analytics
         /// The friends count loaded.
         /// </param>
         public void ReportSocialFriendsLoaded(int friendsCount) {
-			if (mSocialAnalyticsProvider.CurrentNetwork != null){
-				RemoteLogger.ReportAnalytics ("{0}/LoadFriends/Success/FriendsUpdated:{1}",
-				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              friendsCount);
-			}
+			NativeReport.playscape_report_ReportSocialFriendsLoaded(friendsCount);
 		}
 		/// <summary>
 		/// Should report the correct variant according to social login
 		/// status
 		/// </summary>
 		public void ReportSocialFriendsLoadFailed() {
-
-			string reasonText = mIsLoggedIn ? "UpdateFailed" : "NotLoggedIn";
-
-			if (mSocialAnalyticsProvider.CurrentNetwork != null){
-				RemoteLogger.ReportAnalytics ("{0}/LoadFriends/Failure/{1}",
-				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              reasonText);
-			}
+            NativeReport.playscape_report_ReportSocialFriendsLoadFailed();
 		}
 		#endregion
 		
@@ -861,21 +541,14 @@ namespace Playscape.Analytics
         /// The score.
         /// </param>
         public void ReportSocialSubmitScore(long score) {
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/SubmitScore/Success/{1}",
-				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              score);
-			}
+			NativeReport.playscape_report_ReportSocialSubmitScore(score);
 		}
 		
 		/// <summary>
 		/// Should report the RequestFailed variant
 		/// </summary>
 		public void ReportSocialSubmitScoreFailed() {
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/SubmitScore/Failure/RequestFailed",
-				                              mSocialAnalyticsProvider.CurrentNetwork);
-			}
+			NativeReport.playscape_report_ReportSocialSubmitScoreFailed();
 		}
 		#endregion
 		
@@ -897,13 +570,8 @@ namespace Playscape.Analytics
 			string whichTargetUserId,
 			long uniqueRequestId)
 		{
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/RequestSent/Id:{1}/Success/To:{2}/UniqueID:{3}",
-				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              whichRequest,
-				                              whichTargetUserId,
-				                              uniqueRequestId);
-			}
+			NativeReport.playscape_report_ReportSocialRequestSent(
+                    whichRequest, whichTargetUserId, uniqueRequestId);
 		}
 
         /// <summary>
@@ -919,12 +587,7 @@ namespace Playscape.Analytics
 			string whichRequest,
 			string failureReason) {
 
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/RequestSent/Id:{1}/Failure/{2}",
-				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              whichRequest,
-				                              failureReason);
-			}
+			NativeReport.playscape_report_ReportSocialRequestFailed(whichRequest, failureReason);
 		}
 		#endregion
 		
@@ -937,11 +600,7 @@ namespace Playscape.Analytics
         /// The amount of images retrieved succesfuly.
         /// </param>
         public void ReportSocialGetImagesSuccess(int numImages) {
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/GetImages/Count:{1}/Success",
-				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              numImages);
-			}
+			NativeReport.playscape_report_ReportSocialGetImagesSuccess(numImages);
 		}
 
         /// <summary>
@@ -951,11 +610,7 @@ namespace Playscape.Analytics
         /// The amount of images of which retrieval has failed.
         /// </param>
         public void ReportSocialGetImagesFailed(int numImages) {
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/GetImages/Count:{1}/Failure",
-				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              numImages);
-			}
+			NativeReport.playscape_report_ReportSocialGetImagesFailed(numImages);
 		}
 		#endregion
 		
@@ -967,11 +622,7 @@ namespace Playscape.Analytics
 		/// The requests Count.
 		/// </param>
 		public void ReportSocialRequestsFound(int requestsCount) {
-			if ((mSocialAnalyticsProvider.CurrentNetwork != null) && (requestsCount > 0)) {
-				RemoteLogger.ReportAnalytics ("{0}/RequestsReceived/Count:{1}",
-				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              requestsCount);
-				}
+			NativeReport.playscape_report_ReportSocialRequestsFound(requestsCount);
 		}
 		
         /// <param name="whichRequest">
@@ -989,13 +640,7 @@ namespace Playscape.Analytics
 			string whoFromUserId,
 			long uniqueId) {
 
-			if (mSocialAnalyticsProvider.CurrentNetwork != null) {
-				RemoteLogger.ReportAnalytics ("{0}/RequestReceived/Id:{1}/From:{2}/UniqueID:{3}",
-				                              mSocialAnalyticsProvider.CurrentNetwork,
-				                              whichRequest,
-				                              whoFromUserId,
-				                              uniqueId);
-			}
+			NativeReport.playscape_report_ReportSocialRequestDetails(whichRequest, whoFromUserId, uniqueId);
 		}
 		#endregion
 		
@@ -1008,11 +653,7 @@ namespace Playscape.Analytics
         /// The which leaderboard.
         /// </param>
         public void ReportLeaderboardOpened(string whichLeaderboard) {
-			if (mSocialAnalyticsProvider.CurrentNetwork == SocialNetwork.GooglePlus) {
-				RemoteLogger.ReportAnalytics ("{0}/LeaderboardOpened/Name:{1}",
-				                              SocialNetwork.GooglePlus,
-				                              whichLeaderboard);
-			}
+			NativeReport.playscape_report_ReportLeaderboardOpened(whichLeaderboard);
 		}
 		#endregion
 
@@ -1023,9 +664,7 @@ namespace Playscape.Analytics
         /// </summary>
         public void ReportSocialLogout()
         {
-            mIsLoggedIn = false;
-            RemoteLogger.ReportAnalytics("{0}/Logout",
-                                          mSocialAnalyticsProvider.CurrentNetwork);
+            NativeReport.playscape_report_ReportSocialLogout();
         }
 
         #endregion
@@ -1042,7 +681,7 @@ namespace Playscape.Analytics
         /// The server Name.
         /// </param>
 		public void ReportMPServerConnect(string serverName) {
-			RemoteLogger.ReportAnalytics ("Networking/ConnectToOptimalServer/Connecting/ServerName:{0}", serverName);
+			NativeReport.playscape_report_ReportMPServerConnect(serverName);
 		}
 		/// <summary>
 		/// Bible section 10.32
@@ -1056,28 +695,26 @@ namespace Playscape.Analytics
 		public void ReportMPServerConnectSuccess(
 			string serverName,
 			TimeSpan latency) {
-			RemoteLogger.ReportAnalytics ("Networking/ConnectToOptimalServer/Success/Server:{0}/Latency:{1}",
-			                              serverName,
-			                              latency.TotalMilliseconds);
+			
+			NativeReport.playscape_report_ReportMPServerConnectSuccess(serverName, latency.Milliseconds);
 		}
 		/// <summary>
 		/// Networking/StartGameWithFriends/Failure/[reason]
 		/// 10.31, 10.33
 		/// </summary>
-		/// <param name="failureReason">
+		/// <param name="failureReason">11
 		/// The failure Reason.
 		/// </param>
 		public void ReportMPServerConnectFailed(string failureReason) {
-			RemoteLogger.SetNetSessionId(null);
-			RemoteLogger.ReportAnalytics ("Networking/ConnectToOptimalServer/Failure/{0}", failureReason);
+
+			NativeReport.playscape_report_ReportMPServerConnectFailed(failureReason);
 		}
 		
 		/// <summary>
 		/// Bible section 10.34
 		/// </summary>
 		public void ReportMPServerDisconnect() {
-			RemoteLogger.SetNetSessionId(null);
-			RemoteLogger.ReportAnalytics ("Networking/ConnectToOptimalServer/ConnectionStateChanged/Disconnected");
+			NativeReport.playscape_report_ReportMPServerDisconnect();
 		}
 		/// <summary>
 		/// Bible section 10.35
@@ -1086,8 +723,7 @@ namespace Playscape.Analytics
 		/// The error Reason.
 		/// </param>
 		public void ReportMPServerError(string errorReason) {
-			RemoteLogger.SetNetSessionId(null);
-			RemoteLogger.ReportAnalytics ("Networking/ConnectToOptimalServer/Failure/ErrorCode:{0}", errorReason);
+			NativeReport.playscape_report_ReportMPServerError(errorReason);
 		}
 		#endregion
 		
@@ -1096,7 +732,7 @@ namespace Playscape.Analytics
 		/// Bible section 10.01
 		/// </summary>
 		public void ReportMPLoadOnlineFriends() {
-			RemoteLogger.ReportAnalytics ("Networking/LoadOnlineFriends");
+			NativeReport.playscape_report_ReportMPLoadOnlineFriends();
 		}
 		/// <summary>
 		/// Bible section 10.02
@@ -1105,7 +741,7 @@ namespace Playscape.Analytics
 		/// The friends Count.
 		/// </param>
 		public void ReportMPLoadOnlineFriendsSuccess(int friendsCount) {
-			RemoteLogger.ReportAnalytics ("Networking/LoadOnlineFriends/Success/FriendCount:{0}", friendsCount);
+			NativeReport.playscape_report_ReportMPLoadOnlineFriendsSuccess(friendsCount);
 		}
 		#endregion
 		
@@ -1129,11 +765,13 @@ namespace Playscape.Analytics
             int maxPlayers,
             IDictionary<string, string> gameParameters)
         {
-			RemoteLogger.SetNetSessionId(sessionId);
+            gameParameters = gameParameters ?? new Dictionary<string, string>();
 
-            RemoteLogger.ReportAnalytics("Networking/StartRandomGame/CreateRoom/MaxPlayers:{0}/CustomProperties:{1}",
-                                          maxPlayers,
-                                          GetCustomProperties(gameParameters));
+			NativeReport.playscape_report_ReportMPCreatePublicGame(
+				sessionId,
+				maxPlayers,
+				gameParameters.Count,
+				gameParameters.ToCType());
         }
 
         /// <summary>
@@ -1159,32 +797,15 @@ namespace Playscape.Analytics
             string gameName,
 			int maxPlayers,
 			IDictionary<string, string> gameParameters) {
-			RemoteLogger.SetNetSessionId(sessionId);
-			RemoteLogger.ReportAnalytics ("Networking/StartRandomGame/MaxPlayers:{0}/CustomProperties:{1}",
-			                              maxPlayers,
-			                              GetCustomProperties(gameParameters));
-		}
-
-		/// <summary>
-		/// Customs the properties.
-		/// </summary>
-		/// <returns>string in the format of {key:value,..}</returns>
-		/// <param name="parameters">Room Parameters.</param>
-		private string GetCustomProperties (IDictionary<string, string> parameters){
-			parameters = parameters ?? new Dictionary<string, string>();
-
-			StringBuilder temp = new StringBuilder("{");
-			string sep = "";
-
-			foreach (var entry in parameters) { //KeyValuePair<string,string>
-				temp.Append (sep);
-				temp.Append (entry.Key);
-				temp.Append (":");
-				temp.Append (entry.Value);
-				sep = ",";
-			}
-			temp.Append ("}");
-			return temp.ToString ();
+            
+            gameParameters = gameParameters ?? new Dictionary<string, string>();
+            
+			NativeReport.playscape_report_ReportMPJoinPublicGame(
+				sessionId,
+				gameName,
+				maxPlayers,
+				gameParameters.Count,
+				gameParameters.ToCType());
 		}
 
 		/// <summary>
@@ -1195,8 +816,7 @@ namespace Playscape.Analytics
 		/// The failure Reason.
 		/// </param>
 		public void ReportMPJoinPublicGameFailure(string failureReason) {
-            RemoteLogger.SetNetSessionId(null);
-			RemoteLogger.ReportAnalytics ("Networking/StartRandomGame/Failure/{0}", failureReason);
+			NativeReport.playscape_report_ReportMPJoinPublicGameFailure(failureReason);
 		}
         /// <summary>
         /// Bible section 10.12
@@ -1215,10 +835,7 @@ namespace Playscape.Analytics
         /// The player Id.
         /// </param>
 		public void ReportMPJoinedPublicGame(string sessionId, string gameName, int playerId) {
-			RemoteLogger.SetNetSessionId(sessionId);
-			RemoteLogger.ReportAnalytics ("Networking/StartRandomGame/JoinedRoom/RoomName:{0}/PlayerId:{1}",
-			                              gameName,
-			                              playerId);
+			NativeReport.playscape_report_ReportMPJoinedPublicGame(sessionId, gameName, playerId);
 		}
 		#endregion
 		
@@ -1237,10 +854,7 @@ namespace Playscape.Analytics
 		/// The max Players.
 		/// </param>
 		public void ReportMPCreatePrivateGame(string sessionId, string gameName, int maxPlayers) {
-			RemoteLogger.SetNetSessionId(sessionId);
-			RemoteLogger.ReportAnalytics ("Networking/StartGameWithFriends/CreateRoom/RoomName:{0}/MaxPlayers:{1}",
-			                              gameName,
-			                              maxPlayers);
+			NativeReport.playscape_report_ReportMPCreatePrivateGame(sessionId, gameName, maxPlayers);
 		}
 		
 		/// <summary>
@@ -1253,9 +867,10 @@ namespace Playscape.Analytics
 		/// List of friends invited to the private game.
 		/// </param>
 		public void ReportMPJoinPrivateGame(string gameName, List<string> friendIds) {
-			RemoteLogger.ReportAnalytics("Networking/StartGameWithFriends/RequestId:{0}/FriendIds:{1}",
-                                         gameName,
-			                             string.Join(",", friendIds.ToArray()));
+			NativeReport.playscape_report_ReportMPJoinPrivateGame(
+				gameName,
+				friendIds.Count,
+				friendIds.ToArray());
 		}
 		
 		/// <summary>
@@ -1270,9 +885,8 @@ namespace Playscape.Analytics
 		public void ReportMPJoinPrivateGameFailure(
 			string gameName,
 			string failureReason) {
-			RemoteLogger.SetNetSessionId(null);
-            RemoteLogger.ReportAnalytics ("Networking/StartGameWithFriends/Failure/{0}",
-			                              failureReason);
+
+			NativeReport.playscape_report_ReportMPJoinPrivateGameFailure(gameName, failureReason);
 		}
 		
 		/// <summary>
@@ -1289,10 +903,7 @@ namespace Playscape.Analytics
 		/// The player Id.
 		/// </param>
 		public void ReportMPJoinedPrivateGame(string sessionId, string gameName, int playerId) {
-			RemoteLogger.SetNetSessionId(sessionId);
-			RemoteLogger.ReportAnalytics ("Networking/StartGameWithFriends/JoinedRoom/RoomName:{0}/PlayerId:{1}",
-			                              gameName,
-			                              playerId);
+			NativeReport.playscape_report_ReportMPJoinedPrivateGame(sessionId, gameName, playerId);
 		}
 		#endregion
 		
@@ -1304,7 +915,7 @@ namespace Playscape.Analytics
 		/// The number Of Players.
 		/// </param>
 		public void ReportMPStartGame(int numberOfPlayers) {
-			RemoteLogger.ReportAnalytics ("Networking/StartGame/PlayerCount:{0}", numberOfPlayers);
+			NativeReport.playscape_report_ReportMPStartGame(numberOfPlayers);
 		}
 		
 		/// <summary>
@@ -1314,8 +925,7 @@ namespace Playscape.Analytics
 		/// The game Name.
 		/// </param>
 		public void ReportMPLeaveGame(string gameName) {
-			RemoteLogger.ReportAnalytics ("Networking/ConnectionStateChanged/LEAVING/RoomName:{0}", gameName);
-            RemoteLogger.SetNetSessionId(null);
+			NativeReport.playscape_report_ReportMPLeaveGame(gameName);
 		}
 
 
@@ -1326,14 +936,6 @@ namespace Playscape.Analytics
         #region Generic flows
 
         /// <summary>
-        /// Type to flow instances map
-        /// </summary>
-        private IDictionary<string, FlowInstance> mTypeToFlowInstance = new Dictionary<string, FlowInstance>();
-
-        /// <summary>
-        /// </summary>
-        private readonly FlowInstance mStubFlow = new StubFlowInstance();
-
         /// <summary>
         /// Registers a new flow and all its steps.
         /// 
@@ -1350,7 +952,11 @@ namespace Playscape.Analytics
         public void RegisterFlow(
             string type,
             IDictionary<string, int> stepNameToId) {
-			mTypeToFlowInstance[type] = new DefaultFlowInstance(type, stepNameToId);
+
+			NativeReport.playscape_report_RegisterFlow(
+				type,
+				stepNameToId.Count,
+				stepNameToId.ToCType());
 		}
 
         /// <summary>
@@ -1371,13 +977,8 @@ namespace Playscape.Analytics
         /// ArgumentException is thrown in DEBUG, and nothing is reported in
         /// RELEASE.
         public FlowInstance StartNewFlow(string type) {
-            if (mTypeToFlowInstance.ContainsKey(type))
-            {
-                return mTypeToFlowInstance[type];
-            } else
-            {
-                return mStubFlow;
-            }
+			NativeReport.playscape_report_StartNewFlow(type);
+			return new FlowInstance(type);
 		}
 
         /// <summary>
@@ -1402,37 +1003,14 @@ namespace Playscape.Analytics
             string stepName,
             string stepStatus,
             IDictionary<string, double> details) {
-                if (flow is StubFlowInstance)
-                {
-                    if (Debug.isDebugBuild)
-                    {
-                        throw new ArgumentException("The given flow is invalid!");
-                    }
-                } else if (flow is DefaultFlowInstance)
-                {
-                    var detailsString = new StringBuilder();
-                    var keysArray = new string[details.Keys.Count];
-                    details.Keys.CopyTo(keysArray, 0);
-                    Array.Sort(keysArray);
 
-                    bool isFirst = true;
-                    foreach (var key in keysArray)
-                    {
-                        if (!isFirst)
-                        {
-                            detailsString.Append("/");
-                        } else
-                        {
-                            isFirst = false;
-                        }
-
-                        detailsString.Append(key).Append("=").Append(details[key]);
-                    }
-
-                    RemoteLogger.ReportAnalytics("Flow/Type:{0}/SessionID:{5}/StepName:{1}/StepNumber:{2}/Status:{3}/{4}",
-                                               flow.Type, stepName, flow.GetStepId(stepName), stepStatus, detailsString, flow.Id);
-                }
-            }
+        	NativeReport.playscape_report_ReportFlowStep(
+				flow.Type,
+				stepName,
+				stepStatus,
+				details.Count,
+				details.ToCType());
+    	}
 
         #endregion
 
@@ -1468,16 +1046,10 @@ namespace Playscape.Analytics
             string level,
             IDictionary<string, double> additionalParams)
         {
-			RemoteLogger.SetLevelSessionId(Utils.CurrentTimeMillis.ToString());
-
-			RemoteLogger.ReportAnalytics(
-				"custom/Level {0}/Started{1}",
+			NativeReport.playscape_report_ReportLevelStarted(
 				level,
-				PlayscapeUtilities.FormatGameplayRelatedAdditionalParams(additionalParams));
-
-			RemoteLogger.ReportAnalytics(
-				"room/{0}",
-				level);
+				additionalParams.Count,
+				additionalParams.ToCType());
         }
 
         /// <summary>
@@ -1495,12 +1067,10 @@ namespace Playscape.Analytics
             string level,
             IDictionary<string, double> additionalParams)
         {
-			RemoteLogger.ReportAnalytics(
-				"custom/Level {0}/Completed{1}",
+			NativeReport.playscape_report_ReportLevelCompleted(
 				level,
-				PlayscapeUtilities.FormatGameplayRelatedAdditionalParams(additionalParams));
-			
-			RemoteLogger.SetLevelSessionId(null);
+		        additionalParams.Count,
+		        additionalParams.ToCType());
         }
 
         /// <summary>
@@ -1518,15 +1088,13 @@ namespace Playscape.Analytics
             string level,
             IDictionary<string, double> additionalParams)
         {
-			RemoteLogger.ReportAnalytics(
-				"custom/Level {0}/Failed{1}",
+			NativeReport.playscape_report_ReportLevelFailed(
 				level,
-				PlayscapeUtilities.FormatGameplayRelatedAdditionalParams(additionalParams));
-			
-			RemoteLogger.SetLevelSessionId(null);
+				additionalParams.Count,
+				additionalParams.ToCType());
         }
 
-        /// <summary>
+        /// <summary> 
         /// Achievement[achievement]/Unlocked/[params].
         /// </summary>
         /// <param name="achievement">
@@ -1539,10 +1107,10 @@ namespace Playscape.Analytics
             string achievement,
             IDictionary<string, double> additionalParams)
         {
-			RemoteLogger.ReportAnalytics(
-				"custom/Achievement{0}/Unlocked{1}",
+			NativeReport.playscape_report_ReportAchievementUnlocked(
 				achievement,
-				PlayscapeUtilities.FormatGameplayRelatedAdditionalParams(additionalParams));
+				additionalParams.Count,
+				additionalParams.ToCType());
         }
 
         /// <summary>
@@ -1558,10 +1126,10 @@ namespace Playscape.Analytics
             int itemId,
             IDictionary<string, double> additionalParams)
         {
-			RemoteLogger.ReportAnalytics(
-				"custom/Store/Item{0}/UnlockSuccessful{1}",
+			NativeReport.playscape_report_ReportItemUnlocked(
 				itemId,
-				PlayscapeUtilities.FormatGameplayRelatedAdditionalParams(additionalParams));
+				additionalParams.Count,
+				additionalParams.ToCType());
         }
 
         /// <summary>
@@ -1569,7 +1137,7 @@ namespace Playscape.Analytics
         /// </summary>
         public void ReportRatingDialogShow()
         {
-			RemoteLogger.ReportAnalytics("custom/Rating/Displayed");
+			NativeReport.playscape_report_ReportRatingDialogShow();
         }
 
         /// <summary>
@@ -1577,7 +1145,7 @@ namespace Playscape.Analytics
         /// </summary>
         public void ReportRatingDialogYes()
         {
-			RemoteLogger.ReportAnalytics("custom/Rating/Yes");
+			NativeReport.playscape_report_ReportRatingDialogYes();
         }
 
         /// <summary>
@@ -1585,7 +1153,7 @@ namespace Playscape.Analytics
         /// </summary>
         public void ReportRatingDialogNo()
         {
-			RemoteLogger.ReportAnalytics("custom/Rating/NoThanks");
+			NativeReport.playscape_report_ReportRatingDialogNo();
         }
 
         #endregion
@@ -1600,7 +1168,7 @@ namespace Playscape.Analytics
 	    /// </param>
 	    public void ReportSubscriptionState(ServiceState state)
         {
-            RemoteLogger.ReportAnalytics("custom/SubscriptionService/State:{0}", (int)state);
+			NativeReport.playscape_report_ReportSubscriptionState((int) state);
         }
 
         #endregion

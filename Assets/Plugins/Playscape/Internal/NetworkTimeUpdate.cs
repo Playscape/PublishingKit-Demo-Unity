@@ -21,7 +21,7 @@ namespace Playscape.Internal
 					RemoteLogger.SetNetworkTime(newNetTime);
 				}
 			}
-		}
+		} 
 
 	}
 
