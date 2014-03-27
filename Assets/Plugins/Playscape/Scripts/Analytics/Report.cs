@@ -116,11 +116,14 @@ namespace Playscape.Analytics
 		/// The provider.
 		/// </param>
 		public void InitMultiplayer(MPAnalyticsProvider provider) {
+			#if !UNITY_EDITOR
             NativeReport.GetCurrentNetworkTimeCallback callback = provider.ToCType();
 			NativeReport.playscape_report_InitMultiplayer(callback);
-
+			
 			// To keep the object alive.
 			mMpAnalyticsProvider = callback;
+			#endif
+
 		}
 
         /// <summary>
@@ -131,11 +134,13 @@ namespace Playscape.Analytics
         /// The provider.
         /// </param>
         public void InitSocial(SocialAnalyticsProvider provider) {
+			#if !UNITY_EDITOR
             NativeReport.GetCurrentSocialNetworkCallback callback = provider.ToCType();        
 			NativeReport.playscape_report_InitSocial(callback);
-
 			// To keep the object alive.
 			mSocialAnalyticsProvider = callback;
+			#endif
+
 		}
 
 		#region Lifecycle
@@ -149,7 +154,9 @@ namespace Playscape.Analytics
 		/// Resolved automatically by plugin
 		/// </param>
 		public void ReportActivation(string referrer) {
+#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportActivation(referrer);
+#endif
 		}
 		
 		/// <summary>
@@ -159,7 +166,9 @@ namespace Playscape.Analytics
 		/// The referrer.
 		/// </param>
 		public void ReportReferrer(string referrer) {
+#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportReferrer(referrer);
+#endif
 		}
 
         /// <summary>
@@ -169,7 +178,9 @@ namespace Playscape.Analytics
         /// The referrer.
         /// </param>
         public void ReportAppsFlyerReferrer(string referrer) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportAppsFlyerReferrer(referrer);
+#endif
 		}
 		
 		/// <summary>
@@ -182,7 +193,9 @@ namespace Playscape.Analytics
 		/// Resolved automatically by plugin
 		/// </param>
 		public void ReportLaunch(int launchCount) {
+#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportLaunch(launchCount);
+#endif
 		}
 		
 		#endregion
@@ -209,7 +222,9 @@ namespace Playscape.Analytics
                 string action,
                 string notificationId)
         {
+#if !UNITY_EDITOR
             NativeReport.playscape_report_ReportNotificationDisplayed(promotedGame, icon, action, notificationId);
+#endif
         }
 
 		
@@ -234,11 +249,13 @@ namespace Playscape.Analytics
 			string action,
 			string notificationId) 
         {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportNotificationClicked(
                     promotedGame,
 			        icon,
 			        action,
 			        notificationId);
+#endif
 		}
 		
 		#endregion
@@ -251,7 +268,9 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialLoadFailed(string location) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportInterstitialLoadFailed(location);
+#endif
 		}
 
         /// <summary>
@@ -261,7 +280,9 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialDismissed(string location) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportInterstitialDismissed(location);
+#endif
 		}
 
         /// <summary>
@@ -271,7 +292,9 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialClicked(string location) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportInterstitialClicked(location);
+#endif
 		}
 
         /// <summary>
@@ -281,7 +304,9 @@ namespace Playscape.Analytics
         /// The location.
         /// </param>
         public void ReportInterstitialShown(string location) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportInterstitialShown(location);
+#endif
 		}
 		#endregion
 		
@@ -294,7 +319,9 @@ namespace Playscape.Analytics
 		/// The custom Event.
 		/// </param>
 		public void ReportEvent(string customEvent) {
+#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportEvent(customEvent);
+#endif
 		}
 
 		#region Custom Analyics
@@ -316,7 +343,9 @@ namespace Playscape.Analytics
                 get
                 {
                     StringBuilder buffer = new StringBuilder(2048);
+					#if !UNITY_EDITOR
                     NativeReport.playscape_report_getCustomVariable(key, buffer.Capacity, buffer);
+					#endif
                     string theValue = buffer.ToString();
                     
                     if (theValue == "") {
@@ -328,6 +357,7 @@ namespace Playscape.Analytics
 
                 set
                 {
+					#if !UNITY_EDITOR
                     if (value != null)
                     {
                         NativeReport.playscape_report_setCustomVariable(key, value);
@@ -336,6 +366,7 @@ namespace Playscape.Analytics
                     {
 						NativeReport.playscape_report_removeCustomVariable(key);
                     }
+					#endif
                 }
             }
         }
@@ -360,7 +391,9 @@ namespace Playscape.Analytics
         /// </param>
         public void ReportPurchaseStarted(PurchaseItem item)
         {
+			#if !UNITY_EDITOR
             NativeReport.playscape_report_ReportPurchaseStarted(item.ToCType());
+#endif
         }
 
         #region Bible Section 5.08
@@ -395,12 +428,14 @@ namespace Playscape.Analytics
                 long currencyTimestamp,
                 string transactionId)
         {
+			#if !UNITY_EDITOR
             NativeReport.playscape_report_ReportPurchaseSuccess(
                 item.ToCType(),
                 amount,
 				currency,
                 currencyTimestamp,
                 transactionId);
+#endif
         }
         /// <summary>
         /// Should be called by purchase plugin
@@ -410,7 +445,9 @@ namespace Playscape.Analytics
         /// </param>
         public void ReportPurchaseCancelled(PurchaseItem item)
         {
+			#if !UNITY_EDITOR
             NativeReport.playscape_report_ReportPurchaseCancelled(item.ToCType());
+#endif
         }
         /// <summary>
         /// Should be called by purchase plugin
@@ -424,9 +461,11 @@ namespace Playscape.Analytics
         public void ReportPurchaseFailed(PurchaseItem item,
                 string failureReason)
         {
+			#if !UNITY_EDITOR
             NativeReport.playscape_report_ReportPurchaseFailed(
                 item.ToCType(),
                 failureReason);
+#endif
         }
         /// <summary>
         /// Should be called by purchase plugin
@@ -436,8 +475,10 @@ namespace Playscape.Analytics
         /// </param>
         public void ReportPurchaseAlreadyPurchased(PurchaseItem item)
         {
+			#if !UNITY_EDITOR
             NativeReport.playscape_report_ReportPurchaseAlreadyPurchased(
                 item.ToCType());
+#endif
         }
 
         #endregion
@@ -463,7 +504,9 @@ namespace Playscape.Analytics
 			bool isSilentLogin,
 			string whichUserLoggedIn) {
             
+			#if !UNITY_EDITOR
             NativeReport.playscape_report_ReportSocialLoginSuccess(isSilentLogin, whichUserLoggedIn);
+#endif
 		}
 
         /// <summary>
@@ -473,7 +516,9 @@ namespace Playscape.Analytics
         /// The is silent login, without any user interventoin (e.g restoring a login session using a stored token)
         /// </param>
         public void ReportSocialLoginFailed(bool isSilentLogin) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialLoginFailed(isSilentLogin);
+#endif
 		}
 
         /// <summary>
@@ -483,7 +528,9 @@ namespace Playscape.Analytics
         /// The is silent login, without any user interventoin (e.g restoring a login session using a stored token)
         /// </param>
         public void ReportSocialLoginCancelled(bool isSilentLogin) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialLoginCancelled(isSilentLogin);
+#endif
 		}
 
 		#endregion
@@ -494,21 +541,27 @@ namespace Playscape.Analytics
         /// Reports implicit social share, without a dialog.
         /// </summary>
         public void ReportSocialShareNoDialog() { // "Auto" in bible
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialShareNoDialog();
+#endif
 		}
 
         /// <summary>
         /// Reports a social share done through a dialog.
         /// </summary>
         public void ReportSocialShareDialog() {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialShareDialog();
+#endif
 		}
 
         /// <summary>
         /// Reports social share canceled, e.g user clicked cancel in the share dialog.
         /// </summary>
         public void ReportSocialShareCancelled() {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialShareCancelled();
+#endif
 		}
 		#endregion
 		
@@ -521,14 +574,18 @@ namespace Playscape.Analytics
         /// The friends count loaded.
         /// </param>
         public void ReportSocialFriendsLoaded(int friendsCount) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialFriendsLoaded(friendsCount);
+#endif
 		}
 		/// <summary>
 		/// Should report the correct variant according to social login
 		/// status
 		/// </summary>
 		public void ReportSocialFriendsLoadFailed() {
+			#if !UNITY_EDITOR
             NativeReport.playscape_report_ReportSocialFriendsLoadFailed();
+#endif
 		}
 		#endregion
 		
@@ -541,14 +598,18 @@ namespace Playscape.Analytics
         /// The score.
         /// </param>
         public void ReportSocialSubmitScore(long score) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialSubmitScore(score);
+#endif
 		}
 		
 		/// <summary>
 		/// Should report the RequestFailed variant
 		/// </summary>
 		public void ReportSocialSubmitScoreFailed() {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialSubmitScoreFailed();
+#endif
 		}
 		#endregion
 		
@@ -570,8 +631,10 @@ namespace Playscape.Analytics
 			string whichTargetUserId,
 			long uniqueRequestId)
 		{
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialRequestSent(
                     whichRequest, whichTargetUserId, uniqueRequestId);
+#endif
 		}
 
         /// <summary>
@@ -586,8 +649,9 @@ namespace Playscape.Analytics
         public void ReportSocialRequestFailed(
 			string whichRequest,
 			string failureReason) {
-
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialRequestFailed(whichRequest, failureReason);
+#endif
 		}
 		#endregion
 		
@@ -600,7 +664,9 @@ namespace Playscape.Analytics
         /// The amount of images retrieved succesfuly.
         /// </param>
         public void ReportSocialGetImagesSuccess(int numImages) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialGetImagesSuccess(numImages);
+#endif
 		}
 
         /// <summary>
@@ -610,7 +676,9 @@ namespace Playscape.Analytics
         /// The amount of images of which retrieval has failed.
         /// </param>
         public void ReportSocialGetImagesFailed(int numImages) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialGetImagesFailed(numImages);
+#endif
 		}
 		#endregion
 		
@@ -622,7 +690,9 @@ namespace Playscape.Analytics
 		/// The requests Count.
 		/// </param>
 		public void ReportSocialRequestsFound(int requestsCount) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialRequestsFound(requestsCount);
+#endif
 		}
 		
         /// <param name="whichRequest">
@@ -639,8 +709,9 @@ namespace Playscape.Analytics
 			string whichRequest,
 			string whoFromUserId,
 			long uniqueId) {
-
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSocialRequestDetails(whichRequest, whoFromUserId, uniqueId);
+#endif
 		}
 		#endregion
 		
@@ -653,7 +724,9 @@ namespace Playscape.Analytics
         /// The which leaderboard.
         /// </param>
         public void ReportLeaderboardOpened(string whichLeaderboard) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportLeaderboardOpened(whichLeaderboard);
+			#endif
 		}
 		#endregion
 
@@ -664,7 +737,9 @@ namespace Playscape.Analytics
         /// </summary>
         public void ReportSocialLogout()
         {
+			#if !UNITY_EDITOR
             NativeReport.playscape_report_ReportSocialLogout();
+#endif
         }
 
         #endregion
@@ -681,7 +756,9 @@ namespace Playscape.Analytics
         /// The server Name.
         /// </param>
 		public void ReportMPServerConnect(string serverName) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPServerConnect(serverName);
+#endif
 		}
 		/// <summary>
 		/// Bible section 10.32
@@ -695,8 +772,9 @@ namespace Playscape.Analytics
 		public void ReportMPServerConnectSuccess(
 			string serverName,
 			TimeSpan latency) {
-			
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPServerConnectSuccess(serverName, latency.Milliseconds);
+#endif
 		}
 		/// <summary>
 		/// Networking/StartGameWithFriends/Failure/[reason]
@@ -706,15 +784,18 @@ namespace Playscape.Analytics
 		/// The failure Reason.
 		/// </param>
 		public void ReportMPServerConnectFailed(string failureReason) {
-
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPServerConnectFailed(failureReason);
+			#endif
 		}
 		
 		/// <summary>
 		/// Bible section 10.34
 		/// </summary>
 		public void ReportMPServerDisconnect() {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPServerDisconnect();
+#endif
 		}
 		/// <summary>
 		/// Bible section 10.35
@@ -723,7 +804,9 @@ namespace Playscape.Analytics
 		/// The error Reason.
 		/// </param>
 		public void ReportMPServerError(string errorReason) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPServerError(errorReason);
+#endif
 		}
 		#endregion
 		
@@ -732,7 +815,9 @@ namespace Playscape.Analytics
 		/// Bible section 10.01
 		/// </summary>
 		public void ReportMPLoadOnlineFriends() {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPLoadOnlineFriends();
+#endif
 		}
 		/// <summary>
 		/// Bible section 10.02
@@ -741,7 +826,9 @@ namespace Playscape.Analytics
 		/// The friends Count.
 		/// </param>
 		public void ReportMPLoadOnlineFriendsSuccess(int friendsCount) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPLoadOnlineFriendsSuccess(friendsCount);
+#endif
 		}
 		#endregion
 		
@@ -766,12 +853,13 @@ namespace Playscape.Analytics
             IDictionary<string, string> gameParameters)
         {
             gameParameters = gameParameters ?? new Dictionary<string, string>();
-
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPCreatePublicGame(
 				sessionId,
 				maxPlayers,
 				gameParameters.Count,
 				gameParameters.ToCType());
+#endif
         }
 
         /// <summary>
@@ -800,12 +888,14 @@ namespace Playscape.Analytics
             
             gameParameters = gameParameters ?? new Dictionary<string, string>();
             
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPJoinPublicGame(
 				sessionId,
 				gameName,
 				maxPlayers,
 				gameParameters.Count,
 				gameParameters.ToCType());
+#endif
 		}
 
 		/// <summary>
@@ -816,7 +906,9 @@ namespace Playscape.Analytics
 		/// The failure Reason.
 		/// </param>
 		public void ReportMPJoinPublicGameFailure(string failureReason) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPJoinPublicGameFailure(failureReason);
+#endif
 		}
         /// <summary>
         /// Bible section 10.12
@@ -835,7 +927,9 @@ namespace Playscape.Analytics
         /// The player Id.
         /// </param>
 		public void ReportMPJoinedPublicGame(string sessionId, string gameName, int playerId) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPJoinedPublicGame(sessionId, gameName, playerId);
+#endif
 		}
 		#endregion
 		
@@ -854,7 +948,9 @@ namespace Playscape.Analytics
 		/// The max Players.
 		/// </param>
 		public void ReportMPCreatePrivateGame(string sessionId, string gameName, int maxPlayers) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPCreatePrivateGame(sessionId, gameName, maxPlayers);
+#endif
 		}
 		
 		/// <summary>
@@ -867,10 +963,12 @@ namespace Playscape.Analytics
 		/// List of friends invited to the private game.
 		/// </param>
 		public void ReportMPJoinPrivateGame(string gameName, List<string> friendIds) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPJoinPrivateGame(
 				gameName,
 				friendIds.Count,
 				friendIds.ToArray());
+#endif
 		}
 		
 		/// <summary>
@@ -886,7 +984,9 @@ namespace Playscape.Analytics
 			string gameName,
 			string failureReason) {
 
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPJoinPrivateGameFailure(gameName, failureReason);
+#endif
 		}
 		
 		/// <summary>
@@ -903,7 +1003,9 @@ namespace Playscape.Analytics
 		/// The player Id.
 		/// </param>
 		public void ReportMPJoinedPrivateGame(string sessionId, string gameName, int playerId) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPJoinedPrivateGame(sessionId, gameName, playerId);
+#endif
 		}
 		#endregion
 		
@@ -915,7 +1017,9 @@ namespace Playscape.Analytics
 		/// The number Of Players.
 		/// </param>
 		public void ReportMPStartGame(int numberOfPlayers) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPStartGame(numberOfPlayers);
+#endif
 		}
 		
 		/// <summary>
@@ -925,7 +1029,9 @@ namespace Playscape.Analytics
 		/// The game Name.
 		/// </param>
 		public void ReportMPLeaveGame(string gameName) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportMPLeaveGame(gameName);
+#endif
 		}
 
 
@@ -952,11 +1058,12 @@ namespace Playscape.Analytics
         public void RegisterFlow(
             string type,
             IDictionary<string, int> stepNameToId) {
-
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_RegisterFlow(
 				type,
 				stepNameToId.Count,
 				stepNameToId.ToCType());
+#endif
 		}
 
         /// <summary>
@@ -977,7 +1084,9 @@ namespace Playscape.Analytics
         /// ArgumentException is thrown in DEBUG, and nothing is reported in
         /// RELEASE.
         public FlowInstance StartNewFlow(string type) {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_StartNewFlow(type);
+#endif
 			return new FlowInstance(type);
 		}
 
@@ -1004,12 +1113,14 @@ namespace Playscape.Analytics
             string stepStatus,
             IDictionary<string, double> details) {
 
+			#if !UNITY_EDITOR
         	NativeReport.playscape_report_ReportFlowStep(
 				flow.Type,
 				stepName,
 				stepStatus,
 				details.Count,
 				details.ToCType());
+#endif
     	}
 
         #endregion
@@ -1046,10 +1157,12 @@ namespace Playscape.Analytics
             string level,
             IDictionary<string, double> additionalParams)
         {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportLevelStarted(
 				level,
 				additionalParams.Count,
 				additionalParams.ToCType());
+#endif
         }
 
         /// <summary>
@@ -1067,10 +1180,12 @@ namespace Playscape.Analytics
             string level,
             IDictionary<string, double> additionalParams)
         {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportLevelCompleted(
 				level,
 		        additionalParams.Count,
 		        additionalParams.ToCType());
+#endif
         }
 
         /// <summary>
@@ -1088,10 +1203,12 @@ namespace Playscape.Analytics
             string level,
             IDictionary<string, double> additionalParams)
         {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportLevelFailed(
 				level,
 				additionalParams.Count,
 				additionalParams.ToCType());
+#endif
         }
 
         /// <summary> 
@@ -1107,10 +1224,12 @@ namespace Playscape.Analytics
             string achievement,
             IDictionary<string, double> additionalParams)
         {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportAchievementUnlocked(
 				achievement,
 				additionalParams.Count,
 				additionalParams.ToCType());
+#endif
         }
 
         /// <summary>
@@ -1126,10 +1245,12 @@ namespace Playscape.Analytics
             int itemId,
             IDictionary<string, double> additionalParams)
         {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportItemUnlocked(
 				itemId,
 				additionalParams.Count,
 				additionalParams.ToCType());
+#endif
         }
 
         /// <summary>
@@ -1137,7 +1258,9 @@ namespace Playscape.Analytics
         /// </summary>
         public void ReportRatingDialogShow()
         {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportRatingDialogShow();
+#endif
         }
 
         /// <summary>
@@ -1145,7 +1268,9 @@ namespace Playscape.Analytics
         /// </summary>
         public void ReportRatingDialogYes()
         {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportRatingDialogYes();
+#endif
         }
 
         /// <summary>
@@ -1153,7 +1278,9 @@ namespace Playscape.Analytics
         /// </summary>
         public void ReportRatingDialogNo()
         {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportRatingDialogNo();
+#endif
         }
 
         #endregion
@@ -1168,7 +1295,9 @@ namespace Playscape.Analytics
 	    /// </param>
 	    public void ReportSubscriptionState(ServiceState state)
         {
+			#if !UNITY_EDITOR
 			NativeReport.playscape_report_ReportSubscriptionState((int) state);
+#endif
         }
 
         #endregion

@@ -87,7 +87,7 @@ public class NativeReport : MonoBehaviour {
     #endif
     
 	public static void Init() {
-		#if UNITY_ANDROID
+		#if UNITY_ANDROID && !UNITY_EDITOR
 		RegisterGetConnectivityReport(getConnectivityReport);
 		RegisterGenerateGuid(generateGuid);
 		RegisterGetCurrentTimeMillis(getCurrentTimeMillis);
