@@ -11,7 +11,7 @@ import com.unity3d.player.UnityPlayerNativeActivity;
  * @author maximr
  *
  */
-public class PlayscapeActivity extends com.facebook.unity.FBUnityPlayerActivity {
+public class PlayscapeActivity extends UnityPlayerNativeActivity {
 	
 	private ActivityLifeCycle mActivityLifeCycle;
 

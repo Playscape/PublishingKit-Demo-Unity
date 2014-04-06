@@ -47,8 +47,9 @@ public class GameController : MonoBehaviour {
 
 		Report.Instance.CustomVariables["ABTestSegment"] = abTestVal.ToString();
 
-		Report.Instance.ReportLevelStarted(Application.loadedLevelName, new Dictionary<string, double>());
-
+		var additionalParams = new Dictionary<string, double>();
+		additionalParams.Add("GameMode", 1);
+		Report.Instance.ReportLevelStarted(Application.loadedLevelName, additionalParams);
 
 		mTotalCollectibles = GameObject.FindGameObjectsWithTag(PICKUP_TAG).Length;
 

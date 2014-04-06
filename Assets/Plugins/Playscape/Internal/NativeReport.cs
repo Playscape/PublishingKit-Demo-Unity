@@ -10,27 +10,37 @@ using Playscape.Internal;
 using Playscape.Purchase;
 using Playscape.Analytics;
 
-
 public static class CInterop
 {
-	public static NativeReport.CPair<A, B>[] ToCType<A, B>(this IDictionary<A, B> dict)
+
+	public class KeysAndValues<K, V>
+{
+		public KeysAndValues(IDictionary<K, V> dict)
 	{
-		NativeReport.CPair<A, B>[] result = new NativeReport.CPair<A, B>[dict.Count];
-		int i = 0;
-		foreach (var item in dict) {
+			Keys = new K[dict.Count];
+			Values = new V[dict.Count];
+			int counter = 0;
 			
-			result[i] = new NativeReport.CPair<A, B>();
-			result[i].first = item.Key;
-			result[i].second = item.Value;
+			foreach (var item in dict)
+			{
+				Keys[counter] = item.Key;
+				Values[counter] = item.Value;
 			
-			i++;
+				counter++;
 		}
-		return result;
+		}
+
+		public K[] Keys { get; private set; }
+		public V[] Values { get; private set; }
 	}
 	
 	public static NativeReport.CPurchaseItem ToCType(this PurchaseItem item)
 	{
 		return new NativeReport.CPurchaseItem(item);
+	}
+	
+	public static KeysAndValues<K, V> ToKeysAndValues<K, V>(this IDictionary<K, V> dict) {
+		return new KeysAndValues<K, V>(dict);
 	}
 	
 	private class MPAnalyticsProviderAdapter {
@@ -114,13 +124,6 @@ public class NativeReport : MonoBehaviour {
 		}
 		
 		string name;
-	}
-	
-	[StructLayout(LayoutKind.Sequential)]
-	public struct CPair<A, B>
-	{
-		public A first;
-		public B second;
 	}
 	
 	[DllImport(SHARED_LIBRARY)]
@@ -310,7 +313,8 @@ public class NativeReport : MonoBehaviour {
 		string sessionId,
 		int maxPlayers,
 		int gameParametersCount,
-		CPair<string, string>[] gameParameters);
+		string[] gameParametersKeys,
+		string[] gameParametersValues);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportMPJoinPublicGame(
@@ -318,7 +322,8 @@ public class NativeReport : MonoBehaviour {
 		string gameName,
 		int maxPlayers,
 		int gameParametersCount,
-		CPair<string, string>[] gameParameters);
+		string[] gameParametersKeys,
+		string[] gameParametersValues);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportMPJoinPublicGameFailure(string failureReason);
@@ -369,7 +374,8 @@ public class NativeReport : MonoBehaviour {
 	public static extern void playscape_report_RegisterFlow(
 		string type,
 		int stepNameToIdCount,
-		CPair<string, int>[] stepNameToId);
+		string[] stepNameToIdKeys,
+		int[] stepNameToIdValues);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_StartNewFlow(string type);
@@ -380,7 +386,8 @@ public class NativeReport : MonoBehaviour {
 		string stepName,
 		string stepStatus,
 		int detailsCount,
-		CPair<string, double>[] details);
+		string[] detailsKeys,
+		double[] detailsValues);
 	
 	
 	
@@ -388,31 +395,36 @@ public class NativeReport : MonoBehaviour {
 	public static extern void playscape_report_ReportLevelStarted(
 		string level,
 		int additionalParamsCount,
-		CPair<string, double>[] additionalParams);
+		string[] additionalParamsKeys,
+		double[] additionalParamsValues);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportLevelCompleted(
 		string level,
 		int additionalParamsCount,
-		CPair<string, double>[] additionalParams);
+		string[] additionalParamsKeys,
+		double[] additionalParamsValues);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportLevelFailed(
 		string level,
 		int additionalParamsCount,
-		CPair<string, double>[] additionalParams);
+		string[] additionalParamsKeys,
+		double[] additionalParamsValues);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportAchievementUnlocked(
 		string achievement,
 		int additionalParamsCount,
-		CPair<string, double>[] additionalParams);
+		string[] additionalParamsKeys,
+		double[] additionalParamsValues);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportItemUnlocked(
 		int itemId,
 		int additionalParamsCount,
-		CPair<string, double>[] additionalParams);
+		string[] additionalParamsKeys,
+		double[] additionalParamsValues);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportRatingDialogShow();
