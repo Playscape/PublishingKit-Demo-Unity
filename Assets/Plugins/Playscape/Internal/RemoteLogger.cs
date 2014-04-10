@@ -56,19 +56,7 @@ namespace Playscape.Internal {
 			remoteLoggerClass.CallStatic("dumpNow");
 	#endif
 	    }
-
-		/// <summary>
-		/// Sets the GMSID field.
-		/// </summary>
-		/// <param name="sessionId">Session identifier.</param>
-		public static void SetGameSessionId(string sessionId) {
-			L.D("GMSID updated: {0}", sessionId);
-	#if !UNITY_EDITOR && UNITY_ANDROID
-			initializeAndroidRemoteLogger();
-			remoteLoggerClass.CallStatic("setGameSessionId", sessionId);
-	#endif
-		}
-		
+        
 		// NETSID field
 		/// <summary>
 		/// Sets the NETSID field..

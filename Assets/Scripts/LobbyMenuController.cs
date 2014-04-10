@@ -65,7 +65,8 @@ public class LobbyMenuController : MonoBehaviour {
 		}
 
 		public static string CreateRoomName(string roomName, bool isPrivate) {
-			return string.Format("room_{0}_{1}", roomName, isPrivate ? "private" : "public");
+
+			return string.Format("room_{0}_{1}_{2}", roomName, isPrivate ? "private" : "public", GameState.UniqueRequestId);
 		}
 
 		/// <summary>
@@ -97,6 +98,7 @@ public class LobbyMenuController : MonoBehaviour {
 
 		public TryJoiningExistingRoom (string roomName)
 		{
+			Debug.Log("TryJoiningExistingRoom: " + roomName);
 			PhotonNetwork.JoinRoom(roomName);
 		}
 
@@ -139,6 +141,7 @@ public class LobbyMenuController : MonoBehaviour {
 
 			Report.Instance.ReportMPCreatePrivateGame(customProperties[SESSION_ID].ToString(), roomName, PLAYERS_COUNT);
 
+			Debug.Log("TryCreatingRoom: " + roomName);
 			PhotonNetwork.CreateRoom(roomName, false, true, PLAYERS_COUNT, customProperties, new string[]{ SESSION_ID });
 		}
 

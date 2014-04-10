@@ -190,8 +190,10 @@ public class SocialController : MonoBehaviour {
 
 									var requestIds = Uri.UnescapeDataString(value).Split(',');
 
-									// First request will do
-									HandleInvite(requestIds[0]);
+									var lastIndex = requestIds.Length - 1;
+
+									// Operate on the last request id found.
+									HandleInvite(requestIds[lastIndex]);
 								}
 							}
 						}
@@ -252,7 +254,8 @@ public class SocialController : MonoBehaviour {
 					if (requestData != null) {
 
 						if (requestData.ContainsKey("uniqueRequestId")) {
-							long uniqueRequestId = long.Parse(requestData["uniqueRequestId"].ToString());
+							GameState.UniqueRequestId = requestData["uniqueRequestId"].ToString();
+							long uniqueRequestId = long.Parse(GameState.UniqueRequestId);
 							Report.Instance.ReportSocialRequestDetails(REQUEST_TYPE_INVITE, fromUserId, uniqueRequestId);
 
 #if !UNITY_EDITOR
@@ -342,6 +345,7 @@ public class SocialController : MonoBehaviour {
 
 		var dataJson = new Dictionary<string, string>(1);
 		dataJson["uniqueRequestId"] = uniqueRequestId.ToString();
+		GameState.UniqueRequestId = uniqueRequestId.ToString();
 
 		FB.AppRequest("Hey! Let's play Roll A Ball multiplayer", 
 		              new string[] {facebookFriend.FacebookId}, "", null, null, Json.Serialize(dataJson), "Invite", 

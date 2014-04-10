@@ -12,6 +12,11 @@ using Playscape.Analytics;
 
 public static class CInterop
 {
+	// Solution taken from here: http://answers.unity3d.com/questions/191234/unity-ios-function-pointers.html
+	public class MonoPInvokeCallbackAttribute : System.Attribute {
+		private Type type;
+		public MonoPInvokeCallbackAttribute(Type t ) {  type = t; }
+	}
 
 	public class KeysAndValues<K, V>
 {
@@ -42,49 +47,37 @@ public static class CInterop
 	public static KeysAndValues<K, V> ToKeysAndValues<K, V>(this IDictionary<K, V> dict) {
 		return new KeysAndValues<K, V>(dict);
 	}
-	
-	private class MPAnalyticsProviderAdapter {
-		public MPAnalyticsProviderAdapter(MPAnalyticsProvider provider)
-		{
-			mProvider = provider;
-		}
-		
-		public int GetCurrentNetworkTime()
-		{
-			return mProvider.CurrentNetworkTime;
-		}
-		
-		private MPAnalyticsProvider mProvider;
-	}
-	
-	public static NativeReport.GetCurrentNetworkTimeCallback ToCType(this MPAnalyticsProvider provider)
+
+	[MonoPInvokeCallback(typeof(NativeReport.GetCurrentNetworkTimeCallback))]
+	public static int GetCurrentNetworkTime()
 	{
-		return new MPAnalyticsProviderAdapter(provider).GetCurrentNetworkTime;
+		return mMpProvider.CurrentNetworkTime;
 	}
-	
-	private class SocialAnalyticsProviderAdapter {
-		public SocialAnalyticsProviderAdapter(SocialAnalyticsProvider provider)
-		{
-			mProvider = provider;
-		}
-		
-		public int GetCurrentNetwork()
-		{
-			SocialNetwork? network = mProvider.CurrentNetwork;
-			
-			if (network.HasValue) {
-				return (int) network;
-			} else {
-				return 0; // NoSocialNetwork
-			}
-		}
-		
-		private SocialAnalyticsProvider mProvider;
-	}
-	
-	public static NativeReport.GetCurrentSocialNetworkCallback ToCType(this SocialAnalyticsProvider provider)
+
+	private static MPAnalyticsProvider mMpProvider;
+	public static void SetMPAnalyticsProvider(MPAnalyticsProvider provider)
 	{
-		return new SocialAnalyticsProviderAdapter(provider).GetCurrentNetwork;
+		mMpProvider = provider;
+	}
+	
+
+	private static SocialAnalyticsProvider mSocialProvider;
+
+	[MonoPInvokeCallback(typeof(NativeReport.GetCurrentSocialNetworkCallback))]
+	public static int GetCurrentNetwork()
+	{
+		SocialNetwork? network = mSocialProvider.CurrentNetwork;
+		
+		if (network.HasValue) {
+			return (int) network;
+		} else {
+			return 0; // NoSocialNetwork
+		}
+	}
+
+	public static void SetSocialAnalyticsProvider(SocialAnalyticsProvider provider)
+	{
+		mSocialProvider = provider;
 	}
 }
 
@@ -102,7 +95,6 @@ public class NativeReport : MonoBehaviour {
 		RegisterGenerateGuid(generateGuid);
 		RegisterGetCurrentTimeMillis(getCurrentTimeMillis);
 		RegisterReport(report);
-		RegisterSetGameSessionId(setGameSessionId);
 		RegisterSetNetSessionId(setNetSessionId);
 		RegisterSetLevelSessionId(setLevelSessionId);
 		RegisterSetGameAuxVars(setGameAuxVars);
@@ -455,10 +447,6 @@ public class NativeReport : MonoBehaviour {
 	
 	private static void report(string text) {
 		RemoteLogger.Log(RemoteLogger.LogLevel.Info, "RemoteLogger-Unity", text);
-	}
-	
-	private static void setGameSessionId(string text) {
-		RemoteLogger.SetGameSessionId(text);
 	}
 	
 	private static void setNetSessionId(string text) {

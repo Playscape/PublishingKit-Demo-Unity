@@ -27,7 +27,7 @@ namespace Playscape.Editor {
 	/// </summary>
 	class BuildProcessor : MonoBehaviour {
 
-		[PostProcessBuild]
+		[PostProcessBuild(200)]
 		public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject) {
 			L.D ("Playscape OnPostprocessBuild...");
 

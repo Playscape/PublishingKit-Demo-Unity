@@ -13,4 +13,6 @@ public static class GameState {
 
 	public static bool IsHost = false;
 	public static GameType CurrentGameType = GameType.SinglePlayer;
+
+	public static string UniqueRequestId;
 }

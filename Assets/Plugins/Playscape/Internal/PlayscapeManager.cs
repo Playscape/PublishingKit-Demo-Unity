@@ -52,7 +52,6 @@ namespace Playscape.Internal
             
 			RemoteLogger.Init();
 			NativeReport.Init();
-			GenerateGMSID();
 			AddPushWooshScripts();
 
 			// Makes this game object live forever
@@ -98,16 +97,6 @@ namespace Playscape.Internal
 		{
 			NetworkTimeUpdate.UpdateNetworkTimeInRemoteLogger();
 		}
-
-	    /// <summary>
-	    /// Generate game session unique identifier
-	    /// </summary>
-	    private void GenerateGMSID()
-		{
-			RemoteLogger.SetGameSessionId(PlayscapeUtilities.GenerateRandomId());
-		}
-
-
 	}
 
 }

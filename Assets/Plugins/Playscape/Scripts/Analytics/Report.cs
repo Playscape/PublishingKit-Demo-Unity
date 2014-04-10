@@ -117,11 +117,10 @@ namespace Playscape.Analytics
 		/// </param>
 		public void InitMultiplayer(MPAnalyticsProvider provider) {
 			#if !UNITY_EDITOR
-            NativeReport.GetCurrentNetworkTimeCallback callback = provider.ToCType();
-			NativeReport.playscape_report_InitMultiplayer(callback);
-			
-			// To keep the object alive.
-			mMpAnalyticsProvider = callback;
+            
+			CInterop.SetMPAnalyticsProvider(provider);
+			NativeReport.playscape_report_InitMultiplayer(CInterop.GetCurrentNetworkTime);
+
 			#endif
 
 		}
@@ -135,10 +134,10 @@ namespace Playscape.Analytics
         /// </param>
         public void InitSocial(SocialAnalyticsProvider provider) {
 			#if !UNITY_EDITOR
-            NativeReport.GetCurrentSocialNetworkCallback callback = provider.ToCType();        
-			NativeReport.playscape_report_InitSocial(callback);
-			// To keep the object alive.
-			mSocialAnalyticsProvider = callback;
+
+			CInterop.SetSocialAnalyticsProvider(provider);   
+			NativeReport.playscape_report_InitSocial(CInterop.GetCurrentNetwork);
+		
 			#endif
 
 		}
