@@ -256,6 +256,10 @@ public class SocialController : MonoBehaviour {
 						if (requestData.ContainsKey("uniqueRequestId")) {
 							GameState.UniqueRequestId = requestData["uniqueRequestId"].ToString();
 							long uniqueRequestId = long.Parse(GameState.UniqueRequestId);
+
+							// Report 1 request found, since we report this when we receive a request,
+							// not in case we poll to check pending requests.
+							Report.Instance.ReportSocialRequestsFound(1);
 							Report.Instance.ReportSocialRequestDetails(REQUEST_TYPE_INVITE, fromUserId, uniqueRequestId);
 
 #if !UNITY_EDITOR
