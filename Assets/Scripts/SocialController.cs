@@ -104,12 +104,34 @@ public class SocialController : MonoBehaviour {
 			mDownloadedFriends = true;
 		}
 
+
+
+
 #if UNITY_ANDROID || UNITY_IPHONE || UNITY_EDITOR
 		enabled = false;
 		FB.Init(SetInit, OnHideUnity);
 #endif
 		// =TEST-Invite
 		//ReceiveDummyInvite();
+	}
+
+	private string getQueryKeyValue(string queryString, string theKey) {
+		if (queryString.IndexOf(theKey) != -1) {
+			var keysAndValues = queryString.Split('&');
+			foreach (var keyValue in keysAndValues) {
+				var keyValueParts = keyValue.Split('=');
+				if (keyValueParts.Length == 2) {
+					var key = keyValueParts[0];
+					var value = keyValueParts[1];
+
+					if (key == theKey) {
+						return value;
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 	public void ReceiveDummyInvite() {
@@ -163,9 +185,18 @@ public class SocialController : MonoBehaviour {
 		FB.GetDeepLink(delegate (FBResult data) {
 			if(!string.IsNullOrEmpty(data.Text)) {
 				Uri uri = null;
-
+				
 				try {
-				uri = new Uri(data.Text);
+					// target_url can be found in iOS, the actual fb uri with request ids contained there, let's parse it -
+					// iOS Uri example: "fb274700456018483://authorize/#access_token=CAAD51q8ZAwjMBANJpS4zi3tNBk7P9ySroe2wiyrhGcWQ2dK6Gigv4diNg5C6pjGHBGt0tkW3GUZBjZApL8yolnq7c7EERwiok5vhe5twWBKx0e3eWLZCiCi7M1uF03QtNZBWf3Pa4zSzIDsPEmiqgkRrvnCix1BqJ5PQrlhuoA8e6YAsTxfZBtc9t9A5rQpCky5Gv9ZBLlxY4jR14CP2kqPNzhwoaQyM5MZD&expires_in=86400&target_url=http%3A%2F%2Fwww.facebook.com%2Fappcenter%2F274700456018483%3Frequest_ids%3D285810111586443%252C1410310519239633%252C228590510671757%252C494089210696235%252C385755111564938%252C290097021154987%252C682808281775676%252C439421586203685%252C537235563062776%252C300395600115003%252C1497922937097115%252C615165301890941%26ref%3Dnotif%26app_request_type%3Duser_to_user";
+					Debug.Log ("Got deeplink uri: " + data.Text);
+					string targetUrlValue = getQueryKeyValue(data.Text, "target_url");
+					if (targetUrlValue != null) {
+						uri = new Uri(Uri.UnescapeDataString(targetUrlValue));
+					} else {
+						uri = new Uri(data.Text);
+					}
+
 				} catch (UriFormatException e) {
 					Debug.LogException(e);
 				}
@@ -174,30 +205,29 @@ public class SocialController : MonoBehaviour {
 						FacebookLogin(CheckForIncomingRequests);
 						return;
 					}
+
 					if (OnSocialRequestReceived != null) {
 						OnSocialRequestReceived();
 					}
+
+					// Common handling for Android and iOS
 					var queryString = uri.Query;
-					if (queryString.IndexOf("request_ids") != -1) {
-						var keysAndValues = queryString.Split('&');
-						foreach (var keyValue in keysAndValues) {
-							var keyValueParts = keyValue.Split('=');
-							if (keyValueParts.Length == 2) {
-								var key = keyValueParts[0];
-								var value = keyValueParts[1];
-
-								if (key == "request_ids") {
-
-									var requestIds = Uri.UnescapeDataString(value).Split(',');
-
-									var lastIndex = requestIds.Length - 1;
-
-									// Operate on the last request id found.
-									HandleInvite(requestIds[lastIndex]);
-								}
-							}
-						}
+					if (queryString.StartsWith("?")) {
+						queryString = queryString.Substring(1);
 					}
+					
+					string requestIdsValue = getQueryKeyValue(queryString, "request_ids");
+					if (requestIdsValue != null) {
+						string [] requestIds = Uri.UnescapeDataString(requestIdsValue).Split(',');
+						var lastIndex = requestIds.Length - 1;
+						
+						// Operate on the last request id found.
+						HandleInvite(requestIds[lastIndex]);
+						Debug.Log ("Using last request id - " + requestIds[lastIndex]);
+					} else {
+						Debug.LogError("requestIdsValue is null!!!");
+					}
+				
 				}
 			}
 		});
