@@ -33,14 +33,24 @@ public class Build : MonoBehaviour {
 	[MenuItem("Window/Build for Android")]
 	public static void BuildAndroid() {
 		Configure();
-		BuildPipeline.BuildPlayer(GetAllScenes(), buildConfig.OutputPath, BuildTarget.Android, BuildOptions.AcceptExternalModificationsToPlayer | BuildOptions.Development);
+		var errorMessage = BuildPipeline.BuildPlayer(GetAllScenes(), buildConfig.OutputPath, BuildTarget.Android, BuildOptions.AcceptExternalModificationsToPlayer | BuildOptions.Development);
+        
+        if (!string.IsNullOrEmpty(errorMessage))
+		{
+			throw new Exception(errorMessage);
+		}
 	}
     
     [MenuItem("Window/Build for IOS")]
 	public static void BuildIOS() {
 		Configure();
         PlayerSettings.iOS.sdkVersion = iOSSdkVersion.DeviceSDK;
-		BuildPipeline.BuildPlayer(GetAllScenes(), buildConfig.OutputPath, BuildTarget.iPhone, BuildOptions.Development);
+		var errorMessage = BuildPipeline.BuildPlayer(GetAllScenes(), buildConfig.OutputPath, BuildTarget.iPhone, BuildOptions.Development);
+        
+        if (!string.IsNullOrEmpty(errorMessage))
+		{
+			throw new Exception(errorMessage);
+		}
 	}
 
 	private static BuildConfig parseArgs() {
