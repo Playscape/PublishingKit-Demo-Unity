@@ -39,7 +39,7 @@ public class Build : MonoBehaviour {
     [MenuItem("Window/Build for IOS")]
 	public static void BuildIOS() {
 		Configure();
-        PlayerSettings.iOS.sdkVersion = iOSSdkVersion.SimulatorSDK;
+        PlayerSettings.iOS.sdkVersion = iOSSdkVersion.DeviceSDK;
 		BuildPipeline.BuildPlayer(GetAllScenes(), buildConfig.OutputPath, BuildTarget.iPhone, BuildOptions.Development);
 	}
 
