@@ -368,6 +368,16 @@ namespace Playscape.Analytics
 					#endif
                 }
             }
+            
+			/// <summary>
+        	/// Clears all custom variables.
+        	/// </summary>
+            public void Clear()
+            {
+                #if !UNITY_EDITOR
+                NativeReport.playscape_report_clearCustomVariables();
+                #endif
+            }
         }
 
         /// <summary>

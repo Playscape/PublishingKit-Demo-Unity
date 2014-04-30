@@ -93,7 +93,17 @@ namespace Playscape.Internal {
 			L.D("PushWoosh Payload: {0}", payload);
 		}
 
+		public void ReportAllTags() {
+			#if !UNITY_EDITOR
+			playscape_TagReporter_reportAllTags();
+			#endif
+		}
+
 		private void ReportSentTags(string tagName, string tagValue) {
+			#if !UNITY_EDITOR
+			playscape_TagReporter_setTag(tagName, tagValue);
+			#endif
+
 			var sb = new StringBuilder();
 			sb.Append("Sent");
 
@@ -161,6 +171,16 @@ namespace Playscape.Internal {
 		protected abstract void SetTagImpl(string name, string value);
 		protected abstract void SetTagImpl(string name, int value); 
 
+		#if UNITY_IPHONE
+		private const string SHARED_LIBRARY = "__Internal";
+		#else
+		private const string SHARED_LIBRARY = "playscape_pubkit";
+		#endif
 
+		[DllImport(SHARED_LIBRARY)]
+		public static extern void playscape_TagReporter_setTag(string key, string value);
+
+		[DllImport(SHARED_LIBRARY)]
+		public static extern void playscape_TagReporter_reportAllTags();
 	}
 }

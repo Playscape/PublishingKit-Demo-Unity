@@ -85,8 +85,12 @@ namespace Playscape.Internal
 		{
 			#if UNITY_ANDROID
 			gameObject.AddComponent(typeof(PushNotificationsAndroid));
+			PushWooshCommon pushWoosh = (PushWooshCommon) gameObject.GetComponent(typeof(PushNotificationsAndroid));
+			pushWoosh.ReportAllTags();
 			#elif UNITY_IPHONE
 			gameObject.AddComponent(typeof(PushNotificationsIOS ));
+			PushWooshCommon pushWoosh = (PushWooshCommon) gameObject.GetComponent(typeof(PushNotificationsIOS));
+			pushWoosh.ReportAllTags();
 			#endif
 		}
 

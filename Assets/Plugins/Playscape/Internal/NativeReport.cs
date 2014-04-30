@@ -177,10 +177,13 @@ public class NativeReport : MonoBehaviour {
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_removeCustomVariable(string key);
-	
+    
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_getCustomVariable(string key, int outLength, StringBuilder outValue);
-    
+
+    [DllImport(SHARED_LIBRARY)]
+	public static extern void playscape_report_clearCustomVariables();	
+	
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportPurchaseStarted(CPurchaseItem item);
