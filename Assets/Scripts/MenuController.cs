@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Text;
 using Chartboost;
+using Playscape.Notifications;
 
 public class MenuController : MonoBehaviour {
 
@@ -93,7 +94,16 @@ public class MenuController : MonoBehaviour {
 			#endif
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 2.0f, buttonWidth, buttonHeight), QUIT)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 2.0f, buttonWidth, buttonHeight), "Set PW custom tags")) {
+			int randomValue = (int) Random.Range(0, 20000);
+
+			PushWoosh.Instance.SetTag("customTag1", randomValue.ToString());
+			PushWoosh.Instance.SetTag("customTag2", (randomValue + 1).ToString());
+			PushWoosh.Instance.SetTag("customTag3Numeric", randomValue + 2);
+			PushWoosh.Instance.SetTag("customTag4Numeric", randomValue + 4);
+		}
+
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 6 + marginTop * 2.2f, buttonWidth, buttonHeight), QUIT)) {
 			Application.Quit ();
 		}
 	}

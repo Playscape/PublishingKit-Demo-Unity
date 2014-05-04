@@ -76,8 +76,16 @@ namespace Playscape.Editor {
 				contents = AppendAfterLastToken(contents, new string[] {"/* Begin PBXFrameworksBuildPhase section */", "files = ("}, "\nBDCDD2C918A253EF0099F776 /* AdSupport.framework in Frameworks */,");
 				contents = AppendAfterLastToken(contents, new string[] {"29B97323FDCFA39411CA2CEA /* Frameworks */ = {", "children = ("}, "\nBDCDD2C818A253EF0099F776 /* AdSupport.framework */,");
 
+				// Adds Storekit.Framework, needed for Chartboost
+				contents = AppendAfterLastToken(contents, new string[] {"/* Begin PBXBuildFile section */"}, "\nBD9F3E9119127BE9001103C2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD9F3E9019127BE9001103C2 /* StoreKit.framework */; };");
+				contents = AppendAfterLastToken(contents, new string[] {"/* Begin PBXFileReference section */"}, "\nBD9F3E9019127BE9001103C2 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };");
+				contents = AppendAfterLastToken(contents, new string[] {"/* Begin PBXFrameworksBuildPhase section */", "files = ("}, "\nBD9F3E9119127BE9001103C2 /* StoreKit.framework in Frameworks */,");
+				contents = AppendAfterLastToken(contents, new string[] {"29B97323FDCFA39411CA2CEA /* Frameworks */ = {", "children = ("}, "\nBD9F3E9019127BE9001103C2 /* StoreKit.framework */,");
+
 				// Make CoreLocation.Framework optional
 				contents = contents.Replace("/* CoreLocation.framework */; };", "/* CoreLocation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };");
+
+
 
 				// TODO add warning if failed
 				File.WriteAllText(filePath, contents);
