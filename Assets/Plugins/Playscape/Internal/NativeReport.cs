@@ -45,7 +45,12 @@ public static class CInterop
 	}
 	
 	public static KeysAndValues<K, V> ToKeysAndValues<K, V>(this IDictionary<K, V> dict) {
-		return new KeysAndValues<K, V>(dict);
+		if (dict != null) {
+					return new KeysAndValues<K, V> (dict);
+		}
+
+
+		return null;
 	}
 
 	[MonoPInvokeCallback(typeof(NativeReport.GetCurrentNetworkTimeCallback))]

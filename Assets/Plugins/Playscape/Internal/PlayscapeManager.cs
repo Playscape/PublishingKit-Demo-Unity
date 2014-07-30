@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Playscape.Analytics;
 using UnityEngine;
 using Playscape.Internal;
@@ -11,10 +11,6 @@ namespace Playscape.Internal
     /// </summary>
     public class PlayscapeManager : MonoBehaviour
 	{
-        /// <summary>
-        /// </summary>
-		private const string REAL_CHARTBOOST_MANAGER_GAME_OBJECT_NAME = "ChartBoostManager";
-
 	    /// <summary>
 	    /// </summary>
 	    public const string PLAYSCAPE_MANAGER_GAMEOBJECT_NAME = "PlayscapeManager";
@@ -53,6 +49,7 @@ namespace Playscape.Internal
 			RemoteLogger.Init();
 			NativeReport.Init();
 			AddPushWooshScripts();
+			AddAdScripts();
 
 			// Makes this game object live forever
 			DontDestroyOnLoad(gameObject);
@@ -67,9 +64,6 @@ namespace Playscape.Internal
 		/// Start this instance.
 		/// </summary>
 		public void Start() {
-			if (GameObject.Find(REAL_CHARTBOOST_MANAGER_GAME_OBJECT_NAME) == null) {
-				L.W(Warnings.CHARTBOOST_NOT_INITIALIZED);
-			}
 		}
 
 		/// <summary>
@@ -91,6 +85,18 @@ namespace Playscape.Internal
 			gameObject.AddComponent(typeof(PushNotificationsIOS ));
 			PushWooshCommon pushWoosh = (PushWooshCommon) gameObject.GetComponent(typeof(PushNotificationsIOS));
 			pushWoosh.ReportAllTags();
+			#endif
+		}
+
+		/// <summary>
+		/// Adds the ad scripts.
+		/// </summary>
+		void AddAdScripts ()
+		{
+			#if UNITY_ANDROID && !UNITY_EDITOR
+			gameObject.AddComponent(typeof(PlayscapeAdsAndroid));
+			#else
+			gameObject.AddComponent(typeof(PlayscapeAdsMock));
 			#endif
 		}
 

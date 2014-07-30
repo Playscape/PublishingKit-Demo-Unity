@@ -3,12 +3,12 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.INTERNET" />
-    
         
     <application
         android:name="com.playscape.playscapeapp.PlayscapeApp"
@@ -20,10 +20,10 @@
                   android:label="@string/app_name"
                   android:launchMode="singleTask"
                   android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen">
+            <meta-data android:name="unityplayer.ForwardNativeEventsToDalvik" android:value="true" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <meta-data android:name="unityplayer.ForwardNativeEventsToDalvik" android:value="true" />
             </intent-filter>
        </activity>
         
@@ -48,6 +48,54 @@
           <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
         </intent-filter>
       </receiver>
+      
+      <!-- StartApp Ads -->
+      <activity android:name="com.startapp.android.publish.list3d.List3DActivity"
+                  android:theme="@android:style/Theme" />
+
+      <activity android:name="com.startapp.android.publish.AppWallActivity"
+                  android:theme="@android:style/Theme.Translucent"
+                  android:configChanges="orientation|keyboardHidden" />
+
+      <!-- MoPub Ads -->
+      <activity android:name="com.mopub.mobileads.MoPubActivity" android:configChanges="keyboardHidden|orientation"/>
+      <activity android:name="com.mopub.mobileads.MraidActivity" android:configChanges="keyboardHidden|orientation"/>
+      <activity android:name="com.mopub.mobileads.MraidBrowser" android:configChanges="keyboardHidden|orientation"/>
+      <activity android:name="com.mopub.mobileads.MraidVideoPlayerActivity" android:configChanges="keyboardHidden|orientation"/>
+      
+      <!-- Vungle Video Ads -->
+      <activity
+          android:name="com.vungle.sdk.VungleAdvert"
+          android:configChanges="keyboardHidden|orientation|screenSize"
+          android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+    
+      <service android:name="com.vungle.sdk.VungleIntentService"/>
+      
+      <!-- AdColony Video Ads -->
+      <activity android:name="com.jirbo.adcolony.AdColonyOverlay"
+        android:configChanges="keyboardHidden|orientation|screenSize"
+        android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+
+        <activity android:name="com.jirbo.adcolony.AdColonyFullscreen"
+        android:configChanges="keyboardHidden|orientation|screenSize"
+        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
+
+        <activity android:name="com.jirbo.adcolony.AdColonyBrowser"
+        android:configChanges="keyboardHidden|orientation|screenSize"
+        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
+      
+      <!-- AdMob Ads -->
+      <activity android:name="com.google.android.gms.ads.AdActivity"
+          android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
+      
+      <!-- Millenial Media Ads -->
+      <activity android:name="com.millennialmedia.android.VideoPlayer" 
+          android:configChanges="keyboardHidden|orientation|keyboard" >
+     </activity>
+     <activity android:name="com.millennialmedia.android.MMActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:configChanges="keyboardHidden|orientation|keyboard" >
+     </activity>
       
       <!-- Used for install referrer tracking -->
       <receiver android:name="com.playscape.analytics.MarketReferrerReceiver" android:exported="true">

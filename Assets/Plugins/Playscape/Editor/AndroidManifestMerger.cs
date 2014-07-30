@@ -17,12 +17,10 @@ namespace Playscape.Editor {
 			var destXdoc = new XmlDocument ();
 			var psXdoc = new XmlDocument ();
 			var pwXdoc = new XmlDocument ();
-			var cbXdoc = new XmlDocument();
 			
 			psXdoc.LoadXml (File.ReadAllText (CommonConsts.PLAYSCAPE_MANIFEST_PATH));
 			destXdoc.LoadXml (File.ReadAllText (destinationManifest));
 			pwXdoc.LoadXml (File.ReadAllText (CommonConsts.PUSHWOOSH_MANIFEST_PATH));
-			cbXdoc.LoadXml(File.ReadAllText(CommonConsts.CHARTBOOST_MANIFEST_PATH));
 			 
 			// ---------- Remove default main activity -------- //
 			var mainActivity  = destXdoc.SelectSingleNode ("manifest/application/activity/intent-filter[contains(name,android.intent.action.MAIN)]");
@@ -31,7 +29,7 @@ namespace Playscape.Editor {
 				var oldMainActivityName = "UnknownActivity";
 				if (mainActivity.Attributes["android:name"] != null) {
 					oldMainActivityName = mainActivity.Attributes["android:name"].Value;
-				} 
+				}
 
 				L.W ("{0}. Previous Activity: {1}", Warnings.MAIN_ACTIVITY_REPLACED, oldMainActivityName); 
 				mainActivity.ParentNode.RemoveChild(mainActivity);
@@ -62,10 +60,6 @@ namespace Playscape.Editor {
 			// ---------- Merge Pushwoosh ----------- //
 			copyAllManifestTags (pwXdoc, destXdoc);
 			copyAllApplicationTags (pwXdoc, destXdoc);
-			
-			// --------- Merge Chartboost -------- ///
-			copyAllManifestTags(cbXdoc, destXdoc);
-			copyAllApplicationTags(cbXdoc, destXdoc);
 			
 			XmlWriterSettings settings = new XmlWriterSettings ();
 			settings.Indent = true;

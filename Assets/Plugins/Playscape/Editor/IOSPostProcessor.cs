@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace Playscape.Editor {
 		
-	class IOSPostProcessor : IPostProcessor {
+	class IOSPostProcessor : AbstractPostProcessor {
 
 		private readonly string pathToProjectSources;
 		
@@ -20,18 +20,16 @@ namespace Playscape.Editor {
 			this.pathToProjectSources = pathToProjectSources;
 		}
 
-		public void CheckForWarnings(WarningAccumulator warnings)
+		public override void CheckForWarnings(WarningAccumulator warnings)
 		{
-			warnings.WarnIfStringIsEmpty(
-				ConfigurationInEditor.Instance.ReporterId,
-				Warnings.REPORTED_ID_NOT_SET);
+			base.CheckForWarnings (warnings);
 
 			warnings.WarnIfStringIsEmpty(
 				ConfigurationInEditor.Instance.PushWooshIosId,
 				Warnings.PUSH_WOOSH_APP_ID_NOT_SET_IOS);
 		}
 
-		public void Run()
+		public override void Run()
 		{
 			var plistFragment = 
 				pathToProjectSources + "/Libraries/playscape_config.plist_fragment";
@@ -56,10 +54,64 @@ namespace Playscape.Editor {
 
 			File.Delete(plistFragment);
 
-			AddPushWooshSupport(pathToProjectSources);
+			AddRequiredFrameworks(pathToProjectSources);
+
+			if (PlayerSettings.iOS.sdkVersion == iOSSdkVersion.SimulatorSDK) {
+				FixRegisterMonoModules(pathToProjectSources);
+			}
 		}
 
-		void AddPushWooshSupport (string targetPath)
+		/// <summary>
+		/// By default, external native plugin functions are not available to mono in iOS simulator - you will get EntryNotFoundException.
+		/// This enable them by modifying RegisterMonoModules.cpp, for more info read this http://tech.enekochan.com/2012/05/28/using-the-xcode-simulator-with-a-unity-3-native-ios-plug-in/
+		/// </summary>
+		void FixRegisterMonoModules (string targetPath)
+		{
+			var files = Directory.GetFiles(targetPath, "RegisterMonoModules.cpp", SearchOption.AllDirectories);
+
+			if (files.Length > 0) {
+				
+				var filePath = files[0];
+				
+				var lines = File.ReadAllLines(filePath);
+				var newLines = new List<string>();
+
+				int step = 0;
+				for (int i = 0; i < lines.Length; ++i) {
+					bool appendLine = true;
+
+					if (step == 0) {
+
+						if (lines[i].Contains("TARGET_IPHONE_SIMULATOR")) {
+							newLines.Add(@"void mono_dl_register_symbol(const char* name, void *addr);");
+							step = 1;
+						}
+					} else if (step == 1) {
+						if (lines[i].Contains("RegisterMonoModules()")) {
+							step = 2;
+						}
+					} else if (step == 2) {
+						if (lines[i].Contains("mono_dl_register_symbol")) {
+							newLines.Add("#endif // !(TARGET_IPHONE_SIMULATOR)");
+							step = 3;
+						}
+					} else if (step == 3) {
+						if (lines[i].Contains("#endif") && lines[i].Contains("TARGET_IPHONE_SIMULATOR")) {
+							appendLine = false;
+						}
+					}
+
+					if (appendLine) {
+						newLines.Add(lines[i]);
+					}
+				}
+
+				string contents = string.Join("\n", newLines.ToArray());
+				File.WriteAllText(filePath, contents);
+			}
+		}
+
+		void AddRequiredFrameworks (string targetPath)
 		{
 
 			var files = Directory.GetFiles(targetPath, "project.pbxproj", SearchOption.AllDirectories);

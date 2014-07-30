@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
-using Chartboost;
+
+using Playscape.Ads;
 using Playscape.Notifications;
 
 public class MenuController : MonoBehaviour {
@@ -13,14 +14,14 @@ public class MenuController : MonoBehaviour {
 	const string STORE = "STORE";
 	const string QUIT = "QUIT";
 
-	const string SHOW_INTERSTITIAL = "SHOW CHARTBOOST INTERSTITIAL";
+
 
 	bool mSocialRequestReceived;
 
 	// Use this for initialization
 	void Start () {
 		SocialController.Instance.OnSocialRequestReceived += HandleOnSocialRequestReceived;
-
+		Banners.Instance.Hide ();
 
 	}
 
@@ -87,11 +88,8 @@ public class MenuController : MonoBehaviour {
 			Application.LoadLevel ("store");
 		}
 
-		
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop * 1.8f, buttonWidth, buttonHeight), SHOW_INTERSTITIAL)) {
-			#if (UNITY_IPHONE || UNITY_ANDROID) && !UNITY_EDITOR
-			CBBinding.showInterstitial(null);
-			#endif
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop * 1.8f, buttonWidth, buttonHeight), "Show Interstitial")) {
+			Playscape.Ads.Interstitials.Instance.Display(Interstitials.Kind.Both, "main-menu");
 		}
 
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 2.0f, buttonWidth, buttonHeight), "Set PW custom tags")) {
@@ -109,12 +107,15 @@ public class MenuController : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
-		if (Input.GetKeyDown(KeyCode.Escape)) { 
-			Application.Quit(); 
-		}
-
-	}
+	public void Update() {
+	   if (Input.GetKeyUp(KeyCode.Escape)) {
+	       if (Interstitials.Instance.OnBackPressed()) {
+	            return;
+	        } else {
+	       		Application.Quit();
+	         }
+	    }
+	 }
 
 	char[] loadChars = {'/', '-', '\\'};
 	int currLoadChar = 0;

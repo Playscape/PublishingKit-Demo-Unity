@@ -51,10 +51,15 @@ namespace Playscape.Internal {
 		/// Dumps log to server.
 		/// </summary>
 	    public static void DumpNow() {
-	#if !UNITY_EDITOR && UNITY_ANDROID
+#if !UNITY_EDITOR
+	#if UNITY_ANDROID
 	        initializeAndroidRemoteLogger();
 			remoteLoggerClass.CallStatic("dumpNow");
+	#else
+			PlayscapeRemoteLogger_dumpNow();
 	#endif
+
+#endif
 	    }
         
 		// NETSID field

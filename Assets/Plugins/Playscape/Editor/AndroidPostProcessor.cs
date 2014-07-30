@@ -8,11 +8,12 @@ using Playscape.Internal;
 using System.Xml;
 using System.Text;
 using System;
+using System.Reflection;
 using System.Collections.Generic;
 
 namespace Playscape.Editor {
 
-	class AndroidPostProcessor : IPostProcessor {
+	class AndroidPostProcessor : AbstractPostProcessor {
 
 		private const string PLAYSCAPE_CONFIG_XML_PATH = CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/res/values/playscape_config.xml";
 		private const string PUSH_WOOSH_GCM_SENDER_TOKEN = "%{GCM_SENDER_ID}";
@@ -30,11 +31,9 @@ namespace Playscape.Editor {
 			mTargetPath = targetPath;
 		}
 
-		public void CheckForWarnings(WarningAccumulator warnings)
+		public override void CheckForWarnings(WarningAccumulator warnings)
 		{
-			warnings.WarnIfStringIsEmpty(
-				ConfigurationInEditor.Instance.ReporterId,
-				Warnings.REPORTED_ID_NOT_SET);
+			base.CheckForWarnings (warnings);
 
 			warnings.WarnIfStringIsEmpty(
 				ConfigurationInEditor.Instance.PushWooshAndroidId,
@@ -45,7 +44,7 @@ namespace Playscape.Editor {
 				Warnings.PLAYSCAPE_ANDROID_APK_BUILD);
 		}
 
-		public void Run()
+		public override void Run()
 		{
 			// If our manifests are merged then all manifest fragments will reside in the same file and therefore we point
 			// the various sdks to the main manifest file
@@ -102,6 +101,8 @@ namespace Playscape.Editor {
 				Debug.isDebugBuild ? Settings.DebugRemoteLoggerUrl
 								   : Settings.ReleaseRemoteLoggerUrl;
 
+			injectAdConfigs (configDoc);
+
 			var configBaseName = new FileInfo(PLAYSCAPE_CONFIG_XML_PATH).Name;
 			
 			var writerSettings = new XmlWriterSettings();
@@ -110,7 +111,63 @@ namespace Playscape.Editor {
 				configDoc.Save(writer);
 			}
 		}
-		
+
+		void injectAdConfigs (XmlDocument configDoc)
+		{
+			// Use relfection to enumerate all ad provider identifiers, and inject them into the 
+			// configuration xml.
+			//
+			// Reflection assumes that Ads class contains either fields which are classes with fields of type String.
+
+			Configuration.Instance.TraverseAdsConfig (
+				(category, settingFieldInfo) =>
+						{
+							var settingName = new StringBuilder();
+							settingName.Length = 0;
+							settingName.Append("playscape_")
+								.Append(CamelToSnake(category.GetType().Name));
+							
+							settingName.Append("_")
+								.Append(CamelToSnake(settingFieldInfo.Name));
+									object value = settingFieldInfo.GetValue(category);
+							// Ads Config Url
+							var xmlElement = configDoc.SelectSingleNode(string.Format("resources/string[@name='{0}']", settingName.ToString()));
+							
+							if (xmlElement == null) {
+								throw new ApplicationException(string.Format("Unable to find xml element <string name='{0}'>, please " +
+								                                             "verify playscape_config.xml or your ad provider fields naming conventions.", settingName));
+							}
+							
+							xmlElement.InnerText = 
+								string.Format("{0}", value);
+							
+						});
+		}
+
+		/// <summary>
+		/// Converts C# camel case to lower case snake.
+		/// e.g: ThisIsACamel to this_is_a_camel
+		/// </summary>
+		/// <returns>Snake cased string.</returns>
+		/// <param name="camelCase">Camel case string.</param>
+		static string CamelToSnake(string camelCase)
+		{
+			var builder = new StringBuilder();
+			
+			for (int i = 0; i < camelCase.Length; ++i)
+			{
+				if (char.IsUpper(camelCase[i]) && i > 0)
+				{
+					builder.Append("_");
+				}
+				
+				
+				builder.Append(char.ToLower(camelCase[i]));
+			}
+			
+			return builder.ToString();
+		}
+
 		/// <summary>
 		/// Replaces common placeholders according to unity configuration in an android manifest
 		/// </summary>

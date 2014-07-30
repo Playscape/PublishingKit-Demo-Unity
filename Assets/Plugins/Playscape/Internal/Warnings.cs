@@ -71,12 +71,15 @@ namespace Playscape.Internal {
 
 		#region Common Warnings
 
-		public static readonly string CHARTBOOST_NOT_INITIALIZED = 
-			MakeWarning("Chartboost was not initialized, did you integrate Chartboost?", "WARN-C001");
-
 		public static readonly string PLAYSCAPE_MANAGER_NOT_IN_FIRST_SCENE = MakeWarning(
 			"PlayscapeManager prefab must be added ONLY to the first scene! Remove it from any other scenes, but the first and Drag and Drop Plugins/Playscape/Resources/PlayscapeManager into the Hierarchy window in the first scene.",
 			"WARN-C002");
+
+		
+		public static readonly string ATLEAST_ONE_AD_ID_MUST_BE_FILLED = MakeWarning("Atleast one ad identifier must be filled.", 
+		                                                                          "WARN-C003");
+
+		public static readonly string AD_CONFIG_URL_MUST_BE_FILLED = MakeWarning ("Ads Config Url must be filled.", "WARN-C004");
 
 		#endregion
 

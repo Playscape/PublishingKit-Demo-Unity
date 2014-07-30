@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Chartboost;
 using Playscape.Analytics;
+using Playscape.Ads;
 
 public class GameController : MonoBehaviour {
 
@@ -76,6 +76,8 @@ public class GameController : MonoBehaviour {
 
 		var mainCamera = GameObject.Find("Main Camera");
 		mainCamera.GetComponent<CameraController>().player = player;
+
+		Banners.Instance.Display (Banners.BannerAlignment.topRight, "level-" + Application.loadedLevel);
 	}
 
 	void Update() {
@@ -149,9 +151,7 @@ public class GameController : MonoBehaviour {
 
 		Report.Instance.ReportLevelCompleted(Application.loadedLevelName, null);
 
-		#if (UNITY_IPHONE || UNITY_ANDROID) && !UNITY_EDITOR
-		CBBinding.showInterstitial(null);
-		#endif
+		Interstitials.Instance.Display (Interstitials.Kind.Overlay, "end-of-level-" + Application.loadedLevelName);
 	}
 
 	public void SwitchLevel (string level)
