@@ -1,3 +1,6 @@
 lastUpgrade=00900
 proj.AppId=1234567890
 android.SetupDone=true
+ios.ClientId=123456789012-abcd.apps.googleusercontent.com
+ios.BundleId=com.playscape.rollaball
+ios.SetupDone=true
