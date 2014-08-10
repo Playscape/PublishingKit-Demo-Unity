@@ -34,8 +34,11 @@
     <string name="playscape_ads_retry_wait_secs">10</string>
     <string name="playscape_ads_refresh_interval_secs">15</string>
     <string name="playscape_ads_min_interval_between_syncs">900000</string>
+
+    <string name="playscape_adience_key">5f6d5af0df237cd8b2bb7ed2a3098254</string>
     
     <!-- Cocos 2D-x specific -->
     <string name="playscape_pushwoosh_id">DC9EC-2B8CD</string>
 	<string name="playscape_google_sender_id">786132690907</string>
+	
 </resources>

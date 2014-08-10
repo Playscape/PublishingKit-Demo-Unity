@@ -19,19 +19,19 @@ namespace Playscape.Internal
 			#endif
 		}
 
-		public override void displayInterstitialAd(string kind, string placement) {
+		public override void displayInterstitialAd(int kind, string placement) {
 			#if UNITY_ANDROID
 			mJavaMethodsClass.CallStatic ("displayInterstitialAd", new object[] {kind, placement});
 			#endif
 		}
 
-		public override void displayVideoAdInternal(string kind, string placement) {
+		public override void displayVideoAdInternal(int kind, string placement) {
 			#if UNITY_ANDROID
 			mJavaMethodsClass.CallStatic ("displayVideoAd", new object[] {kind, placement});
 			#endif
 		}
 
-		public override void displayBannerAd (string alignment, string placement)
+		public override void displayBannerAd (int alignment, string placement)
 		{
 			#if UNITY_ANDROID
 			mJavaMethodsClass.CallStatic("displayBannerAd", new object[] {alignment, placement});
@@ -54,7 +54,7 @@ namespace Playscape.Internal
 			#endif
 		}
 
-		public override bool hasInterstitialInCache (string kind)
+		public override bool hasInterstitialInCache (int kind)
 		{
 			#if UNITY_ANDROID
 			return mJavaMethodsClass.CallStatic<bool>("hasInterstitialInCache", new object[] { kind });

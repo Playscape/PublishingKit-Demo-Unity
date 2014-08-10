@@ -42,7 +42,12 @@ namespace Playscape.Editor {
 		{
 			return warningSb.Length > 0;
 		}
-		
+
+		public override string ToString ()
+		{
+			return warningSb.ToString ();
+		}
+
 		public void ShowIfNecessary() {
 			if (HasWarnings())
 			{

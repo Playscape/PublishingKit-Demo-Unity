@@ -104,7 +104,7 @@ namespace Playscape.Ads {
 			}
 
 			if (mPlayscapeAds != null) {
-				mPlayscapeAds.displayInterstitialAd(Enum.GetName(typeof(Kind), kind), placement);
+				mPlayscapeAds.displayInterstitialAd((int)kind, placement);
 			}
 		}
 
@@ -161,7 +161,7 @@ namespace Playscape.Ads {
 		/// <returns><c>true</c> there's an interstitial of the given kind in cache.</returns>
 		/// <param name="kind">Kind.</param>
 		public bool HasInterstitialInCache(Kind kind) {
-			return mPlayscapeAds.hasInterstitialInCache (Enum.GetName (typeof(Kind), kind));
+			return mPlayscapeAds.hasInterstitialInCache ((int)kind);
 		}
 
 		/// <summary>

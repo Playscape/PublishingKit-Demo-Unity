@@ -10,12 +10,12 @@ namespace Playscape.Internal
 		public event Action<string> OnInterstitialDisplayEndedInternal;
 		public event Action<string> OnVideoDisplayEndedInternal;
 		
-		public abstract void displayInterstitialAd (string kind, string placement);
-		public abstract void displayVideoAdInternal (string kind, string placement);
-		public abstract void displayBannerAd (string alignment, string placement);
+		public abstract void displayInterstitialAd (int kind, string placement);
+		public abstract void displayVideoAdInternal (int kind, string placement);
+		public abstract void displayBannerAd (int alignment, string placement);
 		public abstract void hideBannerAd ();
 		public abstract bool isBannerShown ();
-		public abstract bool hasInterstitialInCache (string kind);
+		public abstract bool hasInterstitialInCache (int kind);
 		public abstract bool onBackPressed ();
 
 		/// <summary>

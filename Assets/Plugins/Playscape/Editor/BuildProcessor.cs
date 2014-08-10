@@ -39,6 +39,9 @@ namespace Playscape.Editor {
 			warnings.ShowIfNecessary();
 			if (warnings.HasWarnings() == false) {
 				postProcessor.Run();
+			} else {
+				Debug.LogError(string.Format("PlayScape Publishing Kit Build Halted - Publishing Kit Will" +
+											 " Probably Not Function Correctly, Refer To Documentation:\n {0}", warnings.ToString()));
 			}
 		}
 

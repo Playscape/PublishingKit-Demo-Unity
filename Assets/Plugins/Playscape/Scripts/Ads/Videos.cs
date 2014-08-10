@@ -94,7 +94,7 @@ namespace Playscape.Ads {
 			}
 
 			if (mPlayscapeAds != null) {
-				mPlayscapeAds.displayVideoAdInternal(Enum.GetName(typeof(Kind), kind), placement);
+				mPlayscapeAds.displayVideoAdInternal((int)kind, placement);
 			}
 		}
 

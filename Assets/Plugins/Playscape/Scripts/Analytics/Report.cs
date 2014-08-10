@@ -68,15 +68,25 @@ namespace Playscape.Analytics
 		/// <param name="provider">
 		/// The provider.
 		/// </param>
-		public FlowInstance(string type)
+		/// <param name="id"> 
+		/// Identifier.
+		/// </param>
+		public FlowInstance(string type, string id)
 		{
 			Type = type;
+			Id = id;
 		}
 
         /// <summary>
 		/// Gets current type.
 		/// </summary>
 		public string Type { get; private set; }
+
+		/// <summary>
+		/// Gets the identifier.
+		/// </summary>
+		/// <value>The identifier.</value>
+		public string Id { get; private set; }
     }
 
     /// <summary>
@@ -1100,10 +1110,11 @@ namespace Playscape.Analytics
         /// ArgumentException is thrown in DEBUG, and nothing is reported in
         /// RELEASE.
         public FlowInstance StartNewFlow(string type) {
+			string id = string.Empty;
 			#if !UNITY_EDITOR
-			NativeReport.playscape_report_StartNewFlow(type);
+			id = NativeReport.playscape_report_StartNewFlow(type);
 #endif
-			return new FlowInstance(type);
+			return new FlowInstance(type, id);
 		}
 
         /// <summary>
@@ -1133,7 +1144,7 @@ namespace Playscape.Analytics
 
 			#if !UNITY_EDITOR
         	NativeReport.playscape_report_ReportFlowStep(
-				flow.Type,
+				flow.Id,
 				stepName,
 				stepStatus,
 				details.Count,
@@ -1328,6 +1339,55 @@ namespace Playscape.Analytics
 			NativeReport.playscape_report_ReportSubscriptionState((int) state);
 #endif
         }
+
+		/// <summary>
+		/// Wallet operations
+		/// </summary>
+		public enum WalletOperation {
+			Deposit,
+			Withdraw
+		}
+
+		/// <summary>
+		/// Wallet results
+		/// </summary>
+		public enum WalletResult {
+			Success,
+			Failed,
+			Cancel
+		}
+
+		/// <summary>
+		/// Reports of  a wallet related operation.
+		/// </summary>
+		/// <param name="operation">Operation.</param>
+		/// <param name="dealType">Deal type.</param>
+		/// <param name="transactionID">Transaction Id.</param>
+		/// <param name="amount">Amount.</param>
+		/// <param name="currency">Currency.</param>
+		/// <param name="source">Source.</param>
+		/// <param name="flow">Flow.</param>
+		/// <param name="step">Step.</param>
+		/// <param name="item">Item.</param>
+		/// <param name="result">Result.</param>
+		/// <param name="reason">Reason.</param>
+		public void ReportWalletOperation(WalletOperation operation,
+		                      string dealType,
+		                      string transactionID,
+		                      double amount,
+		                      string currency,
+		                      string source, 
+		                      string flow,
+		                      string step,
+		                      string item,
+		                      WalletResult result,
+		                      string reason) {
+			#if !UNITY_EDITOR
+			NativeReport.playscape_report_ReportWalletOperation ((int)operation, dealType, transactionID, amount,
+			                                                    currency, source, flow, step, item,
+			                                                    (int)result, reason);
+			#endif
+		}
 
         #endregion
 	}

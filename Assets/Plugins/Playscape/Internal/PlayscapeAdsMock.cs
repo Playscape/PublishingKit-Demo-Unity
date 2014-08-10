@@ -7,15 +7,15 @@ namespace Playscape.Internal
 // currently, only android is supported, use mock everywhere else
 #if UNITY_EDITOR || !UNITY_ANDROID
 	public class PlayscapeAdsMock : PlayscapeAdsBase {
-		public override void displayInterstitialAd(string kind, string placement) {
+		public override void displayInterstitialAd(int kind, string placement) {
 			L.I ("Mock displayInterstitialAd({0}, {1}) called", kind, placement);
 		}
 
-		public override void displayVideoAdInternal(string kind, string placement) {
+		public override void displayVideoAdInternal(int kind, string placement) {
 			L.I ("Mock displayVideoAdInternal({0}, {1}) called", kind, placement);
 		}
 
-		public override void displayBannerAd (string alignment, string placement)
+		public override void displayBannerAd (int alignment, string placement)
 		{
 			L.I ("Mock displayBannerAd({0}, {1}) called", alignment, placement);
 		}
@@ -31,7 +31,7 @@ namespace Playscape.Internal
 			return false;
 		}
 
-		public override bool hasInterstitialInCache (string kind)
+		public override bool hasInterstitialInCache (int kind)
 		{
 			L.D ("Mock hasInterstitialInCache({0}) called", kind);
 			return false;

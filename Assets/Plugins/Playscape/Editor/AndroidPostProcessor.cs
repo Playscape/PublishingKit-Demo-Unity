@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using Playscape.Internal;
+using Playscape.Internal; 
 using System.Xml;
 using System.Text;
 using System;
@@ -19,7 +19,9 @@ namespace Playscape.Editor {
 		private const string PUSH_WOOSH_GCM_SENDER_TOKEN = "%{GCM_SENDER_ID}";
 		private const string PUSH_WOOSH_APP_ID_TOKEN = "%{PUSH_WOOSH_APP_ID}";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH = "/libs/android-support-v4.jar";
+		private const string LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT  = "/libs/android-support-v4.jar_v19.1";
 		private const string LIBS_UNITY_CLASSES_PATH = "/libs/unity-classes.jar";
+
 
 		private readonly string mPathToMainProjcetSources;
 		private readonly string mTargetPath;
@@ -180,16 +182,37 @@ namespace Playscape.Editor {
 
 		private void CopyDepedencyJarsToLibs ()
 		{
+			string v4supportLibPath = string.Empty;
+			foreach (var dirPath in Directory.GetDirectories(mTargetPath)) {
+				// Is there a v4 support lib in a project other than the pubkit?
+				if (File.Exists(dirPath + LIBS_ANDROID_SUPPORT_V4_PATH) && 
+				    new DirectoryInfo(dirPath).FullName != new DirectoryInfo(mPathToPublishingKitLibSources).FullName) 
+				{
+					v4supportLibPath = dirPath + LIBS_ANDROID_SUPPORT_V4_PATH;
+					break;
+				}
+			}
+
+
+			// If no v4 support lib, use the one that comes with the pubkit
+			if (string.IsNullOrEmpty (v4supportLibPath)) 
+			{
+				v4supportLibPath = mPathToPublishingKitLibSources + LIBS_ANDROID_SUPPORT_V4_PATH;
+				File.Move(mPathToPublishingKitLibSources + LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT, v4supportLibPath);
+			} else {
+				File.Delete(mPathToPublishingKitLibSources + LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT);
+			}
+
 			foreach (var dirPath in Directory.GetDirectories(mTargetPath)) {
 				if (new DirectoryInfo(dirPath).Name != PlayerSettings.productName) {
                     if (!Directory.Exists(dirPath + "/libs")) {
                         Directory.CreateDirectory(dirPath + "/libs");
                     }
 
-					if (File.Exists(mPathToMainProjcetSources + LIBS_ANDROID_SUPPORT_V4_PATH )) {
-						File.Copy(mPathToMainProjcetSources + LIBS_ANDROID_SUPPORT_V4_PATH, dirPath + LIBS_ANDROID_SUPPORT_V4_PATH, true);
+					if (new DirectoryInfo(v4supportLibPath).FullName != new DirectoryInfo(dirPath + LIBS_ANDROID_SUPPORT_V4_PATH).FullName) {
+						File.Copy(v4supportLibPath, dirPath + LIBS_ANDROID_SUPPORT_V4_PATH, true);
 					}
-                    
+
                     if (File.Exists(mPathToMainProjcetSources + LIBS_UNITY_CLASSES_PATH )) {
                         File.Copy(mPathToMainProjcetSources + LIBS_UNITY_CLASSES_PATH, dirPath + LIBS_UNITY_CLASSES_PATH, true);
                     }

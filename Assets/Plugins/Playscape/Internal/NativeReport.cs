@@ -378,11 +378,11 @@ public class NativeReport : MonoBehaviour {
 		int[] stepNameToIdValues);
 	
 	[DllImport(SHARED_LIBRARY)]
-	public static extern void playscape_report_StartNewFlow(string type);
+	public static extern string playscape_report_StartNewFlow(string type);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportFlowStep(
-		string flowType,
+		string flowId,
 		string stepName,
 		string stepStatus,
 		int detailsCount,
@@ -434,9 +434,21 @@ public class NativeReport : MonoBehaviour {
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportRatingDialogNo();
-	
-	
-	
+
+	[DllImport(SHARED_LIBRARY)]
+	public static extern void playscape_report_ReportWalletOperation(int operation,
+	                                                            string dealType,
+	                                                            string transactionID,
+	                                                            double amount,
+	                                                            string currency,
+	                                                            string source, 
+	                                                            string flow,
+	                                                            string step,
+	                                                            string item,
+	                                                            int result,
+	                                                            string reason);
+
+
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportSubscriptionState(int state);
 
