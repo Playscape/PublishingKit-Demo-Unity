@@ -48,7 +48,7 @@ public class MenuController : MonoBehaviour {
 		GUI.Box (new Rect (Screen.width / 2 - boxWidth / 2, 10, boxWidth, boxHeight), MENU_TITLE);
 
 		float buttonWidth = boxWidth * 0.85f;
-		float buttonHeight = boxHeight / 10;
+		float buttonHeight = boxHeight / 11;
 		float marginTop = 80;
 
 
@@ -101,7 +101,11 @@ public class MenuController : MonoBehaviour {
 			PushWoosh.Instance.SetTag("customTag4Numeric", randomValue + 4);
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 6 + marginTop * 2.2f, buttonWidth, buttonHeight), QUIT)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 6 + marginTop * 2.2f, buttonWidth, buttonHeight), "Get AB Testing Values")) {
+			Application.LoadLevel("ab_testing");
+		}
+
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 2.4f, buttonWidth, buttonHeight), QUIT)) {
 			Application.Quit ();
 		}
 	}

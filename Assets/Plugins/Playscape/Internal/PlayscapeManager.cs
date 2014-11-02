@@ -48,6 +48,7 @@ namespace Playscape.Internal
             
 			RemoteLogger.Init();
 			NativeReport.Init();
+			AddABTesingScripts();
 			AddPushWooshScripts();
 			AddAdScripts();
 
@@ -97,6 +98,18 @@ namespace Playscape.Internal
 			gameObject.AddComponent(typeof(PlayscapeAdsAndroid));
 			#else
 			gameObject.AddComponent(typeof(PlayscapeAdsMock));
+			#endif
+		}
+
+		/// <summary>
+		/// Adds the abtesting scripts.
+		/// </summary>
+		private void AddABTesingScripts()
+		{
+			#if UNITY_ANDROID && !UNITY_EDITOR
+			gameObject.AddComponent(typeof(PlayscapeABTestingAndroid));
+			#else
+			gameObject.AddComponent(typeof(PlayscapeABTestingMock));
 			#endif
 		}
 
