@@ -6,7 +6,7 @@ namespace Playscape.Internal
 	public class PlayscapeABTestingAndroid : PlayscapeABTestingBase {
 
 		#if UNITY_ANDROID
-		const string ABTESTING_METHODS_CLASS_NAME = "com.playscape.ads.ExternalABTestingMethods";
+		const string ABTESTING_METHODS_CLASS_NAME = "com.playscape.abtesting.ExternalABTestingMethods";
 	
 		private AndroidJavaClass mJavaMethodsClass = new AndroidJavaClass (ABTESTING_METHODS_CLASS_NAME);
 		#endif

@@ -103,7 +103,9 @@ namespace Playscape.Editor {
 				Debug.isDebugBuild ? Settings.DebugRemoteLoggerUrl
 								   : Settings.ReleaseRemoteLoggerUrl;
 
+			injectABTestingConfig (configDoc);
 			injectAdConfigs (configDoc);
+
 
 			var configBaseName = new FileInfo(PLAYSCAPE_CONFIG_XML_PATH).Name;
 			
@@ -144,6 +146,43 @@ namespace Playscape.Editor {
 								string.Format("{0}", value);
 							
 						});
+		}
+
+		private void injectABTestingConfig(XmlDocument configDoc)
+		{
+			XmlNode rootResources = configDoc.SelectSingleNode("resources");
+			XmlNode lastExperimentsElement = configDoc.SelectSingleNode("resources/string[@name='playscape_enable_ab_testing_system']");
+
+			configDoc.SelectSingleNode("resources/string[@name='playscape_amazon_abtesing_public_key']").InnerText = 
+				ConfigurationInEditor.Instance.MyABTesting.AmazonPublicKey;
+			configDoc.SelectSingleNode("resources/string[@name='playscape_amazon_abtesing_private_key']").InnerText = 
+				ConfigurationInEditor.Instance.MyABTesting.AmazonPrivateKey;
+			configDoc.SelectSingleNode("resources/string[@name='playscape_enable_ab_testing_system']").InnerText = 
+				ConfigurationInEditor.Instance.MyABTesting.EnableABTestingSystem.ToString().ToLower();
+
+			for (int i = 0; i < ConfigurationInEditor.Instance.MyABTesting.NumberOfCustomExperiments; i++) 
+			{
+				XmlElement playscapeExperimentElement = configDoc.CreateElement("string-array");
+				playscapeExperimentElement.SetAttribute("name","playscape_experiment_" + (i + 1).ToString());
+
+				XmlElement experimentNameElement = configDoc.CreateElement("item");
+				experimentNameElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentName;
+				playscapeExperimentElement.AppendChild(experimentNameElement);
+
+				XmlElement experimentTypeElement = configDoc.CreateElement("item");
+				experimentTypeElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentType;
+				playscapeExperimentElement.AppendChild(experimentTypeElement);
+
+				for (int j =0; j <   ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].NumberOfVarsInExperiment; j++)
+				{
+					XmlElement experimentVariableElement = configDoc.CreateElement("item");
+					experimentVariableElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentVars[j];
+					playscapeExperimentElement.AppendChild(experimentVariableElement);
+				}
+
+				rootResources.InsertAfter(playscapeExperimentElement, lastExperimentsElement);
+				lastExperimentsElement = playscapeExperimentElement;
+			}
 		}
 
 		/// <summary>

@@ -58,6 +58,17 @@ namespace Playscape.ABTesting {
 			}
 		}
 
+		/// <summary>
+		/// Use this to reports goal event or view event
+		/// </summary>
+		/// <param name="experimentName">The experiment name to report </param>
+		/// <param name="experimentEvent">The event to report, can be view event or goal event</param>
+		/// 
+		public void reportExperimentEvent (string experimentName, string experimentEvent) 
+		{
+			mPlayscapeABTeting.reportExperimentEvent (experimentName, experimentEvent);
+		}
+
 
 		/// <summary>
 		/// Gets the experiment by experiment name async (nonblocking, waiting for experiment data to be loaded from server)
