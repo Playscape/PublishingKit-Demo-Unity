@@ -378,7 +378,7 @@ public class NativeReport : MonoBehaviour {
 		int[] stepNameToIdValues);
 	
 	[DllImport(SHARED_LIBRARY)]
-	public static extern string playscape_report_StartNewFlow(string type);
+	public static extern IntPtr playscape_report_StartNewFlow(string type);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportFlowStep(

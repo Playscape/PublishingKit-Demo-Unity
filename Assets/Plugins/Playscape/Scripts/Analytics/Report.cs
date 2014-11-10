@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Playscape.Purchase;
 using UnityEngine;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace Playscape.Analytics
 {
@@ -871,9 +872,11 @@ namespace Playscape.Analytics
             int maxPlayers,
             IDictionary<string, string> gameParameters)
         {
-            gameParameters = gameParameters ?? new Dictionary<string, string>();
-			var keysAndValues = gameParameters.ToKeysAndValues();
+            
+
             #if !UNITY_EDITOR
+			gameParameters = gameParameters ?? new Dictionary<string, string>();
+			var keysAndValues = gameParameters.ToKeysAndValues();
 			NativeReport.playscape_report_ReportMPCreatePublicGame(
 				sessionId,
 				maxPlayers,
@@ -906,11 +909,12 @@ namespace Playscape.Analytics
             string gameName,
 			int maxPlayers,
 			IDictionary<string, string> gameParameters)
-        {            
-            gameParameters = gameParameters ?? new Dictionary<string, string>();
-            var keysAndValues = gameParameters.ToKeysAndValues();
+        {   
             
 			#if !UNITY_EDITOR
+			
+			gameParameters = gameParameters ?? new Dictionary<string, string>();
+			var keysAndValues = gameParameters.ToKeysAndValues();
 			NativeReport.playscape_report_ReportMPJoinPublicGame(
 				sessionId,
 				gameName,
@@ -1082,8 +1086,9 @@ namespace Playscape.Analytics
             string type,
             IDictionary<string, int> stepNameToId)
         {
-            var keysAndValues = stepNameToId.ToKeysAndValues();
+            
 #if !UNITY_EDITOR
+			var keysAndValues = stepNameToId.ToKeysAndValues();
 			NativeReport.playscape_report_RegisterFlow(
 				type,
 				stepNameToId.Count,
@@ -1112,8 +1117,8 @@ namespace Playscape.Analytics
         public FlowInstance StartNewFlow(string type) {
 			string id = string.Empty;
 			#if !UNITY_EDITOR
-			id = NativeReport.playscape_report_StartNewFlow(type);
-#endif
+			id = Marshal.PtrToStringAnsi(NativeReport.playscape_report_StartNewFlow(type));
+			#endif
 			return new FlowInstance(type, id);
 		}
 
@@ -1140,9 +1145,9 @@ namespace Playscape.Analytics
             string stepStatus,
             IDictionary<string, double> details)
         {
-            var keysAndValues = details.ToKeysAndValues();
-
+            
 			#if !UNITY_EDITOR
+			var keysAndValues = details.ToKeysAndValues();
         	NativeReport.playscape_report_ReportFlowStep(
 				flow.Id,
 				stepName,
@@ -1187,8 +1192,9 @@ namespace Playscape.Analytics
             string level,
             IDictionary<string, double> additionalParams)
         {
-            var keysAndValues = additionalParams.ToKeysAndValues();
+            
 #if !UNITY_EDITOR
+			var keysAndValues = additionalParams.ToKeysAndValues();
 			NativeReport.playscape_report_ReportLevelStarted(
 				level,
 				additionalParams.Count,
@@ -1212,8 +1218,9 @@ namespace Playscape.Analytics
             string level,
             IDictionary<string, double> additionalParams)
         {
-            var keysAndValues = additionalParams.ToKeysAndValues();
+            
 #if !UNITY_EDITOR
+			var keysAndValues = additionalParams.ToKeysAndValues();
 			NativeReport.playscape_report_ReportLevelCompleted(
 				level,
 		        additionalParams.Count,
@@ -1237,8 +1244,9 @@ namespace Playscape.Analytics
             string level,
             IDictionary<string, double> additionalParams)
         {
-            var keysAndValues = additionalParams.ToKeysAndValues();
+            
 #if !UNITY_EDITOR
+			var keysAndValues = additionalParams.ToKeysAndValues();
 			NativeReport.playscape_report_ReportLevelFailed(
 				level,
 				additionalParams.Count,
@@ -1260,8 +1268,9 @@ namespace Playscape.Analytics
             string achievement,
             IDictionary<string, double> additionalParams)
         {
-            var keysAndValues = additionalParams.ToKeysAndValues();
+            
 #if !UNITY_EDITOR
+			var keysAndValues = additionalParams.ToKeysAndValues();
 			NativeReport.playscape_report_ReportAchievementUnlocked(
 				achievement,
 				additionalParams.Count,
@@ -1283,8 +1292,9 @@ namespace Playscape.Analytics
             int itemId,
             IDictionary<string, double> additionalParams)
         {
-            var keysAndValues = additionalParams.ToKeysAndValues();
+            
 #if !UNITY_EDITOR
+			var keysAndValues = additionalParams.ToKeysAndValues();
 			NativeReport.playscape_report_ReportItemUnlocked(
 				itemId,
 				additionalParams.Count,

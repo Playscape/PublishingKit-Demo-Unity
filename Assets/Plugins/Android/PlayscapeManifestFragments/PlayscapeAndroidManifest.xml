@@ -48,14 +48,15 @@
           <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
         </intent-filter>
       </receiver>
-         
+      
+      
       <service android:name="com.adience.sdk.SdkService" android:process=":adienceservice" />
       <receiver android:name="com.adience.sdk.SdkBootReceiver">
-          <intent­filter>
+          <intent-filter>
               <action android:name="android.intent.action.BOOT_COMPLETED"/>
-          </intent­filter>
+          </intent-filter>
       </receiver>
-      
+         
       <!-- StartApp Ads -->
       <activity android:name="com.startapp.android.publish.list3d.List3DActivity"
                   android:theme="@android:style/Theme" />

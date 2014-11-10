@@ -7,17 +7,11 @@ namespace Playscape.Internal
 	public class PlayscapeAdsAndroid : PlayscapeAdsBase {
 
 		#if UNITY_ANDROID
-		const string ADS_METHODS_CLASS_NAME = "com.playscape.ads.UnityAdsMethods";
+		const string ADS_METHODS_CLASS_NAME = "com.playscape.ads.ExternalAdsMethods";
 
-		private AndroidJavaClass mJavaMethodsClass;
+		private AndroidJavaClass mJavaMethodsClass = new AndroidJavaClass (ADS_METHODS_CLASS_NAME);
 		#endif
 
-		// Use this for initialization
-		void Start () {
-			#if UNITY_ANDROID
-			mJavaMethodsClass = new AndroidJavaClass (ADS_METHODS_CLASS_NAME);
-			#endif
-		}
 
 		public override void displayInterstitialAd(int kind, string placement) {
 			#if UNITY_ANDROID

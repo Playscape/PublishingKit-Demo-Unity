@@ -11,6 +11,40 @@ namespace Playscape.Internal {
 	public class Configuration : ScriptableObject {
 		public const string CONFIGURATION_ASSET_NAME = "PlayscapeConfiguration";
 		public const string CONFIGURATION_PATH = "Assets/Plugins/Playscape/Resources/" + CONFIGURATION_ASSET_NAME + ".asset";  
+		public static int MAX_NUMBER_OF_EXPERIMENTS = 20;
+		public static int MAX_NUMBER_OF_VARS_INEXPERIMENT = 50;
+
+		/* ----- AB TESTING ------------------- */
+		public ABTesting MyABTesting = new ABTesting();
+
+		[Serializable]
+		public class ABTesting
+		{
+			public bool EnableABTestingSystem;
+			public int NumberOfCustomExperiments;
+			public String AmazonPublicKey;
+			public String AmazonPrivateKey;
+			public CustomExperimentConfig[] MyCustomExperimentConfig;
+
+			public ABTesting()
+			{
+				EnableABTestingSystem =false;
+				NumberOfCustomExperiments = 0;
+				MyCustomExperimentConfig = new CustomExperimentConfig[MAX_NUMBER_OF_EXPERIMENTS];
+				for (int i =0; i< MAX_NUMBER_OF_EXPERIMENTS; i++)
+				{
+					MyCustomExperimentConfig[i] = new CustomExperimentConfig();
+				}
+			}
+
+			[Serializable]
+			public class  CustomExperimentConfig {
+				public String ExperimentName;
+				public String ExperimentType = "com.playscape.abtesting.UnityABTestingCustomSubscriber";
+				public String[] ExperimentVars = new String[MAX_NUMBER_OF_VARS_INEXPERIMENT];
+				public int NumberOfVarsInExperiment = 1;
+			}
+		}
 
 		/* --- Reporting --- */
 		public String ReporterId;
@@ -28,7 +62,6 @@ namespace Playscape.Internal {
 			public Adcolony MyAdColonyIds = new Adcolony();
 			public Chartboost MyChartboostIds = new Chartboost();
 			public MillennialMedia MyMillennialMedia = new MillennialMedia();
-			public Mopub MyMoPubIds = new Mopub();
 			public Startapp MyStartAppIds = new Startapp();
 			public Vungle MyVungle = new Vungle();
 
@@ -48,12 +81,6 @@ namespace Playscape.Internal {
 				public string AppId;
 			}
 
-			[Serializable]
-			public class Mopub
-			{
-				public string InterstitialId;
-				public string BannerId;
-			}
 			
 			[Serializable]
 			public class Chartboost

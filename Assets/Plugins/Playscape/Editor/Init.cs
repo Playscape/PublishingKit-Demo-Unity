@@ -20,6 +20,8 @@ namespace Playscape.Editor {
 			EditorApplication.playmodeStateChanged += OnPlayModeStateChanged;
 			EditorApplication.hierarchyWindowChanged += OnHierarchyWindowChanged;
 			UpdateCurrentlyOpenedSceneNumber();
+			Upgrader.Upgrade ();
+
 		}
 
 		[MenuItem ("Window/" + CommonConsts.CONFIGURE_PUBLISHING_KIT_MENU_ITEM)]

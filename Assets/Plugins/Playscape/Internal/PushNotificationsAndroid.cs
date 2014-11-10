@@ -82,6 +82,7 @@ public class PushNotificationsAndroid : Playscape.Internal.PushWooshCommon {
 	void OnApplicationPause(bool paused)
 	{
 		if (Application.platform == RuntimePlatform.Android) {
+            InitPushwoosh();
 			if(paused)
 			{
 				pushwoosh.Call("onPause");

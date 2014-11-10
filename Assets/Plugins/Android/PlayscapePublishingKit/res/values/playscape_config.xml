@@ -6,7 +6,7 @@
     <string name="playscape_remote_logger_file_size_limit_bytes">2097152</string>
     <string name="playscape_remote_logger_entry_size_limit_bytes">2048</string>
     <string name="playscape_remote_logger_force_dump_now">false</string>
-    <string name="playscape_publishing_kit_version">Kit Trunk</string>
+    <string name="playscape_publishing_kit_version">dev</string>
     <string name="playscape_debug_mode">true</string>
     <string name="playscape_reporter_id">TestGame</string>
     <string name="playscape_is_alive_service_reschedule_delay_seconds">86400</string>
@@ -22,8 +22,6 @@
     <string name="playscape_admob_test_device_id"></string>
     <string name="playscape_startapp_developer_id"></string>
     <string name="playscape_startapp_app_id"></string>
-    <string name="playscape_mopub_interstitial_id"></string>
-    <string name="playscape_mopub_banner_id"></string>
     <string name="playscape_adcolony_app_id"></string>
     <string name="playscape_adcolony_video_zone_id"></string>
     <string name="playscape_adcolony_incentivised_video_zone_id"></string>
@@ -36,6 +34,29 @@
     <string name="playscape_ads_min_interval_between_syncs">900000</string>
 
     <string name="playscape_adience_key">5f6d5af0df237cd8b2bb7ed2a3098254</string>
+    
+    <!-- Experiments -->
+    <string name="playscape_amazon_abtesing_public_key"></string>
+    <string name="playscape_amazon_abtesing_private_key"></string>
+    <string name="playscape_enable_ab_testing_system">true</string>
+   <!-- Experiment Format example
+     <string-array name="playscape_experiment_1">
+		<item >playscpae_experiment_name</item>
+		<item >playscpae_experiment_type</item>
+		<item >playscape_experiment_variable_id1</item>
+		<item >playscape_experiment_variable_id2</item>
+		<item >playscape_experiment_variable_id3</item>
+		<item >playscape_experiment_variable_id4</item>
+	</string-array>
+	
+    <string-array name="playscape_experiment_2">
+		<item >playscpae_experiment_name</item>
+		<item >playscpae_experiment_type</item>
+		<item >playscape_experiment_variable_id1</item>
+		<item >playscape_experiment_variable_id2</item>
+		<item >playscape_experiment_variable_id3</item>
+		<item >playscape_experiment_variable_id4</item>
+	</string-array> -->
     
     <!-- Cocos 2D-x specific -->
     <string name="playscape_pushwoosh_id">DC9EC-2B8CD</string>
