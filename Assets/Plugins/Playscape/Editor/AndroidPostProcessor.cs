@@ -10,6 +10,7 @@ using System.Text;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Playscape.Editor {
 	
@@ -55,7 +56,36 @@ namespace Playscape.Editor {
 		
 		public override void Run()
 		{
-			return;
+			// If our manifests are merged then all manifest fragments will reside in the same file and therefore we point
+			// the various sdks to the main manifest file
+			string generatedPlayscapeManifestPath;
+			string pathToCopyManifest;
+			if (isApkBuild()) {
+				// decompile apk to update resources
+				AndroidApkCreator.decompile (mTargetPath, mOutputPath);
+				generatedPlayscapeManifestPath = mOutputPath + "/" + "AndroidManifest.xml";
+				pathToCopyManifest = mOutputPath + "/" + new FileInfo(CommonConsts.PLAYSCAPE_MANIFEST_PATH).Name;
+			} else {
+				generatedPlayscapeManifestPath =  mPathToMainProjcetSources + "/AndroidManifest.xml";
+				pathToCopyManifest =  mPathToMainProjcetSources + "/" + new FileInfo(CommonConsts.PLAYSCAPE_MANIFEST_PATH).Name;
+			}
+			
+			if (ConfigurationInEditor.Instance.MergeAndroidManifests) 
+			{
+				AndroidManifestMerger.Merge(generatedPlayscapeManifestPath);
+			} else {
+				// Copy fragments
+				File.Copy(CommonConsts.PLAYSCAPE_MANIFEST_PATH, pathToCopyManifest);
+			}
+			
+			ApplyPlayscapeAndroidConfiguration(generatedPlayscapeManifestPath);
+			
+			CopyDepedencyJarsToLibs();
+			
+			if (isApkBuild ()) {
+				// recompile apk file and rewrite existing apk
+				AndroidApkCreator.recompile (mTargetPath, mOutputPath, mPathToMainProjcetSources);
+			}
 		}
 		
 		private void ApplyPushWooshAndroidConfiguration(string generatedPushWooshManifestPath)
@@ -275,11 +305,8 @@ namespace Playscape.Editor {
 			}
 		}
 
-		private void copyDependencyToApk() {
-			List<string> origin;
-			List<string> patch;
-			List<string> result;
-
+		private void copyDependencyToApk(List<string> origin, List<string> patch) {
+			// TODO merge jar files
 
 		}
 	}
