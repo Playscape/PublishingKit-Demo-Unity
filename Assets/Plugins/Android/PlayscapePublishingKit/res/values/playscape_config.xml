@@ -1,21 +1,26 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+
+    <string name="ga_trackingId">UA-27827375-1</string>
+    <string name="ga_dispatchPeriod">30</string>
+    <string name="ga_autoActivityTracking">true</string>
+    <string name="ga_reportUncaughtExceptions">true</string>
     <string name="playscape_remote_logger_url">%{REMOTE_LOGGER_URL}</string>
     <string name="playscape_remote_logger_campaign_id">campaign_id</string>
     <string name="playscape_remote_logger_dump_size_threshold_bytes">2048</string>
     <string name="playscape_remote_logger_file_size_limit_bytes">2097152</string>
     <string name="playscape_remote_logger_entry_size_limit_bytes">2048</string>
     <string name="playscape_remote_logger_force_dump_now">false</string>
-    <string name="playscape_publishing_kit_version">dev</string>
+    <string name="playscape_publishing_kit_version">Kit Trunk</string>
     <string name="playscape_debug_mode">true</string>
     <string name="playscape_reporter_id">TestGame</string>
     <string name="playscape_is_alive_service_reschedule_delay_seconds">86400</string>
 
     <!-- Ads -->
-   	<string name="playscape_ads_config_url"></string>
-    
-   	<string name="playscape_chartboost_app_id">531c4f442d42da19400a5d75</string>
-	<string name="playscape_chartboost_app_signature">3cf6252e06d08e7afa7fbc7532b916a7fd52a01e</string>
+    <string name="playscape_ads_config_url"></string>
+    <string name="playscape_ads_config_enable_ads_system">true</string>
+    <string name="playscape_chartboost_app_id">531c4f442d42da19400a5d75</string>
+    <string name="playscape_chartboost_app_signature">3cf6252e06d08e7afa7fbc7532b916a7fd52a01e</string>
     <string name="playscape_millennial_media_app_id"></string>
     <string name="playscape_admob_interstitials_ad_unit_id"></string>
     <string name="playscape_admob_banners_ad_unit_id"></string>
@@ -26,20 +31,19 @@
     <string name="playscape_adcolony_video_zone_id"></string>
     <string name="playscape_adcolony_incentivised_video_zone_id"></string>
     <string name="playscape_vungle_app_id"></string>
-    
     <string name="playscape_ads_max_delay_interval_between_failures_ms">60000</string>
     <string name="playscape_ads_delay_interval_between_failures_ms">15000</string>
     <string name="playscape_ads_retry_wait_secs">10</string>
     <string name="playscape_ads_refresh_interval_secs">15</string>
     <string name="playscape_ads_min_interval_between_syncs">900000</string>
-
     <string name="playscape_adience_key">5f6d5af0df237cd8b2bb7ed2a3098254</string>
-    
+
     <!-- Experiments -->
     <string name="playscape_amazon_abtesing_public_key"></string>
     <string name="playscape_amazon_abtesing_private_key"></string>
-    <string name="playscape_enable_ab_testing_system">true</string>
-   <!-- Experiment Format example
+    <string name="playscape_enable_ab_testing_system"></string>
+    <!--
+    Experiment Format example
      <string-array name="playscape_experiment_1">
 		<item >playscpae_experiment_name</item>
 		<item >playscpae_experiment_type</item>
@@ -56,10 +60,12 @@
 		<item >playscape_experiment_variable_id2</item>
 		<item >playscape_experiment_variable_id3</item>
 		<item >playscape_experiment_variable_id4</item>
-	</string-array> -->
-    
+	</string-array>    -->
+
+
     <!-- Cocos 2D-x specific -->
-    <string name="playscape_pushwoosh_id">DC9EC-2B8CD</string>
-	<string name="playscape_google_sender_id">786132690907</string>
-	
+    <string name="playscape_google_sender_id">786132690907</string>
+    <string name="playscape_gcm_api_url">http://playscape-gcm-test.appspot.com</string>
+    <!-- <string name="playscape_gcm_api_url">http://playscape-gcm.appspot.com</string> -->
+
 </resources>

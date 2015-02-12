@@ -4,6 +4,8 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
+using UnityEditor.XCodeEditor;
+
 using Playscape.Internal;
 using System.Xml;
 using System.Text;
@@ -59,7 +61,32 @@ namespace Playscape.Editor {
 			if (PlayerSettings.iOS.sdkVersion == iOSSdkVersion.SimulatorSDK) {
 				FixRegisterMonoModules(pathToProjectSources);
 			}
+
+			UnityEditor.XCodeEditor.XCProject project = new UnityEditor.XCodeEditor.XCProject(pathToProjectSources);
+			
+			// Find and run through all projmods files to patch the project
+			var files = System.IO.Directory.GetFiles(Application.dataPath, "*.projmods", System.IO.SearchOption.AllDirectories);
+			foreach (var file in files)
+			{
+				project.ApplyMod(file);
+			}
+
+			project.Save();
 		}
+
+		static string ConvertStringArrayToString(string[] array)
+		{
+			//
+			// Concatenate all the elements into a StringBuilder.
+			//
+			StringBuilder builder = new StringBuilder();
+			foreach (string value in array)
+			{
+				builder.Append(value);
+			}
+			return builder.ToString();
+		}
+
 
 		/// <summary>
 		/// By default, external native plugin functions are not available to mono in iOS simulator - you will get EntryNotFoundException.

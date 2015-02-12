@@ -10,6 +10,5 @@ namespace Playscape.Editor
 		public const string CONFIGURE_PUBLISHING_KIT_MENU_ITEM = "Playscape Publishing Kit Configuration...";
 		public const string MANIFEST_FRAGMENTS_PATH = PLUGINS_PATH + "/Android/PlayscapeManifestFragments";
 		public const string PLAYSCAPE_MANIFEST_PATH = MANIFEST_FRAGMENTS_PATH + "/PlayscapeAndroidManifest.xml";
-		public const string PUSHWOOSH_MANIFEST_PATH = MANIFEST_FRAGMENTS_PATH + "/PushWooshAndroidManifest.xml";
 	}
 }

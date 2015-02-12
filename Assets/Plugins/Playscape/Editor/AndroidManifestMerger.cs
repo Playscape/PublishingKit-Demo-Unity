@@ -16,11 +16,9 @@ namespace Playscape.Editor {
 		public static void Merge (string destinationManifest) {
 			var destXdoc = new XmlDocument ();
 			var psXdoc = new XmlDocument ();
-			var pwXdoc = new XmlDocument ();
-			
+
 			psXdoc.LoadXml (File.ReadAllText (CommonConsts.PLAYSCAPE_MANIFEST_PATH));
 			destXdoc.LoadXml (File.ReadAllText (destinationManifest));
-			pwXdoc.LoadXml (File.ReadAllText (CommonConsts.PUSHWOOSH_MANIFEST_PATH));
 			 
 			// ---------- Remove default main activity -------- //
 			var mainActivity  = destXdoc.SelectSingleNode ("manifest/application/activity/intent-filter[contains(name,android.intent.action.MAIN)]");
@@ -56,10 +54,6 @@ namespace Playscape.Editor {
 				destAppNode.Attributes.Append (debuggableAttrib);
 				destAppNode.Attributes ["android:debuggable"].Value = "true";
 			}
-			
-			// ---------- Merge Pushwoosh ----------- //
-			copyAllManifestTags (pwXdoc, destXdoc);
-			copyAllApplicationTags (pwXdoc, destXdoc);
 			
 			XmlWriterSettings settings = new XmlWriterSettings ();
 			settings.Indent = true;

@@ -43,9 +43,7 @@ namespace Playscape.Notifications
 					GameObject go = GameObject.Find(PlayscapeManager.PLAYSCAPE_MANAGER_GAMEOBJECT_NAME);
 					if (go != null) {
 
-						#if UNITY_ANDROID && !UNITY_EDITOR
-						mPushWooshCommon = (PushWooshCommon) go.GetComponent(typeof(PushNotificationsAndroid));
-						#elif UNITY_IPHONE && !UNITY_EDITOR
+						#if UNITY_IPHONE && !UNITY_EDITOR
 						mPushWooshCommon = (PushWooshCommon )go.GetComponent(typeof(PushNotificationsIOS));
 						#else
 						go.AddComponent(typeof(PushWooshStub));

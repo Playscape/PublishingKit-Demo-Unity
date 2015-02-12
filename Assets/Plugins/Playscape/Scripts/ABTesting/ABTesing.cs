@@ -5,11 +5,15 @@ using Playscape.Internal;
 using System;
 
 namespace Playscape.ABTesting {
+	/// <summary>
+	/// Lets you get your ab testing info from the server
+	/// </summary>
 	public class ABTesing {
 
 		/// <summary>
 		/// delegate to retreive experimentData
 		/// </summary>
+		/// <param name="ExperimentData">The experiment data </param>
 		public delegate void OnExperimentDataArrivedDelegate(ExperimentData ExperimentData);
 
 		/// <summary>

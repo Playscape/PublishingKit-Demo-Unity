@@ -64,11 +64,12 @@ namespace Playscape.Internal {
 			public MillennialMedia MyMillennialMedia = new MillennialMedia();
 			public Startapp MyStartAppIds = new Startapp();
 			public Vungle MyVungle = new Vungle();
-
-
+            
+            
 			[Serializable]
 			public class AdsConfig {
 				public string Url;
+                public bool EnableAdsSystem = true;
 			}
 
 			[Serializable]
@@ -114,7 +115,6 @@ namespace Playscape.Internal {
 		}
 
 		/* --- Push Woosh --- */
-		public string PushWooshAndroidId;
 		public string PushWooshIosId;
 
 		public bool MergeAndroidManifests = true;

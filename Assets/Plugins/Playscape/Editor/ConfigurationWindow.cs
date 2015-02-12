@@ -4,6 +4,7 @@ using System.Collections;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
+using System;
 using Playscape.Internal;
 
 namespace Playscape.Editor {
@@ -98,11 +99,7 @@ namespace Playscape.Editor {
 		private void OnPushWooshGUI ()
 		{
 			GUILayout.Label (PUSHWOOSH_CONFIG, EditorStyles.boldLabel);
-			string result = EditorGUILayout.TextField (ANDROID + " " + APP_ID, ConfigurationInEditor.Instance.PushWooshAndroidId);
-			if (result != null) {
-				ConfigurationInEditor.Instance.PushWooshAndroidId = result;
-			}
-			result = EditorGUILayout.TextField (IOS + " " + APP_ID, ConfigurationInEditor.Instance.PushWooshIosId);
+			string result = EditorGUILayout.TextField (IOS + " " + APP_ID, ConfigurationInEditor.Instance.PushWooshIosId);
 			if (result != null) {
 				ConfigurationInEditor.Instance.PushWooshIosId = result;
 			}
@@ -117,12 +114,17 @@ namespace Playscape.Editor {
 								GUILayout.Label (category.GetType().Name, EditorStyles.boldLabel);
 								categories.Add(category, true);
 							}
-			
-							string result = EditorGUILayout.TextField (fieldInfo.Name, fieldInfo.GetValue(category) as string);
-							if (result != null) {
+                            
+                            if (fieldInfo.FieldType == typeof(string)) {
+                                string result = EditorGUILayout.TextField (fieldInfo.Name, fieldInfo.GetValue(category) as string);
+                                if (result != null) {
 								fieldInfo.SetValue(category, result);
-								
-							}
+                                }   
+                            } else if (fieldInfo.FieldType == typeof(bool)) {
+                                bool currentValue =  (bool) fieldInfo.GetValue(category);
+                                bool result  = EditorGUILayout.ToggleLeft (fieldInfo.Name,currentValue);
+                                fieldInfo.SetValue(category, result);
+                            }
 						});
 					
 		}
