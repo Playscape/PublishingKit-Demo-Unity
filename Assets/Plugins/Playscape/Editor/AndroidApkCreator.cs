@@ -19,32 +19,36 @@ namespace Playscape.Editor
 			DirectoryInfo directoryToRemove = new DirectoryInfo(pathToRemove);
 			if (directoryToRemove != null && directoryToRemove.Exists) {
 				directoryToRemove.Delete (true);
+			} else {
+				FileInfo fileToRemove = new FileInfo (pathToRemove);
+				if(fileToRemove != null && fileToRemove.Exists) {
+					fileToRemove.Delete();
+				}
 			}
 		}
 
 		public static void decompile(string targetPath, string outputPath) 
 		{
-			useApkTool (false, targetPath, outputPath, "");
+			useApkTool (false, targetPath, outputPath);
 		}
 
-		public static void recompile(string targetPath, string outputPath, string buildTargetPath) 
+		public static void recompile(string targetPath, string outputPath) 
 		{
-			// remove 'origin/metadata' to make apk unsigned
-			cleanUselessResources (outputPath + "/original/");
-			useApkTool (true, targetPath, outputPath, buildTargetPath);
+			// remove origin apk
+			cleanUselessResources (targetPath);
+			useApkTool (true, targetPath, outputPath);
 			// remove folder with decompiled source
 			cleanUselessResources (outputPath);
 		}
 
 		// at the end auto sing apk calling
-		private static void useApkTool(Boolean isCompile, string targetPath, string outputPath, string buildTargetPath) 
+		private static void useApkTool(Boolean isCompile, string targetPath, string outputPath) 
 		{
 			string apkToolPath = Directory.GetParent (Environment.CurrentDirectory).FullName + APK_TOOL_PATH;
 			
 			string arguments = "";
 			if (isCompile) {
-//				string buildTargetPath = mPathToMainProjcetSources;
-				arguments = "-jar " + apkToolPath + " b -f " + outputPath + " -o " + buildTargetPath;
+				arguments = "-jar " + apkToolPath + " b -f " + outputPath + " -o " + targetPath;
 			} else {
 				arguments = "-jar " + apkToolPath + " d -s -f " + targetPath + " -o " + outputPath + "/";
 			}
@@ -70,14 +74,17 @@ namespace Playscape.Editor
 			string alias = "androiddebugkey";
 			string storepass = "android";
 			string keypass = "android";
-			//			jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android newUnityProject_out/dist/newUnityProject.apk androiddebugkey
-			string arguments = "verbose -keystore " + KEY_STORE_PATH + " -storepass " + storepass + " -keypass " + keypass + targetPath + " " + alias;
+//			jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android newUnityProject_out/dist/newUnityProject.apk androiddebugkey
+			string arguments = "-verbose -keystore " + KEY_STORE_PATH + " -storepass " + storepass + " -keypass " + keypass + " " + targetPath + " " + alias;
 
 			string command = "jarsigner";
 			if (isWindows ()) {
 				command += ".exe";
 			}
-			runProcessWithCommand (command, arguments);
+			int exitCode = runProcessWithCommand (command, arguments);
+			string message = "apk was " + (exitCode == 0 ? "" : "not") + " signed successfully" + (exitCode == 0 ? "" : " with code " + exitCode); 
+			L.W (message);
+			L.W ("arguments: {0}", arguments);
 		}
 		
 		public static int runProcessWithCommand(string command, string args)
