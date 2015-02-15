@@ -10,8 +10,9 @@ namespace Playscape.Editor
 		private const string APK_CONFIG_STUFF_PATH = "/Apk_config_stuff";
 		private const string APK_TOOL_PATH = APK_CONFIG_STUFF_PATH + "/apktool.jar";
 
-		// TODO add if for windows and unix 
-		private const string KEY_STORE_PATH = "/Users/mac/.android/debug.keystore";
+		private const string DEFAULT_ALIAS = "androiddebugkey";
+		private const string DEFAULT_STOREPASS = "android";
+		private const string DEFAULT_KEYPASS = "android";
 
 
 		public static void cleanUselessResources(string pathToRemove) 
@@ -53,10 +54,12 @@ namespace Playscape.Editor
 				arguments = "-jar " + apkToolPath + " d -s -f " + targetPath + " -o " + outputPath + "/";
 			}
 
-			string command = "java";
+			string command;
 
 			if (isWindows ()) {
-				command += ".exe";
+				command = "%JAVA_HOME%/bin/java.exe";
+			} else {
+				command = "/usr/bin/java";
 			}
 			
 			int exitCode = runProcessWithCommand (command, arguments);
@@ -70,21 +73,26 @@ namespace Playscape.Editor
 		
 		private static void signApk(string targetPath) 
 		{
-			// TODO extract to constants
-			string alias = "androiddebugkey";
-			string storepass = "android";
-			string keypass = "android";
-//			jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android newUnityProject_out/dist/newUnityProject.apk androiddebugkey
-			string arguments = "-verbose -keystore " + KEY_STORE_PATH + " -storepass " + storepass + " -keypass " + keypass + " " + targetPath + " " + alias;
 
-			string command = "jarsigner";
+			string keystore = "/.android/debug.keystore";
+			string keyStorePath;
+			string keyStorePath1;
+
+			keyStorePath = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).FullName + keystore;
+
+			string arguments = "-verbose -keystore " + keyStorePath + " -storepass " + DEFAULT_STOREPASS + " -keypass " + DEFAULT_KEYPASS + " " + targetPath + " " + DEFAULT_ALIAS;
+
+			string command;
+			
 			if (isWindows ()) {
-				command += ".exe";
+				command = "%JAVA_HOME%/bin/jarsigner.exe";
+			} else {
+				command = "/usr/bin/jarsigner";
 			}
+
 			int exitCode = runProcessWithCommand (command, arguments);
 			string message = "apk was " + (exitCode == 0 ? "" : "not") + " signed successfully" + (exitCode == 0 ? "" : " with code " + exitCode); 
 			L.W (message);
-			L.W ("arguments: {0}", arguments);
 		}
 		
 		public static int runProcessWithCommand(string command, string args)

@@ -4,7 +4,6 @@ using System.Collections;
 using System.Xml;
 using System.IO;
 using Playscape.Internal;
-using System;
 
 namespace Playscape.Editor {
 	static class AndroidManifestMerger  {
@@ -18,9 +17,7 @@ namespace Playscape.Editor {
 			var destXdoc = new XmlDocument ();
 			var psXdoc = new XmlDocument ();
 
-			string psManifestPath = Directory.GetParent (Directory.GetParent (Environment.CurrentDirectory).FullName).FullName + "/unitypackage/" + CommonConsts.PLAYSCAPE_MANIFEST_PATH;
-	
-			psXdoc.LoadXml (File.ReadAllText (psManifestPath));
+			psXdoc.LoadXml (File.ReadAllText (CommonConsts.PLAYSCAPE_MANIFEST_PATH));
 			destXdoc.LoadXml (File.ReadAllText (destinationManifest));
 			 
 			// ---------- Remove default main activity -------- //
