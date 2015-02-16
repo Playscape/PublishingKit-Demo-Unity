@@ -102,7 +102,8 @@ namespace Playscape.Editor
 			var processInfo = new ProcessStartInfo (command, args)
 			{
 				CreateNoWindow = true,
-				UseShellExecute = false
+				UseShellExecute = false,
+				RedirectStandardOutput = true
 			};
 			Process proc;
 			
@@ -113,8 +114,11 @@ namespace Playscape.Editor
 			
 			proc.WaitForExit();
 			int exitCode = proc.ExitCode;
+
+			proc.WaitForExit();
+
 			proc.Close();
-			
+
 			return exitCode;
 		}
 
