@@ -11,101 +11,92 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 
+
 namespace Playscape.Editor {
-
+	
 	class AndroidPostProcessor : AbstractPostProcessor {
-
+		
 		private const string PLAYSCAPE_CONFIG_XML_PATH = CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/res/values/playscape_config.xml";
-		private const string PUSH_WOOSH_GCM_SENDER_TOKEN = "%{GCM_SENDER_ID}";
-		private const string PUSH_WOOSH_APP_ID_TOKEN = "%{PUSH_WOOSH_APP_ID}";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH = "/libs/android-support-v4.jar";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT  = "/libs/android-support-v4.jar_v19.1";
 		private const string LIBS_UNITY_CLASSES_PATH = "/libs/unity-classes.jar";
+		
+		private const string MANIFEST_FILE_NAME = "AndroidManifest.xml";
 
-
-		private readonly string mPathToMainProjcetSources;
-		private readonly string mTargetPath;
-		private readonly string mPathToPublishingKitLibSources;
-		private readonly string mOutputPath;
+		private  string mTargetPath;
 
 		public AndroidPostProcessor(string targetPath) {
 			mTargetPath = targetPath;
-			mPathToMainProjcetSources = mTargetPath + "/" + PlayerSettings.productName;
-			if (isApkBuild ()) {
-				mOutputPath = mTargetPath.Substring (0, mTargetPath.Length - 4) + "_out";
-				mPathToPublishingKitLibSources = Environment.CurrentDirectory + "/Assets/Plugins/Android/PlayscapePublishingKit";
-			} else {
-				mOutputPath = mTargetPath;
-				mPathToPublishingKitLibSources = targetPath + "/PlayscapePublishingKit";
-			}
 		}
-
-		public override void CheckForWarnings(WarningAccumulator warnings)
-		{
-			base.CheckForWarnings (warnings);
-
-			warnings.WarnIf(
-				mPathToMainProjcetSources.ToLower().EndsWith(".apk"),
-				Warnings.PLAYSCAPE_ANDROID_APK_BUILD);
-		}
-
+		
 		private Boolean isApkBuild() {
 			return mTargetPath.ToLower ().EndsWith (".apk");
 		}
-
+		
 		public override void Run()
 		{
 			// If our manifests are merged then all manifest fragments will reside in the same file and therefore we point
 			// the various sdks to the main manifest file
-			string generatedPlayscapeManifestPath;
-			string pathToCopyManifest;
+			string sourcesPath = isApkBuild () ? 
+				Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) : 
+				mTargetPath + "/" + PlayerSettings.productName;		
+
+			string publishingKitLibPath = isApkBuild() ? 
+				Environment.CurrentDirectory + "/Assets/Plugins/Android/PlayscapePublishingKit" : 
+					mTargetPath + "/PlayscapePublishingKit";
+
+			var manifestDst = sourcesPath + "/" + MANIFEST_FILE_NAME;
+
+			L.D(mTargetPath);
+			L.D(sourcesPath);
+
+
 			if (isApkBuild()) {
 				// decompile apk to update resources
-				AndroidApkCreator.decompile (mTargetPath, mOutputPath);
-				generatedPlayscapeManifestPath = mOutputPath + "/" + "AndroidManifest.xml";
-				pathToCopyManifest = mOutputPath + "/" + new FileInfo(CommonConsts.PLAYSCAPE_MANIFEST_PATH).Name;
-			} else {
-				generatedPlayscapeManifestPath =  mPathToMainProjcetSources + "/AndroidManifest.xml";
-				pathToCopyManifest =  mPathToMainProjcetSources + "/" + new FileInfo(CommonConsts.PLAYSCAPE_MANIFEST_PATH).Name;
+				AndroidApkCreator.decompile (mTargetPath, sourcesPath);
 			}
 			
 			if (ConfigurationInEditor.Instance.MergeAndroidManifests) 
 			{
-				AndroidManifestMerger.Merge(generatedPlayscapeManifestPath);
+				AndroidManifestMerger.Merge(manifestDst);
 			} else {
 				// Copy fragments
-				File.Copy(CommonConsts.PLAYSCAPE_MANIFEST_PATH, pathToCopyManifest);
+				File.Copy(CommonConsts.PLAYSCAPE_MANIFEST_PATH, sourcesPath + "/" + new FileInfo(CommonConsts.PLAYSCAPE_MANIFEST_PATH).Name);
 			}
-			
-			ApplyPlayscapeAndroidConfiguration(generatedPlayscapeManifestPath);
-			
-			CopyDepedencyJarsToLibs();
-			
+
+
+			string manifestContents = File.ReadAllText(manifestDst);
+			manifestContents = ApplyCommonAndroidManifestParams(manifestContents);
+			File.WriteAllText(manifestDst, manifestContents);
+
+			var configBaseName = isApkBuild () ? "strings.xml"  : new FileInfo(PLAYSCAPE_CONFIG_XML_PATH).Name;
+			var dstConfig = (isApkBuild() ? sourcesPath : publishingKitLibPath) + "/res/values/" + configBaseName;
+			var srcConfig = isApkBuild () ? dstConfig : PLAYSCAPE_CONFIG_XML_PATH;
+
+			ApplyPlayscapeAndroidConfiguration(srcConfig,
+			                                   dstConfig);
+
+			if (!isApkBuild()) {
+				CopyDepedencyJarsToLibs(mTargetPath, publishingKitLibPath, sourcesPath);
+			}
+
 			if (isApkBuild ()) {
 				// recompile apk file and rewrite existing apk
-				AndroidApkCreator.recompile (mTargetPath, mOutputPath);
+				AndroidApkCreator.recompile (mTargetPath, sourcesPath);
+
+				DirectoryInfo directoryToRemove = new DirectoryInfo(sourcesPath);
+				if (directoryToRemove != null && directoryToRemove.Exists) {
+					directoryToRemove.Delete (true);
+				} 
 			}
 		}
-
-		void ApplyPlayscapeAndroidConfiguration(string generatedPlayscapeManifestPath)
+		
+		private static void ApplyPlayscapeAndroidConfiguration(string srcConfig,
+		                                                       string dstConfig)
 		{
-			string manifestContents = File.ReadAllText(generatedPlayscapeManifestPath);
-			string manifestBaseName = new FileInfo(generatedPlayscapeManifestPath).Name;
-			
-			manifestContents = ApplyCommonAndroidManifestParams(manifestContents);
-			
-			string path;
-			if (isApkBuild ()) {
-				path = mOutputPath;
-			} else {
-				path = mPathToMainProjcetSources;
-			}
-			
-			File.WriteAllText(path + "/" + manifestBaseName, manifestContents);
-			
 			// Manipulate Config
 			var configDoc = new XmlDocument();
-			configDoc.LoadXml(File.ReadAllText (PLAYSCAPE_CONFIG_XML_PATH));
+			configDoc.LoadXml(File.ReadAllText (srcConfig));
 			
 			configDoc.SelectSingleNode("resources/string[@name='playscape_reporter_id']").InnerText = 
 				ConfigurationInEditor.Instance.ReporterId;
@@ -115,96 +106,95 @@ namespace Playscape.Editor {
 					: Settings.ReleaseRemoteLoggerUrl;
 			
 			injectABTestingConfig (configDoc);
-			injectAdConfigs (configDoc);
-			
-			var configBaseName = new FileInfo(PLAYSCAPE_CONFIG_XML_PATH).Name;
+			injectAdConfigs (configDoc);			
+
 			
 			var writerSettings = new XmlWriterSettings();
 			writerSettings.Indent = true;
-			using (var writer = XmlWriter.Create(mPathToPublishingKitLibSources + "/res/values/" + configBaseName, writerSettings)) {
+			using (var writer = XmlWriter.Create(dstConfig)) {
 				configDoc.Save(writer);
 			}
 		}
-
-		void injectAdConfigs (XmlDocument configDoc)
+		
+		private static void injectAdConfigs (XmlDocument configDoc)
 		{
 			// Use relfection to enumerate all ad provider identifiers, and inject them into the 
 			// configuration xml.
 			//
 			// Reflection assumes that Ads class contains either fields which are classes with fields of type String.
-            
-            
-
+			
+			
+			
 			Configuration.Instance.TraverseAdsConfig (
 				(category, settingFieldInfo) =>
-						{
-							var settingName = new StringBuilder();
-							settingName.Length = 0;
-							settingName.Append("playscape_")
-								.Append(CamelToSnake(category.GetType().Name));
-							
-							settingName.Append("_")
-								.Append(CamelToSnake(settingFieldInfo.Name));
-									object value = settingFieldInfo.GetValue(category);
-							// Ads Config Url
-							var xmlElement = configDoc.SelectSingleNode(string.Format("resources/string[@name='{0}']", settingName.ToString()));
-							
-							if (xmlElement == null) {
-								throw new ApplicationException(string.Format("Unable to find xml element <string name='{0}'>, please " +
-								                                             "verify playscape_config.xml or your ad provider fields naming conventions.", settingName));
-							}
-							
-							xmlElement.InnerText = 
-								string.Format("{0}", value);
-							
-						});
-            configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
+				{
+				var settingName = new StringBuilder();
+				settingName.Length = 0;
+				settingName.Append("playscape_")
+					.Append(CamelToSnake(category.GetType().Name));
+				
+				settingName.Append("_")
+					.Append(CamelToSnake(settingFieldInfo.Name));
+				object value = settingFieldInfo.GetValue(category);
+				// Ads Config Url
+				var xmlElement = configDoc.SelectSingleNode(string.Format("resources/string[@name='{0}']", settingName.ToString()));
+				
+				if (xmlElement == null) {
+					throw new ApplicationException(string.Format("Unable to find xml element <string name='{0}'>, please " +
+					                                             "verify playscape_config.xml or your ad provider fields naming conventions.", settingName));
+				}
+				
+				xmlElement.InnerText = 
+					string.Format("{0}", value);
+				
+			});
+			configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
 		}
-
-		private void injectABTestingConfig(XmlDocument configDoc)
+		
+		private static void injectABTestingConfig(XmlDocument configDoc)
 		{
 			XmlNode rootResources = configDoc.SelectSingleNode("resources");
 			XmlNode lastExperimentsElement = configDoc.SelectSingleNode("resources/string[@name='playscape_enable_ab_testing_system']");
-
+			
 			configDoc.SelectSingleNode("resources/string[@name='playscape_amazon_abtesing_public_key']").InnerText = 
 				ConfigurationInEditor.Instance.MyABTesting.AmazonPublicKey;
 			configDoc.SelectSingleNode("resources/string[@name='playscape_amazon_abtesing_private_key']").InnerText = 
 				ConfigurationInEditor.Instance.MyABTesting.AmazonPrivateKey;
 			configDoc.SelectSingleNode("resources/string[@name='playscape_enable_ab_testing_system']").InnerText = 
 				ConfigurationInEditor.Instance.MyABTesting.EnableABTestingSystem.ToString().ToLower();
-
+			
 			for (int i = 0; i < ConfigurationInEditor.Instance.MyABTesting.NumberOfCustomExperiments; i++) 
 			{
 				XmlElement playscapeExperimentElement = configDoc.CreateElement("string-array");
 				playscapeExperimentElement.SetAttribute("name","playscape_experiment_" + (i + 1).ToString());
-
+				
 				XmlElement experimentNameElement = configDoc.CreateElement("item");
 				experimentNameElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentName;
 				playscapeExperimentElement.AppendChild(experimentNameElement);
-
+				
 				XmlElement experimentTypeElement = configDoc.CreateElement("item");
 				experimentTypeElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentType;
 				playscapeExperimentElement.AppendChild(experimentTypeElement);
-
+				
 				for (int j =0; j <   ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].NumberOfVarsInExperiment; j++)
 				{
 					XmlElement experimentVariableElement = configDoc.CreateElement("item");
 					experimentVariableElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentVars[j];
 					playscapeExperimentElement.AppendChild(experimentVariableElement);
 				}
-
+				
 				rootResources.InsertAfter(playscapeExperimentElement, lastExperimentsElement);
 				lastExperimentsElement = playscapeExperimentElement;
 			}
 		}
-
+		
 		/// <summary>
 		/// Converts C# camel case to lower case snake.
 		/// e.g: ThisIsACamel to this_is_a_camel
 		/// </summary>
 		/// <returns>Snake cased string.</returns>
 		/// <param name="camelCase">Camel case string.</param>
-		static string CamelToSnake(string camelCase)
+		private static string CamelToSnake(string camelCase)
 		{
 			var builder = new StringBuilder();
 			
@@ -221,62 +211,61 @@ namespace Playscape.Editor {
 			
 			return builder.ToString();
 		}
-
+		
 		/// <summary>
 		/// Replaces common placeholders according to unity configuration in an android manifest
 		/// </summary>
 		/// <returns>The common android manifest parameters.</returns>
 		/// <param name="manifestContents">Manifest contents.</param>
-		private string ApplyCommonAndroidManifestParams (string manifestContents)
+		private static string ApplyCommonAndroidManifestParams (string manifestContents)
 		{
 			return manifestContents.Replace("PACKAGE_NAME", PlayerSettings.bundleIdentifier);
 		}
-
-		private void CopyDepedencyJarsToLibs ()
+		
+		private static void CopyDepedencyJarsToLibs (string targetPath,
+												string pathToPublishingKitLibSources,
+		                                      	string projectSources)
 		{
-			if (isApkBuild ()) {
-				return;
-			}
 
 			string v4supportLibPath = string.Empty;
-			foreach (var dirPath in Directory.GetDirectories(mTargetPath)) {
+			foreach (var dirPath in Directory.GetDirectories(targetPath)) {
 				// Is there a v4 support lib in a project other than the pubkit?
 				if (File.Exists(dirPath + LIBS_ANDROID_SUPPORT_V4_PATH) && 
-				    new DirectoryInfo(dirPath).FullName != new DirectoryInfo(mPathToPublishingKitLibSources).FullName) 
+				    new DirectoryInfo(dirPath).FullName != new DirectoryInfo(pathToPublishingKitLibSources).FullName) 
 				{
 					v4supportLibPath = dirPath + LIBS_ANDROID_SUPPORT_V4_PATH;
 					break;
 				}
 			}
-
-
+			
+			
 			// If no v4 support lib, use the one that comes with the pubkit
 			if (string.IsNullOrEmpty (v4supportLibPath)) 
 			{
-				v4supportLibPath = mPathToPublishingKitLibSources + LIBS_ANDROID_SUPPORT_V4_PATH;
-				File.Move(mPathToPublishingKitLibSources + LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT, v4supportLibPath);
+				v4supportLibPath = pathToPublishingKitLibSources + LIBS_ANDROID_SUPPORT_V4_PATH;
+				File.Move(pathToPublishingKitLibSources + LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT, v4supportLibPath);
 			} else {
-				File.Delete(mPathToPublishingKitLibSources + LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT);
+				File.Delete(pathToPublishingKitLibSources + LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT);
 			}
-
-			foreach (var dirPath in Directory.GetDirectories(mTargetPath)) {
+			
+			foreach (var dirPath in Directory.GetDirectories(targetPath)) {
 				if (new DirectoryInfo(dirPath).Name != PlayerSettings.productName) {
-                    if (!Directory.Exists(dirPath + "/libs")) {
-                        Directory.CreateDirectory(dirPath + "/libs");
-                    }
-
+					if (!Directory.Exists(dirPath + "/libs")) {
+						Directory.CreateDirectory(dirPath + "/libs");
+					}
+					
 					if (new DirectoryInfo(v4supportLibPath).FullName != new DirectoryInfo(dirPath + LIBS_ANDROID_SUPPORT_V4_PATH).FullName) {
 						File.Copy(v4supportLibPath, dirPath + LIBS_ANDROID_SUPPORT_V4_PATH, true);
 					}
-
-                    if (File.Exists(mPathToMainProjcetSources + LIBS_UNITY_CLASSES_PATH )) {
-                        File.Copy(mPathToMainProjcetSources + LIBS_UNITY_CLASSES_PATH, dirPath + LIBS_UNITY_CLASSES_PATH, true);
-                    }
+					
+					if (File.Exists(projectSources + LIBS_UNITY_CLASSES_PATH )) {
+						File.Copy(projectSources + LIBS_UNITY_CLASSES_PATH, dirPath + LIBS_UNITY_CLASSES_PATH, true);
+					}
 				}
 			}
 		}
 	}
-
+	
 	/// <summary>
 	/// Handles the OnPostProcessBuild callback, in which we apply configurations to the sdks in the various platforms
 	/// </summary>

@@ -1,98 +1,100 @@
+using UnityEngine;
 using System;
 using System.Diagnostics;
 using System.IO;
-using Playscape.Internal; 
+using Playscape.Internal;
+
 
 namespace Playscape.Editor
 {
 	public class AndroidApkCreator
 	{
-		private const string APK_CONFIG_STUFF_PATH = "/Apk_config_stuff";
-		private const string APK_TOOL_PATH = APK_CONFIG_STUFF_PATH + "/apktool.jar";
+		//private static readonly string APKTOOL_FOLDER;
+		//private static readonly string APK_TOOL_PATH;
+		private const string APK_TOOL_PATH = "Assets/Plugins/Playscape/ThirdParty/apktool.jar" ;
+		private static readonly string KEY_STORE_PATH;
 
-		private const string DEFAULT_ALIAS = "androiddebugkey";
-		private const string DEFAULT_STOREPASS = "android";
-		private const string DEFAULT_KEYPASS = "android";
-
+		static AndroidApkCreator()
+		{
+			//APKTOOL_FOLDER = "Assets/Plugins/Playscape/ThirdParty";
+			//APK_TOOL_PATH = Path.Combine (APKTOOL_FOLDER, "apktool.jar");
+			KEY_STORE_PATH = (isWindows() ? System.Environment.GetEnvironmentVariable("USERPROFILE") : "~") + "/.android/debug.keystore";
+		}
 
 		public static void cleanUselessResources(string pathToRemove) 
 		{
-			DirectoryInfo directoryToRemove = new DirectoryInfo(pathToRemove);
-			if (directoryToRemove != null && directoryToRemove.Exists) {
-				directoryToRemove.Delete (true);
-			} else {
-				FileInfo fileToRemove = new FileInfo (pathToRemove);
-				if(fileToRemove != null && fileToRemove.Exists) {
-					fileToRemove.Delete();
-				}
-			}
+			L.D("Removing Path: " + pathToRemove);
 		}
 
-		public static void decompile(string targetPath, string outputPath) 
+		public static void decompile(string apkPath, string outputPath) 
 		{
-			useApkTool (false, targetPath, outputPath);
+			useApkTool (false, apkPath, outputPath);
 		}
 
 		public static void recompile(string targetPath, string outputPath) 
 		{
-			// remove origin apk
-			cleanUselessResources (targetPath);
 			useApkTool (true, targetPath, outputPath);
-			// remove folder with decompiled source
-			cleanUselessResources (outputPath);
 		}
 
 		// at the end auto sing apk calling
 		private static void useApkTool(Boolean isCompile, string targetPath, string outputPath) 
 		{
-			string apkToolPath = Directory.GetParent (Environment.CurrentDirectory).FullName + APK_TOOL_PATH;
+			//UnityEngine.Debug.LogError (APKTOOL_FOLDER);
+			string unsignedPath = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ());
 			
 			string arguments = "";
 			if (isCompile) {
-				arguments = "-jar " + apkToolPath + " b -f " + outputPath + " -o " + targetPath;
+				arguments = "-jar " + APK_TOOL_PATH + " b -f " + outputPath + " -o " + unsignedPath;
 			} else {
-				arguments = "-jar " + apkToolPath + " d -s -f " + targetPath + " -o " + outputPath + "/";
+				arguments = "-jar " + APK_TOOL_PATH + " d -s -f " + targetPath + " -o " + outputPath + "/";
 			}
 
 			string command;
 
 			if (isWindows ()) {
-				command = "%JAVA_HOME%/bin/java.exe";
-			} else {
+				command = System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/java.exe";
+			}
+			else {
 				command = "/usr/bin/java";
 			}
-			
+
+			L.D ("Command " + command);
+			L.D ("Argumnets " + arguments);
+
 			int exitCode = runProcessWithCommand (command, arguments);
 			string message = (isCompile ? "compile" : "decompile") + " was " + (exitCode == 0 ? "" : "not") + " successfully"; 
 			L.W (message);
 
 			if (exitCode == 0 && isCompile) {
-				signApk (targetPath);
+				signApk (unsignedPath, targetPath);
 			}
 		}
 		
-		private static void signApk(string targetPath) 
+		private static void signApk(string unsignedAPKPath, string targetPath) 
 		{
+			// TODO extract to constants
+			string alias = "androiddebugkey";
+			string storepass = "android";
 
-			string keystore = "/.android/debug.keystore";
-			string keyStorePath;
-			string keyStorePath1;
-
-			keyStorePath = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).FullName + keystore;
-
-			string arguments = "-verbose -keystore " + keyStorePath + " -storepass " + DEFAULT_STOREPASS + " -keypass " + DEFAULT_KEYPASS + " " + targetPath + " " + DEFAULT_ALIAS;
-
+			string keypass = "android";
 			string command;
-			
 			if (isWindows ()) {
-				command = "%JAVA_HOME%/bin/jarsigner.exe";
+				 command = System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/jarSigner.exe";
 			} else {
 				command = "/usr/bin/jarsigner";
 			}
 
+			string arguments = "-verbose -keystore " + KEY_STORE_PATH + " -storepass " + storepass + " -keypass " + keypass + " " + unsignedAPKPath + " " + alias;
 			int exitCode = runProcessWithCommand (command, arguments);
 			string message = "apk was " + (exitCode == 0 ? "" : "not") + " signed successfully" + (exitCode == 0 ? "" : " with code " + exitCode); 
 			L.W (message);
+			L.D ("arguments: {0}", arguments);
+
+			if (File.Exists(targetPath)) {
+				File.Delete (targetPath);
+			}
+
+			File.Move(unsignedAPKPath, targetPath);
 		}
 		
 		public static int runProcessWithCommand(string command, string args)

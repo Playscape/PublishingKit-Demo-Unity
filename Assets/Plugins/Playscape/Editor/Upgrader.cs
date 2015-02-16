@@ -16,8 +16,13 @@ namespace Playscape.Editor {
 		/// 
 		/// </summary>
 		public static void Upgrade() {
-			string myVersion = File.ReadAllText (CommonConsts.PLUGINS_PLAYSCAPE_VERSION_PATH + "/my_version");
-			string upgradeStatus = File.ReadAllText (CommonConsts.PLUGINS_PLAYSCAPE_VERSION_PATH + "/" + myVersion);
+			string myVersion = null;
+			string upgradeStatus = null;
+			try {
+				myVersion = File.ReadAllText (CommonConsts.PLUGINS_PLAYSCAPE_VERSION_PATH + "/my_version");
+				upgradeStatus = File.ReadAllText (CommonConsts.PLUGINS_PLAYSCAPE_VERSION_PATH + "/" + myVersion);
+			} catch {
+			}
 
             if (string.IsNullOrEmpty (upgradeStatus)) {
                 if (File.Exists(CommonConsts.PLUGINS_PLAYSCAPE_VERSION_PATH + "/1.3.2")) {
@@ -38,6 +43,11 @@ namespace Playscape.Editor {
                     DeleteFileForUpgrade(CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/libs/com.adience.adience-1.4.1-RELEASE.jar");
                     DeleteFileForUpgrade(CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/libs/com.mopub.mobileads.mopub-sdk-1.0.3-RELEASE.jar");
                 }
+				
+				// delete the PlayScapeActivity source file if exist (it is not compiled into a .jar file
+				string playScapeActivitySourcePath = "Assets/Plugins/Android/PlayscapePublishingKit/src/com/playscape/publishingkit/PlayscapeActivity.java";
+				DeleteFileForUpgrade(playScapeActivitySourcePath);
+				DeleteFileForUpgrade(playScapeActivitySourcePath + ".meta");
             }
             
             File.WriteAllText(CommonConsts.PLUGINS_PLAYSCAPE_VERSION_PATH + "/" + myVersion, "upgraded");

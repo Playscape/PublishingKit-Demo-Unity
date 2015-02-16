@@ -11,7 +11,7 @@
     <string name="playscape_remote_logger_file_size_limit_bytes">2097152</string>
     <string name="playscape_remote_logger_entry_size_limit_bytes">2048</string>
     <string name="playscape_remote_logger_force_dump_now">false</string>
-    <string name="playscape_publishing_kit_version">Kit Trunk</string>
+    <string name="playscape_publishing_kit_version">dev</string>
     <string name="playscape_debug_mode">true</string>
     <string name="playscape_reporter_id">TestGame</string>
     <string name="playscape_is_alive_service_reschedule_delay_seconds">86400</string>
@@ -64,8 +64,8 @@
 
 
     <!-- Cocos 2D-x specific -->
-    <string name="playscape_google_sender_id">786132690907</string>
-    <string name="playscape_gcm_api_url">http://playscape-gcm-test.appspot.com</string>
+    <string name="playscape_google_sender_id">842387343621</string>
+    <string name="playscape_gcm_api_url">http://nifty-catfish-845.appspot.com</string>
     <!-- <string name="playscape_gcm_api_url">http://playscape-gcm.appspot.com</string> -->
 
 </resources>
