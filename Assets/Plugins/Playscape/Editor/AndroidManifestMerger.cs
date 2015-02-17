@@ -16,10 +16,10 @@ namespace Playscape.Editor {
 		public static void Merge (string destinationManifest) {
 			var destXdoc = new XmlDocument ();
 			var psXdoc = new XmlDocument ();
-
+			
 			psXdoc.LoadXml (File.ReadAllText (CommonConsts.PLAYSCAPE_MANIFEST_PATH));
 			destXdoc.LoadXml (File.ReadAllText (destinationManifest));
-			 
+			
 			// ---------- Remove default main activity -------- //
 			var mainActivity  = destXdoc.SelectSingleNode ("manifest/application/activity/intent-filter[contains(name,android.intent.action.MAIN)]");
 			if (mainActivity != null) {
@@ -28,11 +28,11 @@ namespace Playscape.Editor {
 				if (mainActivity.Attributes["android:name"] != null) {
 					oldMainActivityName = mainActivity.Attributes["android:name"].Value;
 				}
-
+				
 				L.W ("{0}. Previous Activity: {1}", Warnings.MAIN_ACTIVITY_REPLACED, oldMainActivityName); 
 				mainActivity.ParentNode.RemoveChild(mainActivity);
 			}
-
+			
 			// ---------- Merge Playscape -------------- //
 			copyAllManifestTags (psXdoc, destXdoc);
 			copyAllApplicationTags (psXdoc, destXdoc);
@@ -48,7 +48,7 @@ namespace Playscape.Editor {
 				destAppNode.Attributes.Append (destAppNameAttrib);
 				destAppNode.Attributes ["android:name"].Value = psAppNode.Attributes ["android:name"].Value;
 			}
-
+			
 			if (Debug.isDebugBuild) {
 				var debuggableAttrib = destXdoc.CreateAttribute ("android:debuggable", ANDROID_XMLNS);
 				destAppNode.Attributes.Append (debuggableAttrib);
@@ -57,7 +57,7 @@ namespace Playscape.Editor {
 			
 			XmlWriterSettings settings = new XmlWriterSettings ();
 			settings.Indent = true;
-
+			
 			File.Copy (destinationManifest, destinationManifest + ".bak", true);
 			using (var writer = XmlWriter.Create(destinationManifest, settings)) {
 				destXdoc.Save (writer);

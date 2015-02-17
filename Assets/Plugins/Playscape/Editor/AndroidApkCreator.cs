@@ -13,34 +13,36 @@ namespace Playscape.Editor
 		//private static readonly string APK_TOOL_PATH;
 		private const string APK_TOOL_PATH = "Assets/Plugins/Playscape/ThirdParty/apktool.jar" ;
 		private static readonly string KEY_STORE_PATH;
-
+		
 		static AndroidApkCreator()
 		{
 			//APKTOOL_FOLDER = "Assets/Plugins/Playscape/ThirdParty";
 			//APK_TOOL_PATH = Path.Combine (APKTOOL_FOLDER, "apktool.jar");
-			KEY_STORE_PATH = (isWindows() ? System.Environment.GetEnvironmentVariable("USERPROFILE") : "~") + "/.android/debug.keystore";
+			KEY_STORE_PATH = (isWindows() ? System.Environment.GetEnvironmentVariable("USERPROFILE") : 
+			                  Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).FullName) + "/.android/debug.keystore";
 		}
-
+		
 		public static void cleanUselessResources(string pathToRemove) 
 		{
 			L.D("Removing Path: " + pathToRemove);
 		}
-
+		
 		public static void decompile(string apkPath, string outputPath) 
 		{
 			useApkTool (false, apkPath, outputPath);
 		}
-
+		
 		public static void recompile(string targetPath, string outputPath) 
 		{
 			useApkTool (true, targetPath, outputPath);
 		}
-
+		
 		// at the end auto sing apk calling
 		private static void useApkTool(Boolean isCompile, string targetPath, string outputPath) 
 		{
 			//UnityEngine.Debug.LogError (APKTOOL_FOLDER);
 			string unsignedPath = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ());
+			unsignedPath = unsignedPath.Substring(0, unsignedPath.Length - 4) + ".apk";
 			
 			string arguments = "";
 			if (isCompile) {
@@ -48,23 +50,23 @@ namespace Playscape.Editor
 			} else {
 				arguments = "-jar " + APK_TOOL_PATH + " d -s -f " + targetPath + " -o " + outputPath + "/";
 			}
-
+			
 			string command;
-
+			
 			if (isWindows ()) {
 				command = System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/java.exe";
 			}
 			else {
 				command = "/usr/bin/java";
 			}
-
+			
 			L.D ("Command " + command);
 			L.D ("Argumnets " + arguments);
-
+			
 			int exitCode = runProcessWithCommand (command, arguments);
 			string message = (isCompile ? "compile" : "decompile") + " was " + (exitCode == 0 ? "" : "not") + " successfully"; 
 			L.W (message);
-
+			
 			if (exitCode == 0 && isCompile) {
 				signApk (unsignedPath, targetPath);
 			}
@@ -75,25 +77,26 @@ namespace Playscape.Editor
 			// TODO extract to constants
 			string alias = "androiddebugkey";
 			string storepass = "android";
-
+			
 			string keypass = "android";
 			string command;
 			if (isWindows ()) {
-				 command = System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/jarSigner.exe";
+				command = System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/jarSigner.exe";
 			} else {
 				command = "/usr/bin/jarsigner";
 			}
-
+			
 			string arguments = "-verbose -keystore " + KEY_STORE_PATH + " -storepass " + storepass + " -keypass " + keypass + " " + unsignedAPKPath + " " + alias;
+			L.D ("command: {0}", command);
+			L.D ("arguments: {0}", arguments);
 			int exitCode = runProcessWithCommand (command, arguments);
 			string message = "apk was " + (exitCode == 0 ? "" : "not") + " signed successfully" + (exitCode == 0 ? "" : " with code " + exitCode); 
 			L.W (message);
-			L.D ("arguments: {0}", arguments);
-
+			
 			if (File.Exists(targetPath)) {
 				File.Delete (targetPath);
 			}
-
+			
 			File.Move(unsignedAPKPath, targetPath);
 		}
 		
@@ -103,7 +106,7 @@ namespace Playscape.Editor
 			{
 				CreateNoWindow = true,
 				UseShellExecute = false,
-				RedirectStandardOutput = true
+//				RedirectStandardOutput = true
 			};
 			Process proc;
 			
@@ -113,33 +116,31 @@ namespace Playscape.Editor
 			}
 			
 			proc.WaitForExit();
-			int exitCode = proc.ExitCode;
-
-			proc.WaitForExit();
-
+			int exitCode = proc.ExitCode;			
+			
 			proc.Close();
-
+			
 			return exitCode;
 		}
-
+		
 		private static Boolean isMac() 
 		{
 			PlatformID pid = getPlatfomId ();
 			return pid == PlatformID.MacOSX;
 		}
-
+		
 		private static Boolean isUnix() 
 		{
 			PlatformID pid = getPlatfomId ();
 			return pid == PlatformID.Unix;
 		}
-
+		
 		private static Boolean isWindows() 
 		{
 			PlatformID pid = getPlatfomId ();
 			return pid == PlatformID.Win32NT || pid == PlatformID.Win32S || pid == PlatformID.Win32Windows || pid == PlatformID.WinCE;
 		}
-
+		
 		private static PlatformID getPlatfomId() 
 		{
 			OperatingSystem os = Environment.OSVersion;
@@ -147,4 +148,3 @@ namespace Playscape.Editor
 		}
 	}
 }
-

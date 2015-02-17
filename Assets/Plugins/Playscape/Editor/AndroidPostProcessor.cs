@@ -22,9 +22,9 @@ namespace Playscape.Editor {
 		private const string LIBS_UNITY_CLASSES_PATH = "/libs/unity-classes.jar";
 		
 		private const string MANIFEST_FILE_NAME = "AndroidManifest.xml";
-
+		
 		private  string mTargetPath;
-
+		
 		public AndroidPostProcessor(string targetPath) {
 			mTargetPath = targetPath;
 		}
@@ -39,18 +39,18 @@ namespace Playscape.Editor {
 			// the various sdks to the main manifest file
 			string sourcesPath = isApkBuild () ? 
 				Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) : 
-				mTargetPath + "/" + PlayerSettings.productName;		
-
+					mTargetPath + "/" + PlayerSettings.productName;		
+			
 			string publishingKitLibPath = isApkBuild() ? 
 				Environment.CurrentDirectory + "/Assets/Plugins/Android/PlayscapePublishingKit" : 
 					mTargetPath + "/PlayscapePublishingKit";
-
+			
 			var manifestDst = sourcesPath + "/" + MANIFEST_FILE_NAME;
-
-			L.D(mTargetPath);
-			L.D(sourcesPath);
-
-
+			
+			L.D("mTargetPath: " + mTargetPath);
+			L.D("sourcesPath: " + sourcesPath);
+			
+			
 			if (isApkBuild()) {
 				// decompile apk to update resources
 				AndroidApkCreator.decompile (mTargetPath, sourcesPath);
@@ -63,27 +63,27 @@ namespace Playscape.Editor {
 				// Copy fragments
 				File.Copy(CommonConsts.PLAYSCAPE_MANIFEST_PATH, sourcesPath + "/" + new FileInfo(CommonConsts.PLAYSCAPE_MANIFEST_PATH).Name);
 			}
-
-
+			
+			
 			string manifestContents = File.ReadAllText(manifestDst);
 			manifestContents = ApplyCommonAndroidManifestParams(manifestContents);
 			File.WriteAllText(manifestDst, manifestContents);
-
+			
 			var configBaseName = isApkBuild () ? "strings.xml"  : new FileInfo(PLAYSCAPE_CONFIG_XML_PATH).Name;
 			var dstConfig = (isApkBuild() ? sourcesPath : publishingKitLibPath) + "/res/values/" + configBaseName;
 			var srcConfig = isApkBuild () ? dstConfig : PLAYSCAPE_CONFIG_XML_PATH;
-
+			
 			ApplyPlayscapeAndroidConfiguration(srcConfig,
 			                                   dstConfig);
-
+			
 			if (!isApkBuild()) {
 				CopyDepedencyJarsToLibs(mTargetPath, publishingKitLibPath, sourcesPath);
 			}
-
+			
 			if (isApkBuild ()) {
 				// recompile apk file and rewrite existing apk
 				AndroidApkCreator.recompile (mTargetPath, sourcesPath);
-
+				
 				DirectoryInfo directoryToRemove = new DirectoryInfo(sourcesPath);
 				if (directoryToRemove != null && directoryToRemove.Exists) {
 					directoryToRemove.Delete (true);
@@ -107,7 +107,7 @@ namespace Playscape.Editor {
 			
 			injectABTestingConfig (configDoc);
 			injectAdConfigs (configDoc);			
-
+			
 			
 			var writerSettings = new XmlWriterSettings();
 			writerSettings.Indent = true;
@@ -223,10 +223,10 @@ namespace Playscape.Editor {
 		}
 		
 		private static void CopyDepedencyJarsToLibs (string targetPath,
-												string pathToPublishingKitLibSources,
-		                                      	string projectSources)
+		                                             string pathToPublishingKitLibSources,
+		                                             string projectSources)
 		{
-
+			
 			string v4supportLibPath = string.Empty;
 			foreach (var dirPath in Directory.GetDirectories(targetPath)) {
 				// Is there a v4 support lib in a project other than the pubkit?
