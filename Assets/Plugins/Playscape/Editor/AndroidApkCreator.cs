@@ -3,7 +3,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using Playscape.Internal;
-
+using UnityEditor;
+using System.Collections;
 
 namespace Playscape.Editor
 {
@@ -12,6 +13,7 @@ namespace Playscape.Editor
 		//private static readonly string APKTOOL_FOLDER;
 		//private static readonly string APK_TOOL_PATH;
 		private const string APK_TOOL_PATH = "Assets/Plugins/Playscape/ThirdParty/apktool.jar" ;
+		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/ThirdParty/zipalign" ;
 		private static readonly string KEY_STORE_PATH;
 		
 		static AndroidApkCreator()
@@ -45,10 +47,18 @@ namespace Playscape.Editor
 			unsignedPath = unsignedPath.Substring(0, unsignedPath.Length - 4) + ".apk";
 			
 			string arguments = "";
+			string apkToolPath = APK_TOOL_PATH;
+			if (isWindows ()) {
+				apkToolPath = "\"" + APK_TOOL_PATH + "\"";
+				outputPath = "\"" + outputPath + "\"";
+				unsignedPath = "\"" + unsignedPath + "\"";
+				targetPath = "\"" + targetPath + "\"";
+			}
+			
 			if (isCompile) {
-				arguments = "-jar " + APK_TOOL_PATH + " b -f " + outputPath + " -o " + unsignedPath;
+				arguments = "-jar " + apkToolPath + " b -f " + outputPath + " -o " + unsignedPath;
 			} else {
-				arguments = "-jar " + APK_TOOL_PATH + " d -s -f " + targetPath + " -o " + outputPath + "/";
+				arguments = "-jar " + apkToolPath + " d -s -f " + targetPath + " -o " + outputPath + "/";
 			}
 			
 			string command;
@@ -98,6 +108,25 @@ namespace Playscape.Editor
 			}
 			
 			File.Move(unsignedAPKPath, targetPath);
+		}
+		
+		private static string applyZipalign(string unsignedAPKPath) {
+			string command = Directory.GetCurrentDirectory() + ZIPALIGN_TOOL_PATH;
+			if (isWindows ()) {
+				command += ".exe";
+			} 
+			
+			string signedAPKPATH = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ());
+			signedAPKPATH = signedAPKPATH.Substring(0, signedAPKPATH.Length - 4) + ".apk";
+			
+			string arguments = "-v 4 " + unsignedAPKPath + " " + signedAPKPATH;
+			L.D ("command: {0}", command);
+			L.D ("arguments: {0}", arguments);
+			int exitCode = runProcessWithCommand (command, arguments);
+			string message = "apk was " + (exitCode == 0 ? "" : "not") + " zipaligned successfully" + (exitCode == 0 ? "" : " with code " + exitCode); 
+			L.W (message);
+			
+			return signedAPKPATH;
 		}
 		
 		public static int runProcessWithCommand(string command, string args)

@@ -20,6 +20,7 @@ namespace Playscape.Editor {
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH = "/libs/android-support-v4.jar";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT  = "/libs/android-support-v4.jar_v19.1";
 		private const string LIBS_UNITY_CLASSES_PATH = "/libs/unity-classes.jar";
+		private const string LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH = "/libs/playscape_publishing_kit.jar";
 		
 		private const string MANIFEST_FILE_NAME = "AndroidManifest.xml";
 		
@@ -262,6 +263,10 @@ namespace Playscape.Editor {
 						File.Copy(projectSources + LIBS_UNITY_CLASSES_PATH, dirPath + LIBS_UNITY_CLASSES_PATH, true);
 					}
 				}
+			}
+			
+			if(File.Exists(pathToPublishingKitLibSources + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH)) {
+				File.Delete(pathToPublishingKitLibSources + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH);
 			}
 		}
 	}
