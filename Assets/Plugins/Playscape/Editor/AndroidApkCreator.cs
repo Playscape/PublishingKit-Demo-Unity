@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using System;
 using System.Diagnostics;
@@ -14,15 +15,9 @@ namespace Playscape.Editor
 		//private static readonly string APK_TOOL_PATH;
 		private const string APK_TOOL_PATH = "Assets/Plugins/Playscape/ThirdParty/apktool.jar" ;
 		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/ThirdParty/zipalign" ;
-		private static readonly string KEY_STORE_PATH;
 		
 		static AndroidApkCreator()
-		{
-			//APKTOOL_FOLDER = "Assets/Plugins/Playscape/ThirdParty";
-			//APK_TOOL_PATH = Path.Combine (APKTOOL_FOLDER, "apktool.jar");
-			KEY_STORE_PATH = (isWindows() ? System.Environment.GetEnvironmentVariable("USERPROFILE") : 
-			                  Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).FullName) + "/.android/debug.keystore";
-		}
+		{}
 		
 		public static void cleanUselessResources(string pathToRemove) 
 		{
@@ -84,11 +79,20 @@ namespace Playscape.Editor
 		
 		private static void signApk(string unsignedAPKPath, string targetPath) 
 		{
-			// TODO extract to constants
-			string alias = "androiddebugkey";
-			string storepass = "android";
+			string keysotre_path = PlayerSettings.Android.keystoreName;
+			string alias = PlayerSettings.Android.keyaliasName;
+			string storepass = PlayerSettings.Android.keystorePass;
+			string keypass = PlayerSettings.Android.keyaliasPass;
 			
-			string keypass = "android";
+			if (UnityEngine.Debug.isDebugBuild && (keysotre_path == null || (keysotre_path != null && keysotre_path.Length == 0))) {
+				keysotre_path = (isWindows () ? System.Environment.GetEnvironmentVariable ("USERPROFILE") : 
+				                 Directory.GetParent (Environment.GetFolderPath (Environment.SpecialFolder.Desktop)).FullName) 
+					+ "/.android/debug.keystore";
+				alias = "androiddebugkey";
+				storepass = "android";
+				keypass = "android";
+			}
+			
 			string command;
 			if (isWindows ()) {
 				command = System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/jarSigner.exe";
@@ -96,18 +100,20 @@ namespace Playscape.Editor
 				command = "/usr/bin/jarsigner";
 			}
 			
-			string arguments = "-verbose -keystore " + KEY_STORE_PATH + " -storepass " + storepass + " -keypass " + keypass + " " + unsignedAPKPath + " " + alias;
+			string arguments = "-verbose -keystore " + keysotre_path + " -storepass " + storepass + " -keypass " + keypass + " " + unsignedAPKPath + " " + alias;
 			L.D ("command: {0}", command);
 			L.D ("arguments: {0}", arguments);
 			int exitCode = runProcessWithCommand (command, arguments);
 			string message = "apk was " + (exitCode == 0 ? "" : "not") + " signed successfully" + (exitCode == 0 ? "" : " with code " + exitCode); 
 			L.W (message);
 			
+			string signedAPKPATH = applyZipalign (unsignedAPKPath);
+			
 			if (File.Exists(targetPath)) {
 				File.Delete (targetPath);
 			}
 			
-			File.Move(unsignedAPKPath, targetPath);
+			File.Move(signedAPKPATH, targetPath);
 		}
 		
 		private static string applyZipalign(string unsignedAPKPath) {
@@ -135,7 +141,7 @@ namespace Playscape.Editor
 			{
 				CreateNoWindow = true,
 				UseShellExecute = false,
-//				RedirectStandardOutput = true
+				//				RedirectStandardOutput = true
 			};
 			Process proc;
 			
@@ -177,3 +183,4 @@ namespace Playscape.Editor
 		}
 	}
 }
+#endif

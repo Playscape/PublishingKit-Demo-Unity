@@ -40,7 +40,7 @@ namespace Playscape.Editor {
 			// the various sdks to the main manifest file
 			string sourcesPath = isApkBuild () ? 
 				Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) : 
-					mTargetPath + "/" + PlayerSettings.productName;		
+					mTargetPath + "/" + PlayerSettings.productName;	
 			
 			string publishingKitLibPath = isApkBuild() ? 
 				Environment.CurrentDirectory + "/Assets/Plugins/Android/PlayscapePublishingKit" : 
@@ -227,7 +227,6 @@ namespace Playscape.Editor {
 		                                             string pathToPublishingKitLibSources,
 		                                             string projectSources)
 		{
-			
 			string v4supportLibPath = string.Empty;
 			foreach (var dirPath in Directory.GetDirectories(targetPath)) {
 				// Is there a v4 support lib in a project other than the pubkit?
