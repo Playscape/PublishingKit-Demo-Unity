@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using Playscape.Analytics;
 using System.Collections.Generic;
+using Soomla.Store;
 
 public class HUD : MonoBehaviour {
 
@@ -55,19 +56,19 @@ public class HUD : MonoBehaviour {
 		}
 
 		// Only levels displaying status
-		if (Application.loadedLevelName.StartsWith("level")) {
-			string statusText  = "You Collected: " + mMyAmount;
+		if (Application.loadedLevelName.StartsWith ("level")) {
+			string statusText = "You Collected: " + mMyAmount;
 			if (mHisAmount != -1) {
-				statusText += " your opponent collected: " + mHisAmount; 
+					statusText += " your opponent collected: " + mHisAmount; 
 			}
 			if (shouldDisplayVictory) {
 				if (mWinnerName != null) {
-					statusText = mWinnerName + " Wins!";
+						statusText = mWinnerName + " Wins!";
 				} else {
-					statusText = "You Win!";
+						statusText = "You Win!";
 				}
 			}
-			GUI.TextArea(statusTextRect, statusText);
+			GUI.TextArea (statusTextRect, statusText);
 		}
 	}
 
@@ -83,6 +84,11 @@ public class HUD : MonoBehaviour {
 			dict["QuitToMenu"] = 1.0;
 			Report.Instance.ReportLevelFailed(Application.loadedLevelName, dict);
 			Application.LoadLevel("menu");
+			if (Application.loadedLevelName.StartsWith ("store")) {
+				#if UNITY_ANDROID && !UNITY_EDITOR
+				SoomlaStore.StopIabServiceInBg();
+				#endif
+			}
 		}
 
 		if (shouldDisplayVictory) {

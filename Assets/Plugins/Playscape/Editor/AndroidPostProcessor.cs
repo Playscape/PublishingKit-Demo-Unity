@@ -16,7 +16,7 @@ namespace Playscape.Editor {
 	
 	class AndroidPostProcessor : AbstractPostProcessor {
 		
-		private const string PLAYSCAPE_CONFIG_XML_PATH = CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/res/values/playscape_config.xml";
+		public const string PLAYSCAPE_CONFIG_XML_PATH = CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/res/values/playscape_config.xml";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH = "/libs/android-support-v4.jar";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT  = "/libs/android-support-v4.jar_v19.1";
 		private const string LIBS_UNITY_CLASSES_PATH = "/libs/unity-classes.jar";
@@ -36,15 +36,20 @@ namespace Playscape.Editor {
 		
 		public override void Run()
 		{
+			string publishingKitLibPath = isApkBuild() ? 
+				Environment.CurrentDirectory + "/Assets/Plugins/Android/PlayscapePublishingKit" : 
+					mTargetPath + "/PlayscapePublishingKit";
+			if (!isApkBuild()) {
+				if(File.Exists(publishingKitLibPath + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH)) {
+					File.Delete(publishingKitLibPath + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH);
+				}
+			}
+			return;
 			// If our manifests are merged then all manifest fragments will reside in the same file and therefore we point
 			// the various sdks to the main manifest file
 			string sourcesPath = isApkBuild () ? 
 				Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) : 
 					mTargetPath + "/" + PlayerSettings.productName;	
-			
-			string publishingKitLibPath = isApkBuild() ? 
-				Environment.CurrentDirectory + "/Assets/Plugins/Android/PlayscapePublishingKit" : 
-					mTargetPath + "/PlayscapePublishingKit";
 			
 			var manifestDst = sourcesPath + "/" + MANIFEST_FILE_NAME;
 			
@@ -54,12 +59,12 @@ namespace Playscape.Editor {
 			
 			if (isApkBuild()) {
 				// decompile apk to update resources
-				AndroidApkCreator.decompile (mTargetPath, sourcesPath);
+				AndroidApkCreator.decompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
 			}
 			
 			if (ConfigurationInEditor.Instance.MergeAndroidManifests) 
 			{
-				AndroidManifestMerger.Merge(manifestDst);
+				AndroidManifestMerger.Merge(manifestDst, Debug.isDebugBuild);
 			} else {
 				// Copy fragments
 				File.Copy(CommonConsts.PLAYSCAPE_MANIFEST_PATH, sourcesPath + "/" + new FileInfo(CommonConsts.PLAYSCAPE_MANIFEST_PATH).Name);
@@ -75,7 +80,8 @@ namespace Playscape.Editor {
 			var srcConfig = isApkBuild () ? dstConfig : PLAYSCAPE_CONFIG_XML_PATH;
 			
 			ApplyPlayscapeAndroidConfiguration(srcConfig,
-			                                   dstConfig);
+			                                   dstConfig,
+			                                   Debug.isDebugBuild);
 			
 			if (!isApkBuild()) {
 				CopyDepedencyJarsToLibs(mTargetPath, publishingKitLibPath, sourcesPath);
@@ -83,7 +89,7 @@ namespace Playscape.Editor {
 			
 			if (isApkBuild ()) {
 				// recompile apk file and rewrite existing apk
-				AndroidApkCreator.recompile (mTargetPath, sourcesPath);
+				AndroidApkCreator.recompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
 				
 				DirectoryInfo directoryToRemove = new DirectoryInfo(sourcesPath);
 				if (directoryToRemove != null && directoryToRemove.Exists) {
@@ -92,8 +98,9 @@ namespace Playscape.Editor {
 			}
 		}
 		
-		private static void ApplyPlayscapeAndroidConfiguration(string srcConfig,
-		                                                       string dstConfig)
+		public static void ApplyPlayscapeAndroidConfiguration(string srcConfig,
+		                                                      string dstConfig,
+		                                                      bool isDebugBuild)
 		{
 			// Manipulate Config
 			var configDoc = new XmlDocument();
@@ -103,7 +110,7 @@ namespace Playscape.Editor {
 				ConfigurationInEditor.Instance.ReporterId;
 			
 			configDoc.SelectSingleNode("resources/string[@name='playscape_remote_logger_url']").InnerText = 
-				Debug.isDebugBuild ? Settings.DebugRemoteLoggerUrl
+				isDebugBuild ? Settings.DebugRemoteLoggerUrl
 					: Settings.ReleaseRemoteLoggerUrl;
 			
 			injectABTestingConfig (configDoc);
@@ -164,10 +171,12 @@ namespace Playscape.Editor {
 			configDoc.SelectSingleNode("resources/string[@name='playscape_enable_ab_testing_system']").InnerText = 
 				ConfigurationInEditor.Instance.MyABTesting.EnableABTestingSystem.ToString().ToLower();
 			
+			//TODO: remove all previous experiments - or simply generate this into a different file
 			for (int i = 0; i < ConfigurationInEditor.Instance.MyABTesting.NumberOfCustomExperiments; i++) 
 			{
+				string elementName = "playscape_experiment_" + (i + 1).ToString();
 				XmlElement playscapeExperimentElement = configDoc.CreateElement("string-array");
-				playscapeExperimentElement.SetAttribute("name","playscape_experiment_" + (i + 1).ToString());
+				playscapeExperimentElement.SetAttribute("name",elementName);
 				
 				XmlElement experimentNameElement = configDoc.CreateElement("item");
 				experimentNameElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentName;
@@ -184,7 +193,12 @@ namespace Playscape.Editor {
 					playscapeExperimentElement.AppendChild(experimentVariableElement);
 				}
 				
-				rootResources.InsertAfter(playscapeExperimentElement, lastExperimentsElement);
+				XmlNode oldNode = configDoc.SelectSingleNode(string.Format ("resources/string-array[@name='{0}']", elementName));
+				if (oldNode != null) {
+					rootResources.ReplaceChild(playscapeExperimentElement, oldNode);
+				} else {
+					rootResources.InsertAfter(playscapeExperimentElement, lastExperimentsElement);
+				}
 				lastExperimentsElement = playscapeExperimentElement;
 			}
 		}
@@ -218,7 +232,7 @@ namespace Playscape.Editor {
 		/// </summary>
 		/// <returns>The common android manifest parameters.</returns>
 		/// <param name="manifestContents">Manifest contents.</param>
-		private static string ApplyCommonAndroidManifestParams (string manifestContents)
+		public static string ApplyCommonAndroidManifestParams (string manifestContents)
 		{
 			return manifestContents.Replace("PACKAGE_NAME", PlayerSettings.bundleIdentifier);
 		}

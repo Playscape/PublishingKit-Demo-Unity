@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings>
     <DebugRemoteLoggerUrl>https://qa.server.gameconsole.mominis.com/services/LoggingService/WriteToLog</DebugRemoteLoggerUrl>
-    <ReleaseRemoteLoggerUrl>dev-build-no-release-url-specified</ReleaseRemoteLoggerUrl>
+    <ReleaseRemoteLoggerUrl>https://server.gameconsole.mominis.com/services/LoggingService/WriteToLog</ReleaseRemoteLoggerUrl>
 </Settings>

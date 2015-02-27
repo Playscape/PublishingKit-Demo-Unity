@@ -4,6 +4,7 @@ using System.Text;
 
 using Playscape.Ads;
 using Playscape.Notifications;
+using Soomla.Store;
 
 public class MenuController : MonoBehaviour {
 
@@ -20,6 +21,7 @@ public class MenuController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		SoomlaStore.Initialize(new StoreItemAsset());
 		SocialController.Instance.OnSocialRequestReceived += HandleOnSocialRequestReceived;
 		Banners.Instance.Hide ();
 
@@ -85,6 +87,9 @@ public class MenuController : MonoBehaviour {
 		}
 
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop * 1.6f, buttonWidth, buttonHeight), STORE)) {
+			#if UNITY_ANDROID && !UNITY_EDITOR
+			SoomlaStore.StartIabServiceInBg();
+			#endif
 			Application.LoadLevel ("store");
 		}
 

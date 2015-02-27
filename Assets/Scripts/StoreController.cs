@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Playscape;
+using Soomla.Store;
 
 public class StoreController : MonoBehaviour {
 
@@ -81,7 +82,40 @@ public class StoreController : MonoBehaviour {
 
 		RegisterStoreFlow();
 
+		StoreEvents.OnMarketPurchaseStarted      += OnMarketPurchaseStarted;
+		StoreEvents.OnMarketPurchase             += OnMarketPurchase;
+		StoreEvents.OnItemPurchaseStarted        += OnItemPurchaseStarted;
+		StoreEvents.OnItemPurchased              += OnItemPurchased;
+		StoreEvents.OnUnexpectedErrorInStore     += OnUnexpectedErrorInStore;
+
 		Report.Instance.ReportFlowStep(mStoreFlow, OPEN_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
+	}
+
+	string s = "<nothing>";
+
+	public void OnMarketPurchaseStarted( PurchasableVirtualItem pvi) {
+		Debug.Log( "OnMarketPurchaseStarted: " + pvi.ItemId );
+		s += "OnMarketPurchaseStarted: " + pvi.ItemId;
+	}
+	
+	public void OnMarketPurchase( PurchasableVirtualItem pvi, string str, Dictionary<string, string> dict ) {
+		Debug.Log( "OnMarketPurchase: " + pvi.ItemId );
+		s += "OnMarketPurchase: " + pvi.ItemId;
+	}
+	
+	public void OnItemPurchaseStarted( PurchasableVirtualItem pvi ) {
+		Debug.Log( "OnItemPurchaseStarted: " + pvi.ItemId );
+		s += "OnItemPurchaseStarted: " + pvi.ItemId;
+	}
+	
+	public void OnItemPurchased( PurchasableVirtualItem pvi, string str ) {
+		Debug.Log( "OnItemPurchased: " + pvi.ItemId );
+		s += "OnItemPurchased: " + pvi.ItemId;
+	}
+
+	public void OnUnexpectedErrorInStore( string err ) {
+		Debug.Log( "OnUnexpectedErrorInStore" + err );
+		s += "OnUnexpectedErrorInStore" + err;
 	}
 
 	void RegisterStoreFlow ()
@@ -160,6 +194,7 @@ public class StoreController : MonoBehaviour {
 						Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
 						Report.Instance.ReportPurchaseSuccess(mCurrentItemPurchasing, mCurrentItemPrice, "USD", Utils.CurrentTimeMillis, "fake-tranaction-id");
 
+						StoreInventory.BuyItem(StoreItemAsset.DARK_MATTER.ItemId);
 
 						NextState = State.None;
 					}

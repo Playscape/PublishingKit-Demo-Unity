@@ -24,18 +24,18 @@ namespace Playscape.Editor
 			L.D("Removing Path: " + pathToRemove);
 		}
 		
-		public static void decompile(string apkPath, string outputPath) 
+		public static void decompile(string apkPath, string outputPath, bool isDebugBuild) 
 		{
-			useApkTool (false, apkPath, outputPath);
+			useApkTool (false, apkPath, outputPath, isDebugBuild);
 		}
 		
-		public static void recompile(string targetPath, string outputPath) 
+		public static void recompile(string targetPath, string outputPath, bool isDebugBuild) 
 		{
-			useApkTool (true, targetPath, outputPath);
+			useApkTool (true, targetPath, outputPath, isDebugBuild);
 		}
 		
 		// at the end auto sing apk calling
-		private static void useApkTool(Boolean isCompile, string targetPath, string outputPath) 
+		private static void useApkTool(Boolean isCompile, string targetPath, string outputPath, bool isDebugBuild) 
 		{
 			//UnityEngine.Debug.LogError (APKTOOL_FOLDER);
 			string unsignedPath = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ());
@@ -43,17 +43,11 @@ namespace Playscape.Editor
 			
 			string arguments = "";
 			string apkToolPath = APK_TOOL_PATH;
-			if (isWindows ()) {
-				apkToolPath = "\"" + APK_TOOL_PATH + "\"";
-				outputPath = "\"" + outputPath + "\"";
-				unsignedPath = "\"" + unsignedPath + "\"";
-				targetPath = "\"" + targetPath + "\"";
-			}
-			
+
 			if (isCompile) {
-				arguments = "-jar " + apkToolPath + " b -f " + outputPath + " -o " + unsignedPath;
+				arguments = "-jar " + qualifyPath(apkToolPath) + " b -f " + qualifyPath(outputPath) + " -o " + qualifyPath(unsignedPath);
 			} else {
-				arguments = "-jar " + apkToolPath + " d -s -f " + targetPath + " -o " + outputPath + "/";
+				arguments = "-jar " + qualifyPath(apkToolPath) + " d -s -f " + qualifyPath(targetPath) + " -o " + qualifyPath(outputPath);
 			}
 			
 			string command;
@@ -73,18 +67,18 @@ namespace Playscape.Editor
 			L.W (message);
 			
 			if (exitCode == 0 && isCompile) {
-				signApk (unsignedPath, targetPath);
+				signApk (unsignedPath, targetPath, isDebugBuild);
 			}
 		}
 		
-		private static void signApk(string unsignedAPKPath, string targetPath) 
+		private static void signApk(string unsignedAPKPath, string targetPath, bool isDebugBuild) 
 		{
 			string keysotre_path = PlayerSettings.Android.keystoreName;
 			string alias = PlayerSettings.Android.keyaliasName;
 			string storepass = PlayerSettings.Android.keystorePass;
 			string keypass = PlayerSettings.Android.keyaliasPass;
 			
-			if (UnityEngine.Debug.isDebugBuild && (keysotre_path == null || (keysotre_path != null && keysotre_path.Length == 0))) {
+			if (isDebugBuild && (keysotre_path == null || (keysotre_path != null && keysotre_path.Length == 0))) {
 				keysotre_path = (isWindows () ? System.Environment.GetEnvironmentVariable ("USERPROFILE") : 
 				                 Directory.GetParent (Environment.GetFolderPath (Environment.SpecialFolder.Desktop)).FullName) 
 					+ "/.android/debug.keystore";
@@ -100,7 +94,7 @@ namespace Playscape.Editor
 				command = "/usr/bin/jarsigner";
 			}
 			
-			string arguments = "-verbose -keystore " + keysotre_path + " -storepass " + storepass + " -keypass " + keypass + " " + unsignedAPKPath + " " + alias;
+			string arguments = "-verbose -keystore " + qualifyPath(keysotre_path) + " -storepass " + storepass + " -keypass " + keypass + " " + qualifyPath(unsignedAPKPath) + " " + alias;
 			L.D ("command: {0}", command);
 			L.D ("arguments: {0}", arguments);
 			int exitCode = runProcessWithCommand (command, arguments);
@@ -125,7 +119,7 @@ namespace Playscape.Editor
 			string signedAPKPATH = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ());
 			signedAPKPATH = signedAPKPATH.Substring(0, signedAPKPATH.Length - 4) + ".apk";
 			
-			string arguments = "-v 4 " + unsignedAPKPath + " " + signedAPKPATH;
+			string arguments = "-v 4 " + qualifyPath(unsignedAPKPath) + " " + qualifyPath(signedAPKPATH);
 			L.D ("command: {0}", command);
 			L.D ("arguments: {0}", arguments);
 			int exitCode = runProcessWithCommand (command, arguments);
@@ -180,6 +174,13 @@ namespace Playscape.Editor
 		{
 			OperatingSystem os = Environment.OSVersion;
 			return os.Platform;
+		}
+
+		private static string qualifyPath(string str) {
+			if (isWindows ()) {
+				str = "\"" + str + "\"";
+			}
+			return str;
 		}
 	}
 }

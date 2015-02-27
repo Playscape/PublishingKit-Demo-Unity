@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using UnityEngine;
 using System.Collections;
 using UnityEditor;
@@ -16,7 +16,7 @@ namespace Playscape.Editor {
 		private const string ANDROID = "Android";
 		private const string IOS = "iOS";
 		private const string WINDOW_TITLE = "Playscape";
-		private const string CLOSE = "Close";
+		private const string CLOSE = "Apply Changes";
 		private Vector2  scrollPos;
 
 		private const string AB_TESTING_TITLE = "AB Testing Configuration";
@@ -37,15 +37,35 @@ namespace Playscape.Editor {
 
 			GUILayout.Space (30);
 
-			if (GUILayout.Button (CLOSE)) {
-				Close ();
+			if (GUILayout.Button (CLOSE)) {			
+				onClose();
 			}
             
             if (GUI.changed) {
 				EditorUtility.SetDirty (ConfigurationInEditor.Instance);
 			}
 		}
+		private void onClose() {
+			string targetManifest = "Assets/Plugins/Android/PlayscapePublishingKit/AndroidManifest.xml";
 
+			string manifestContents = File.ReadAllText(CommonConsts.PLAYSCAPE_MANIFEST_PATH);
+			manifestContents = AndroidPostProcessor.ApplyCommonAndroidManifestParams(manifestContents);
+			File.WriteAllText(targetManifest, manifestContents);
+
+			targetManifest = "Assets/Plugins/Android/AndroidManifest.xml";
+			AndroidManifestMerger.Merge (targetManifest, false);
+
+			AndroidPostProcessor.ApplyPlayscapeAndroidConfiguration (AndroidPostProcessor.PLAYSCAPE_CONFIG_XML_PATH,
+			                                                         AndroidPostProcessor.PLAYSCAPE_CONFIG_XML_PATH,
+			                                                         false);
+
+			EditorUtility.DisplayDialog(
+				"Configuration Ended",
+				"The configuration process has ended successfully",
+				"OK");
+
+			Close ();
+		}
 		private void OnABTestingGUI ()
 		{
 			GUILayout.Label (AB_TESTING_TITLE, EditorStyles.boldLabel);

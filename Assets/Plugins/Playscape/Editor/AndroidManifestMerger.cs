@@ -13,7 +13,8 @@ namespace Playscape.Editor {
 		/// Merges manifests, rules of merging are defined in this method.
 		/// </summary>
 		/// <param name="destinationManifest">Full path to AndroidManifest.xml created by Unity or copied from Android dir upon build</param>
-		public static void Merge (string destinationManifest) {
+		public static void Merge (string destinationManifest, bool isDebugBuild) {
+			
 			var destXdoc = new XmlDocument ();
 			var psXdoc = new XmlDocument ();
 			
@@ -29,27 +30,27 @@ namespace Playscape.Editor {
 					oldMainActivityName = mainActivity.Attributes["android:name"].Value;
 				}
 				
-				L.W ("{0}. Previous Activity: {1}", Warnings.MAIN_ACTIVITY_REPLACED, oldMainActivityName); 
+				L.I ("{0}. Previous Activity: {1}", Warnings.MAIN_ACTIVITY_REPLACED, oldMainActivityName); 
 				mainActivity.ParentNode.RemoveChild(mainActivity);
 			}
 			
 			// ---------- Merge Playscape -------------- //
-			copyAllManifestTags (psXdoc, destXdoc);
-			copyAllApplicationTags (psXdoc, destXdoc);
+			//copyAllManifestTags (psXdoc, destXdoc);
+			//copyAllApplicationTags (psXdoc, destXdoc);
 			
 			// Copy application's android:name tag
 			var destAppNode = destXdoc.SelectSingleNode ("manifest/application");
 			var psAppNode = psXdoc.SelectSingleNode ("manifest/application");
 			
 			if (destAppNode.Attributes ["android:name"] != null) {
-				L.W (Warnings.ANDROID_NAME_EXISTS_IN_MANIFEST);
+				L.D (Warnings.ANDROID_NAME_EXISTS_IN_MANIFEST);
 			} else {
 				var destAppNameAttrib = destXdoc.CreateAttribute ("android:name", ANDROID_XMLNS);
 				destAppNode.Attributes.Append (destAppNameAttrib);
 				destAppNode.Attributes ["android:name"].Value = psAppNode.Attributes ["android:name"].Value;
 			}
 			
-			if (Debug.isDebugBuild) {
+			if (isDebugBuild) {
 				var debuggableAttrib = destXdoc.CreateAttribute ("android:debuggable", ANDROID_XMLNS);
 				destAppNode.Attributes.Append (debuggableAttrib);
 				destAppNode.Attributes ["android:debuggable"].Value = "true";
