@@ -40,7 +40,8 @@ namespace Soomla.Store {
 
 		public const string BALLS_CURRENCY_ITEM_ID      = "currency_balls";
 
-		public const string DARK_MATTER_PRODUCT_ID      = "dark_matter";
+//		public const string DARK_MATTER_PRODUCT_ID      = "dark_matter";
+		public const string DARK_MATTER_PRODUCT_ID      = "android.test.purchased";
 
 
 		public static VirtualCurrency BALLS_CURRENCY = new VirtualCurrency(

@@ -88,34 +88,29 @@ public class StoreController : MonoBehaviour {
 		StoreEvents.OnItemPurchased              += OnItemPurchased;
 		StoreEvents.OnUnexpectedErrorInStore     += OnUnexpectedErrorInStore;
 
-		Report.Instance.ReportFlowStep(mStoreFlow, OPEN_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
+//		Report.Instance.ReportFlowStep(mStoreFlow, OPEN_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
 	}
 
 	string s = "<nothing>";
 
 	public void OnMarketPurchaseStarted( PurchasableVirtualItem pvi) {
 		Debug.Log( "OnMarketPurchaseStarted: " + pvi.ItemId );
-		s += "OnMarketPurchaseStarted: " + pvi.ItemId;
 	}
 	
 	public void OnMarketPurchase( PurchasableVirtualItem pvi, string str, Dictionary<string, string> dict ) {
 		Debug.Log( "OnMarketPurchase: " + pvi.ItemId );
-		s += "OnMarketPurchase: " + pvi.ItemId;
 	}
 	
 	public void OnItemPurchaseStarted( PurchasableVirtualItem pvi ) {
 		Debug.Log( "OnItemPurchaseStarted: " + pvi.ItemId );
-		s += "OnItemPurchaseStarted: " + pvi.ItemId;
 	}
 	
 	public void OnItemPurchased( PurchasableVirtualItem pvi, string str ) {
 		Debug.Log( "OnItemPurchased: " + pvi.ItemId );
-		s += "OnItemPurchased: " + pvi.ItemId;
 	}
 
 	public void OnUnexpectedErrorInStore( string err ) {
 		Debug.Log( "OnUnexpectedErrorInStore" + err );
-		s += "OnUnexpectedErrorInStore" + err;
 	}
 
 	void RegisterStoreFlow ()
@@ -128,8 +123,8 @@ public class StoreController : MonoBehaviour {
 		stepNameToId [CANCELLED_FLOW_STEP] = 5;
 		stepNameToId[CLOSED_STORE_FLOW_STEP] = 6;
 
-		Report.Instance.RegisterFlow(STORE_FLOW_TYPE, stepNameToId);
-		mStoreFlow = Report.Instance.StartNewFlow(STORE_FLOW_TYPE);
+//		Report.Instance.RegisterFlow(STORE_FLOW_TYPE, stepNameToId);
+//		mStoreFlow = Report.Instance.StartNewFlow(STORE_FLOW_TYPE);
 	}
 
 	static IDictionary<string, double> MakeFlowDetails(double premiumCurrency, double trashCurrency, double category, double itemId) {
@@ -151,8 +146,8 @@ public class StoreController : MonoBehaviour {
 
 	public void StartPurchase (string name, PurchaseItem purchaseItem, float price, bool shouldFail)
 	{
-		Report.Instance.ReportFlowStep(mStoreFlow, SELECT_CATEGORY_FLOW_STEP, "ok", mDummyFlowDetails);
-		Report.Instance.ReportFlowStep(mStoreFlow, SELECT_ITEM_FLOW_STEP, "ok", mDummyFlowDetails);
+//		Report.Instance.ReportFlowStep(mStoreFlow, SELECT_CATEGORY_FLOW_STEP, "ok", mDummyFlowDetails);
+//		Report.Instance.ReportFlowStep(mStoreFlow, SELECT_ITEM_FLOW_STEP, "ok", mDummyFlowDetails);
 
 
 		NextState = State.PurchaseStarted;
@@ -181,18 +176,18 @@ public class StoreController : MonoBehaviour {
 				bool confirm = GUI.Button(new Rect(Screen.width/2 - buttonWidth/2, Screen.height/4, buttonWidth, buttonHeight), "Confirm"); 
 				if (confirm) {
 					if (mShouldPurchaseFail) {
-						Report.Instance.ReportFlowStep(mStoreFlow, CLOSED_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
-
-						Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
-						Report.Instance.ReportPurchaseFailed(mCurrentItemPurchasing, "User Canceled");
+//						Report.Instance.ReportFlowStep(mStoreFlow, CLOSED_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
+//
+//						Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
+//						Report.Instance.ReportPurchaseFailed(mCurrentItemPurchasing, "User Canceled");
 
 						NextState = State.Failed;
 					} else {
-						Report.Instance.ReportFlowStep(mStoreFlow, PURCHASED_FLOW_STEP, "ok", mDummyFlowDetails);
-						Report.Instance.ReportFlowStep(mStoreFlow, CLOSED_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
-
-						Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
-						Report.Instance.ReportPurchaseSuccess(mCurrentItemPurchasing, mCurrentItemPrice, "USD", Utils.CurrentTimeMillis, "fake-tranaction-id");
+//						Report.Instance.ReportFlowStep(mStoreFlow, PURCHASED_FLOW_STEP, "ok", mDummyFlowDetails);
+//						Report.Instance.ReportFlowStep(mStoreFlow, CLOSED_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
+//
+//						Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
+//						Report.Instance.ReportPurchaseSuccess(mCurrentItemPurchasing, mCurrentItemPrice, "USD", Utils.CurrentTimeMillis, "fake-tranaction-id");
 
 						StoreInventory.BuyItem(StoreItemAsset.DARK_MATTER.ItemId);
 
@@ -204,11 +199,11 @@ public class StoreController : MonoBehaviour {
 	            // Cancel
 				bool cancel = GUI.Button(new Rect(Screen.width/2 - buttonWidth/2,10+ Screen.height/4 + buttonHeight, buttonWidth, buttonHeight), "Cancel"); 
 				if (cancel) {
-					Report.Instance.ReportFlowStep(mStoreFlow, CANCELLED_FLOW_STEP, "ok", mDummyFlowDetails);
-					Report.Instance.ReportFlowStep(mStoreFlow, CLOSED_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
+//					Report.Instance.ReportFlowStep(mStoreFlow, CANCELLED_FLOW_STEP, "ok", mDummyFlowDetails);
+//					Report.Instance.ReportFlowStep(mStoreFlow, CLOSED_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
 
-					Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
-					Report.Instance.ReportPurchaseCancelled(mCurrentItemPurchasing);
+//					Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
+//					Report.Instance.ReportPurchaseCancelled(mCurrentItemPurchasing);
 
 
 
