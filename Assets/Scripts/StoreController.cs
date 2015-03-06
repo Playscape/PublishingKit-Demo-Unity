@@ -94,23 +94,23 @@ public class StoreController : MonoBehaviour {
 	string s = "<nothing>";
 
 	public void OnMarketPurchaseStarted( PurchasableVirtualItem pvi) {
-		Debug.Log( "OnMarketPurchaseStarted: " + pvi.ItemId );
+//		Debug.Log( "OnMarketPurchaseStarted: " + pvi.ItemId );
 	}
 	
 	public void OnMarketPurchase( PurchasableVirtualItem pvi, string str, Dictionary<string, string> dict ) {
-		Debug.Log( "OnMarketPurchase: " + pvi.ItemId );
+//		Debug.Log( "OnMarketPurchase: " + pvi.ItemId );
 	}
 	
 	public void OnItemPurchaseStarted( PurchasableVirtualItem pvi ) {
-		Debug.Log( "OnItemPurchaseStarted: " + pvi.ItemId );
+//		Debug.Log( "OnItemPurchaseStarted: " + pvi.ItemId );
 	}
 	
 	public void OnItemPurchased( PurchasableVirtualItem pvi, string str ) {
-		Debug.Log( "OnItemPurchased: " + pvi.ItemId );
+//		Debug.Log( "OnItemPurchased: " + pvi.ItemId );
 	}
 
 	public void OnUnexpectedErrorInStore( string err ) {
-		Debug.Log( "OnUnexpectedErrorInStore" + err );
+//		Debug.Log( "OnUnexpectedErrorInStore" + err );
 	}
 
 	void RegisterStoreFlow ()
@@ -189,8 +189,7 @@ public class StoreController : MonoBehaviour {
 //						Report.Instance.ReportPurchaseStarted(mCurrentItemPurchasing);
 //						Report.Instance.ReportPurchaseSuccess(mCurrentItemPurchasing, mCurrentItemPrice, "USD", Utils.CurrentTimeMillis, "fake-tranaction-id");
 
-						StoreInventory.BuyItem(StoreItemAsset.DARK_MATTER.ItemId);
-
+						StoreInventory.BuyItem(StoreItemAsset.getItemIdByName(mCurrentItemName));
 						NextState = State.None;
 					}
 

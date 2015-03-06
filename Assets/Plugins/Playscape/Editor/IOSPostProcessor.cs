@@ -11,6 +11,8 @@ using System.Xml;
 using System.Text;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Playscape.Editor {
 		
@@ -48,7 +50,7 @@ namespace Playscape.Editor {
 
 			infoAppender.AddString(
 				"PlayscapeRemoteLoggerUrl",
-				Debug.isDebugBuild ? Settings.DebugRemoteLoggerUrl
+				UnityEngine.Debug.isDebugBuild ? Settings.DebugRemoteLoggerUrl
 								   : Settings.ReleaseRemoteLoggerUrl);
 
 			infoAppender.AppendFragment(plistFragment);
@@ -56,7 +58,7 @@ namespace Playscape.Editor {
 
 			File.Delete(plistFragment);
 
-			AddRequiredFrameworks(pathToProjectSources);
+//			AddRequiredFrameworks(pathToProjectSources);
 
 			if (PlayerSettings.iOS.sdkVersion == iOSSdkVersion.SimulatorSDK) {
 				FixRegisterMonoModules(pathToProjectSources);
@@ -70,6 +72,8 @@ namespace Playscape.Editor {
 			{
 				project.ApplyMod(file);
 			}
+
+			RunPushNotificationBashScript();
 
 			project.Save();
 		}
@@ -197,6 +201,42 @@ namespace Playscape.Editor {
 			}
 
 			return contents;
+		}
+
+		private void RunPushNotificationBashScript() {
+			string scriptName = "Push_Notification_Script.sh";
+			string[] files = Directory.GetFiles(Application.dataPath, scriptName, System.IO.SearchOption.AllDirectories);
+
+			string scriptFile = "";
+
+			if (files.Length > 0)
+			{
+				scriptFile = files[0];
+			}
+			
+			if (!String.IsNullOrEmpty(scriptFile)) 
+			{
+				string destScriptFile = Path.Combine(pathToProjectSources, scriptName);
+
+				File.Copy(scriptFile, destScriptFile, true);
+
+				if (File.Exists(destScriptFile)) {
+					Process process = new System.Diagnostics.Process();
+					process.StartInfo.FileName = destScriptFile;
+
+					string argumentsPath = "\"" + pathToProjectSources + "\"";
+					process.StartInfo.Arguments = argumentsPath;
+					process.StartInfo.UseShellExecute = false; 
+					process.StartInfo.RedirectStandardError = true;
+					process.StartInfo.RedirectStandardInput = true;
+					process.StartInfo.RedirectStandardOutput = true;
+					process.Start();
+					var output = process.StandardOutput.ReadToEnd ();
+					L.I ("stdout: {0}", output);
+				}
+
+				System.IO.File.Delete(destScriptFile);
+			}
 		}
 	}
 }

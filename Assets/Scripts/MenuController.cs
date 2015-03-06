@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Text;
 
@@ -21,12 +21,12 @@ public class MenuController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		SoomlaStore.Initialize(new StoreItemAsset());
+		SoomlaStore.Initialize(StoreItemAsset.Instance);
 		SocialController.Instance.OnSocialRequestReceived += HandleOnSocialRequestReceived;
 		Banners.Instance.Hide ();
 
 	}
-
+	
 	void Destroy() {
 		StopCoroutine( "ChangeLoadChar" );
 		SocialController.Instance.OnSocialRequestReceived -= HandleOnSocialRequestReceived;
