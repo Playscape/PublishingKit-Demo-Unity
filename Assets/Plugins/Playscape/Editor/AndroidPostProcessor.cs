@@ -44,10 +44,32 @@ namespace Playscape.Editor {
 					File.Delete(publishingKitLibPath + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH);
 				}
 			}
+
+			// the various sdks to the main manifest file
+			string sourcesPath = isApkBuild () ? 
+				Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) : 
+					mTargetPath + "/" + PlayerSettings.productName;	
+
+			if (isApkBuild ()) {
+				// decompile apk to update resources
+				AndroidApkCreator.decompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
+
+				AndroidApkCreator.applyAspects(mTargetPath, sourcesPath, Debug.isDebugBuild);
+				
+				// recompile apk file and rewrite existing apk
+				AndroidApkCreator.recompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
+				
+				DirectoryInfo directoryToRemove = new DirectoryInfo(sourcesPath);
+				if (directoryToRemove != null && directoryToRemove.Exists) {
+					directoryToRemove.Delete (true);
+				} 
+
+			}
+
 			return;
 			// If our manifests are merged then all manifest fragments will reside in the same file and therefore we point
 			// the various sdks to the main manifest file
-			string sourcesPath = isApkBuild () ? 
+			sourcesPath = isApkBuild () ? 
 				Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) : 
 					mTargetPath + "/" + PlayerSettings.productName;	
 			

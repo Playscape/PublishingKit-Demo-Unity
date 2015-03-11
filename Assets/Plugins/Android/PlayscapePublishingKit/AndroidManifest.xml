@@ -12,10 +12,10 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="com.playscape.rollaball.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.playscape.rollaball.test.permission.C2D_MESSAGE" />
 
     <permission
-        android:name="com.playscape.rollaball.permission.C2D_MESSAGE"
+        android:name="com.playscape.rollaball.test.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <application
@@ -48,21 +48,21 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <category android:name="com.playscape.rollaball" />
+                <category android:name="com.playscape.rollaball.test" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.playscape.utils.gcm.handlers.NotificationActionListener" >
             <intent-filter>
                 <action android:name="com.playscape.utils.intent.NOTIFICATIONACTION" />
 
-                <category android:name="com.playscape.rollaball" />
+                <category android:name="com.playscape.rollaball.test" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.playscape.utils.gcm.handlers.AutomaticRetryExponentialBackOff" >
             <intent-filter>
                 <action android:name="com.playscape.utils.intent.RETRY_BACKOFF" />
 
-                <category android:name="com.playscape.rollaball" />
+                <category android:name="com.playscape.rollaball.test" />
             </intent-filter>
         </receiver>
 

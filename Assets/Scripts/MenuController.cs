@@ -21,15 +21,13 @@ public class MenuController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		SoomlaStore.Initialize(StoreItemAsset.Instance);
 		SocialController.Instance.OnSocialRequestReceived += HandleOnSocialRequestReceived;
 		Banners.Instance.Hide ();
-
 	}
 	
 	void Destroy() {
-		StopCoroutine( "ChangeLoadChar" );
 		SocialController.Instance.OnSocialRequestReceived -= HandleOnSocialRequestReceived;
+		StopCoroutine( "ChangeLoadChar" );
 	}
 
 	void HandleOnSocialRequestReceived ()
@@ -87,9 +85,6 @@ public class MenuController : MonoBehaviour {
 		}
 
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop * 1.6f, buttonWidth, buttonHeight), STORE)) {
-			#if UNITY_ANDROID && !UNITY_EDITOR
-			SoomlaStore.StartIabServiceInBg();
-			#endif
 			Application.LoadLevel ("store");
 		}
 

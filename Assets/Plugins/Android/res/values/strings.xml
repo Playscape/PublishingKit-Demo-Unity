@@ -17,4 +17,5 @@
 		   You will have to check if a Chartboost impression is open in any code that responds to
 		     touch events.  You can use the CBAndroidBinding.isImpressionVisible() method for this purpose. -->
   <string name="chartboost_unity_impressions_use_activities">true</string>
+    <string name="game_app_ip">123456789</string>
 </resources>

@@ -6,15 +6,24 @@ using System.IO;
 using Playscape.Internal;
 using UnityEditor;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.AccessControl;
+using Ionic.Zip;
 
 namespace Playscape.Editor
 {
 	public class AndroidApkCreator
 	{
-		//private static readonly string APKTOOL_FOLDER;
-		//private static readonly string APK_TOOL_PATH;
 		private const string APK_TOOL_PATH = "Assets/Plugins/Playscape/ThirdParty/apktool.jar" ;
-		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/ThirdParty/zipalign" ;
+		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/ThirdParty/zipalign";
+		private const string DEX_2_JAR_TOOL_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/dex2jar";
+		private const string ASPECT_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/aspectsj/";
+		private const string ANDROID_JAR = "/usr/local/android-sdk-macosx/platforms/android-19/android.jar";
+		private const string GOOGLE_PLAY_SERVICES_JAR = "/usr/local/android-sdk-macosx/extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar";
+
+		// temp solution
+		private const string PATCH_FILE = "../../../bridges/android/playscape_automated_reports/bin/classes.jar";
 		
 		static AndroidApkCreator()
 		{}
@@ -33,7 +42,143 @@ namespace Playscape.Editor
 		{
 			useApkTool (true, targetPath, outputPath, isDebugBuild);
 		}
-		
+
+		public static void applyAspects(string targetPath, string outputPath, bool isDebugBuild) 
+		{
+			string dstFile = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) + ".jar";
+			string targetFile = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) + ".jar";
+			string dex2jarFile = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) + ".jar";
+			string pathName = PATCH_FILE;
+
+			executeDex2jar (dex2jarFile, outputPath, isDebugBuild);
+			unifyLibs (qualifyPath(dex2jarFile), qualifyPath(pathName), qualifyPath(dstFile));
+			applyPatch (qualifyPath(dstFile), qualifyPath(dstFile), qualifyPath(targetFile));
+			executeLib2dex (targetFile, outputPath, isDebugBuild);
+
+			File.Delete (qualifyPath(dstFile));
+			File.Delete (qualifyPath(targetFile));
+		}
+
+		private static void executeDex2jar(string dex2jarFile, string outputPath, bool isDebugBuild) {
+			string command = getJavaCommand ();
+
+			string classpath = getClasspathForDex2JarTool ();
+
+			string mainClass = "com.googlecode.dex2jar.tools.Dex2jarCmd";
+			string mainClassParams = "-f -o " + qualifyPath(dex2jarFile) + " " + qualifyPath(outputPath + "/classes.dex");
+
+			string arguments = "-classpath " + classpath + " -Xms512m -Xmx1024m " + mainClass + " " + mainClassParams;
+			
+			L.D ("Command " + command);
+			L.D ("Argumnets " + arguments);
+			
+			int exitCode = runProcessWithCommand (command, arguments);
+			string message = "executeDex2jar was" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode; 
+			L.W (message);
+		}
+
+		private static void unifyLibs(string origin, string patch, string dst) {
+			FileStream originStream = new FileStream (origin, FileMode.Open, FileAccess.Read, FileShare.Read);
+			FileStream patchStream = new FileStream (patch, FileMode.Open, FileAccess.Read, FileShare.Read);
+			
+			ZipFile originZipFile = new ZipFile(origin);
+			ZipFile patchZipFile = new ZipFile(patch);
+			List<string> originFiles = new List<string> ();
+			foreach (ZipEntry ze in originZipFile)
+			{
+				if (ze.IsDirectory)
+					continue;
+				if(ze.FileName.EndsWith(".class")) {
+					originFiles.Add(ze.FileName);
+				}        
+			}
+			List<string> patchFiles = new List<string> ();
+			foreach (ZipEntry ze in patchZipFile)
+			{
+				if (ze.IsDirectory)
+					continue;
+				if(ze.FileName.EndsWith(".class")) {
+					patchFiles.Add(ze.FileName);
+				}        
+			}
+			IEnumerable<string> differenceQuery = patchFiles.Except(originFiles);
+			
+			byte[] buf = new byte[4096];
+			
+			File.Copy (origin, dst, true);
+			string unzipFolderName = Path.Combine(Path.GetDirectoryName(patchZipFile.Name),
+			                                      Path.GetFileNameWithoutExtension(patchZipFile.Name));
+			patchZipFile.ExtractAll(unzipFolderName, ExtractExistingFileAction.OverwriteSilently);
+			patchZipFile.Dispose();
+
+			using (ZipFile dstZipFile = new ZipFile(dst))
+			{
+				var differenceQuery_new =
+					differenceQuery.Select(x => x.Insert(0, "/").Insert(0, Path.Combine(Path.GetDirectoryName(patchZipFile.Name),
+					                                                                     Path.GetFileNameWithoutExtension(patchZipFile.Name))));
+				
+				for (int i = 0; i < differenceQuery_new.Count(); i++)
+				{
+					dstZipFile.AddFile(differenceQuery_new.ElementAt(i), Path.GetDirectoryName(differenceQuery.ElementAt(i)));
+					dstZipFile.Save(dst);
+				}
+				
+			}
+			
+			originStream.Close ();
+			patchStream.Close ();
+			File.Delete (origin);
+
+			DirectoryInfo downloadedMessageInfo = new DirectoryInfo(Path.Combine(Path.GetDirectoryName(patch), Path.GetFileNameWithoutExtension (patch)));
+			foreach (FileInfo file in downloadedMessageInfo.GetFiles())
+			{
+				file.Delete(); 
+			}
+			foreach (DirectoryInfo dir in downloadedMessageInfo.GetDirectories())
+			{
+				dir.Delete(true); 
+			}
+			Directory.Delete (Path.Combine(Path.GetDirectoryName(patch), Path.GetFileNameWithoutExtension (patch)), true);
+		}
+
+		private static void applyPatch(string inpath, string aspectpath, string outjar) {
+			string command = getJavaCommand ();
+
+			string delimeter = (isWindows ()) ? ";" : ":";
+			string classpath = Path.Combine (ASPECT_HOME_PATH, "aspectjtools.jar") + delimeter
+				+ Path.Combine (ASPECT_HOME_PATH, "aspectjrt.jar") + delimeter 
+					+ ANDROID_JAR + delimeter 
+				+ GOOGLE_PLAY_SERVICES_JAR;
+
+			string arguments = "-classpath " + classpath + " -Xmx8g org.aspectj.tools.ajc.Main -source 1.5 -Xlint:ignore -inpath "
+				+ qualifyPath(inpath) + " -aspectpath " + qualifyPath(aspectpath) + " -outjar " + qualifyPath(outjar);
+
+			L.W ("Command " + command);
+			L.W ("Argumnets " + arguments);
+			
+			int exitCode = runProcessWithCommand (command, arguments);
+			string message = "aspects was applyed" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode;
+			L.W (message);
+		}
+
+		private static void executeLib2dex(string targetPath, string outputPath, bool isDebugBuild) {
+			string command = getJavaCommand ();
+			
+			string classpath = getClasspathForDex2JarTool ();
+			
+			string mainClass = "com.googlecode.dex2jar.tools.Jar2Dex";
+			string mainClassParams = "-f -o " + qualifyPath(outputPath + "/classes.dex") + " " + qualifyPath(targetPath);
+			
+			string arguments = "-classpath " + classpath + " -Xms512m -Xmx1024m " + mainClass + " " + mainClassParams;
+
+			L.D ("Command " + command);
+			L.D ("Argumnets " + arguments);
+			
+			int exitCode = runProcessWithCommand (command, arguments);
+			string message = "executeLib2dex was" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode;
+			L.W (message);
+		}
+
 		// at the end auto sing apk calling
 		private static void useApkTool(Boolean isCompile, string targetPath, string outputPath, bool isDebugBuild) 
 		{
@@ -50,14 +195,7 @@ namespace Playscape.Editor
 				arguments = "-jar " + qualifyPath(apkToolPath) + " d -s -f " + qualifyPath(targetPath) + " -o " + qualifyPath(outputPath);
 			}
 			
-			string command;
-			
-			if (isWindows ()) {
-				command = System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/java.exe";
-			}
-			else {
-				command = "/usr/bin/java";
-			}
+			string command = getJavaCommand ();
 			
 			L.D ("Command " + command);
 			L.D ("Argumnets " + arguments);
@@ -135,7 +273,7 @@ namespace Playscape.Editor
 			{
 				CreateNoWindow = true,
 				UseShellExecute = false,
-				//				RedirectStandardOutput = true
+				RedirectStandardOutput = true
 			};
 			Process proc;
 			
@@ -150,6 +288,10 @@ namespace Playscape.Editor
 			proc.Close();
 			
 			return exitCode;
+		}
+
+		private static string getJavaCommand() {
+			return (isWindows ()) ? System.Environment.GetEnvironmentVariable ("JAVA_HOME") + @"/bin/java.exe" : "/usr/bin/java";
 		}
 		
 		private static Boolean isMac() 
@@ -181,6 +323,20 @@ namespace Playscape.Editor
 				str = "\"" + str + "\"";
 			}
 			return str;
+		}
+
+		private static string getClasspathForDex2JarTool() {
+			string delimeter = (isWindows ()) ? ";" : ":";
+			string classpath = Path.Combine (DEX_2_JAR_TOOL_HOME_PATH, "lib/asm-all-3.3.1.jar") + delimeter 
+				+ Path.Combine (DEX_2_JAR_TOOL_HOME_PATH, "lib/commons-lite-1.15.jar") + delimeter 
+					+ Path.Combine (DEX_2_JAR_TOOL_HOME_PATH, "lib/dex-ir-1.12.jar") + delimeter 
+					+ Path.Combine (DEX_2_JAR_TOOL_HOME_PATH, "lib/dex-reader-1.15.jar") + delimeter 
+					+ Path.Combine (DEX_2_JAR_TOOL_HOME_PATH, "lib/dex-tools-0.0.9.15.jar") + delimeter 
+					+ Path.Combine (DEX_2_JAR_TOOL_HOME_PATH, "lib/dex-translator-0.0.9.15.jar") + delimeter 
+					+ Path.Combine (DEX_2_JAR_TOOL_HOME_PATH, "lib/dx.jar") + delimeter 
+					+ Path.Combine (DEX_2_JAR_TOOL_HOME_PATH, "lib/jar-rename-1.6.jar") + delimeter 
+					+ Path.Combine (DEX_2_JAR_TOOL_HOME_PATH, "lib/asmin-p2.5.jar");
+			return classpath;
 		}
 	}
 }

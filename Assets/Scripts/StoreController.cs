@@ -60,6 +60,7 @@ public class StoreController : MonoBehaviour {
 	IDictionary<string, double> mDummyFlowDetails = MakeFlowDetails(PREMIUM_CURRENCY, TRASH_CURRENCY, CATEGORY, ITEM_ID);
 
 	FlowInstance mStoreFlow;
+	private Boolean iapInitialized;
 
 	public static StoreController Instance {
 		get {
@@ -82,13 +83,25 @@ public class StoreController : MonoBehaviour {
 
 		RegisterStoreFlow();
 
-		StoreEvents.OnMarketPurchaseStarted      += OnMarketPurchaseStarted;
-		StoreEvents.OnMarketPurchase             += OnMarketPurchase;
-		StoreEvents.OnItemPurchaseStarted        += OnItemPurchaseStarted;
-		StoreEvents.OnItemPurchased              += OnItemPurchased;
-		StoreEvents.OnUnexpectedErrorInStore     += OnUnexpectedErrorInStore;
+		if (!iapInitialized) {
+			iapInitialized = true;
+			SoomlaStore.Initialize (StoreItemAsset.Instance);
+
+			StoreEvents.OnSoomlaStoreInitialized += OnSoomlaStoreInitialized;
+			StoreEvents.OnMarketPurchaseStarted += OnMarketPurchaseStarted;
+			StoreEvents.OnMarketPurchase += OnMarketPurchase;
+			StoreEvents.OnItemPurchaseStarted += OnItemPurchaseStarted;
+			StoreEvents.OnItemPurchased += OnItemPurchased;
+			StoreEvents.OnUnexpectedErrorInStore += OnUnexpectedErrorInStore;
+		}
 
 //		Report.Instance.ReportFlowStep(mStoreFlow, OPEN_STORE_FLOW_STEP, "ok", mDummyFlowDetails);
+	}
+
+	public void OnSoomlaStoreInitialized() {
+		#if UNITY_ANDROID && !UNITY_EDITOR
+		SoomlaStore.StartIabServiceInBg();
+		#endif
 	}
 
 	string s = "<nothing>";
