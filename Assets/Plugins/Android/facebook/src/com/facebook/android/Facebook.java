@@ -531,9 +531,13 @@ public class Facebook {
         @Override
         public void onServiceDisconnected(ComponentName arg) {
             serviceListener.onError(new Error("Service disconnected"));
-            // We returned an error so there's no point in
-            // keeping the binding open.
-            applicationsContext.unbindService(TokenRefreshServiceConnection.this);
+            try {
+                // We returned an error so there's no point in
+                // keeping the binding open.
+                applicationsContext.unbindService(TokenRefreshServiceConnection.this);
+            } catch (IllegalArgumentException ex) {
+                // Do nothing, the connection was already unbound
+            }
         }
 
         private void refreshToken() {
@@ -1195,49 +1199,6 @@ public class Facebook {
     @Deprecated
     public static String getAttributionId(ContentResolver contentResolver) {
         return Settings.getAttributionId(contentResolver);
-    }
-
-    /**
-     * Get the auto install publish setting.  If true, an install event will be published during authorize(), unless
-     * it has occurred previously or the app does not have install attribution enabled on the application's developer
-     * config page.
-     * <p/>
-     * This method is deprecated.  See {@link Facebook} and {@link Settings} for more info.
-     *
-     * @return a Boolean indicating whether installation of the app should be auto-published.
-     */
-    @Deprecated
-    public boolean getShouldAutoPublishInstall() {
-        return Settings.getShouldAutoPublishInstall();
-    }
-
-    /**
-     * Sets whether auto publishing of installs will occur.
-     * <p/>
-     * This method is deprecated.  See {@link Facebook} and {@link Settings} for more info.
-     *
-     * @param value a Boolean indicating whether installation of the app should be auto-published.
-     */
-    @Deprecated
-    public void setShouldAutoPublishInstall(boolean value) {
-        Settings.setShouldAutoPublishInstall(value);
-    }
-
-    /**
-     * Manually publish install attribution to the Facebook graph.  Internally handles tracking repeat calls to prevent
-     * multiple installs being published to the graph.
-     * <p/>
-     * This method is deprecated.  See {@link Facebook} and {@link Settings} for more info.
-     *
-     * @param context the current Android context
-     * @return Always false.  Earlier versions of the API returned true if it was no longer necessary to call.
-     * Apps should ignore this value, but for compatibility we will return false to ensure repeat calls (and the
-     * underlying code will prevent duplicate network traffic).
-     */
-    @Deprecated
-    public boolean publishInstall(final Context context) {
-        Settings.publishInstallAsync(context, mAppId);
-        return false;
     }
 
     /**
