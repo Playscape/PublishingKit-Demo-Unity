@@ -63,8 +63,8 @@ namespace Soomla.Store {
 
 		public const string BALLS_CURRENCY_ITEM_ID      = "currency_balls";
 
-		public const string DARK_MATTER_PRODUCT_ID      = "dark_matter";
-		public const string DIAMOND_PRODUCT_ID      = "diamond_item";
+		public const string DARK_MATTER_PRODUCT_ID      = "dark_matter_unmanaged";
+		public const string DIAMOND_PRODUCT_ID      = "diamond_item_unmanaged";
 		public const string FIRE_BALL_PRODUCT_ID      = "buy_fail";
 
 
