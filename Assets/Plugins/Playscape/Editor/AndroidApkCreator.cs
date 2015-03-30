@@ -23,7 +23,7 @@ namespace Playscape.Editor
 		private const string GOOGLE_PLAY_SERVICES_JAR = "/usr/local/android-sdk-macosx/extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar";
 
 		// temp solution
-		private const string PATCH_FILE = "../../../bridges/android/playscape_automated_reports/bin/classes.jar";
+		private const string PATCH_FILE = "../../../bridges/android/playscape_lifecycle/bin/classes.jar";
 		
 		static AndroidApkCreator()
 		{}
