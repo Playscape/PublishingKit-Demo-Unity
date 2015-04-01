@@ -45,9 +45,13 @@ namespace Playscape.Editor {
 			if (destAppNode.Attributes ["android:name"] != null) {
 				L.D (Warnings.ANDROID_NAME_EXISTS_IN_MANIFEST);
 			} else {
-				var destAppNameAttrib = destXdoc.CreateAttribute ("android:name", ANDROID_XMLNS);
-				destAppNode.Attributes.Append (destAppNameAttrib);
-				destAppNode.Attributes ["android:name"].Value = psAppNode.Attributes ["android:name"].Value;
+				if(psAppNode.Attributes["android:name"] != null 
+				   && psAppNode.Attributes["android:name"].Value != null 
+				   && psAppNode.Attributes["android:name"].Value.Length > 0) {
+					var destAppNameAttrib = destXdoc.CreateAttribute ("android:name", ANDROID_XMLNS);
+					destAppNode.Attributes.Append (destAppNameAttrib);
+					destAppNode.Attributes ["android:name"].Value = psAppNode.Attributes ["android:name"].Value;
+				}
 			}
 			
 			if (isDebugBuild) {
