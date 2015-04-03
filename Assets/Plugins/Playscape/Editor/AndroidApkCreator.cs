@@ -1,5 +1,4 @@
 #if UNITY_EDITOR
-#if UNITY_ANDROID
 using UnityEngine;
 using System;
 using System.Diagnostics;
@@ -341,5 +340,4 @@ namespace Playscape.Editor
 		}
 	}
 }
-#endif
 #endif
