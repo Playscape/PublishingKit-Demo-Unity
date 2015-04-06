@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="pubkit">
+<project name="facebook">
     <target name="-pre-compile">
         <!-- adience jar in thirdparty_jars to classpath -->
 

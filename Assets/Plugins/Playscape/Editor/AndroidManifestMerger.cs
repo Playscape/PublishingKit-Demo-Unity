@@ -8,6 +8,7 @@ using Playscape.Internal;
 namespace Playscape.Editor {
 	static class AndroidManifestMerger  {
 		private const string ANDROID_XMLNS = "http://schemas.android.com/apk/res/android";
+		private const string APP_CLASS_NAME = "com.playscape.playscapeapp.PlayscapeApp";
 		
 		/// <summary>
 		/// Merges manifests, rules of merging are defined in this method.
@@ -20,38 +21,21 @@ namespace Playscape.Editor {
 			
 			psXdoc.LoadXml (File.ReadAllText (CommonConsts.PLAYSCAPE_MANIFEST_PATH));
 			destXdoc.LoadXml (File.ReadAllText (destinationManifest));
-			
-			// ---------- Remove default main activity -------- //
-			var mainActivity  = destXdoc.SelectSingleNode ("manifest/application/activity/intent-filter[contains(name,android.intent.action.MAIN)]");
-			if (mainActivity != null) {
-				mainActivity = mainActivity.ParentNode;
-				var oldMainActivityName = "UnknownActivity";
-				if (mainActivity.Attributes["android:name"] != null) {
-					oldMainActivityName = mainActivity.Attributes["android:name"].Value;
-				}
-				
-				L.I ("{0}. Previous Activity: {1}", Warnings.MAIN_ACTIVITY_REPLACED, oldMainActivityName); 
-				mainActivity.ParentNode.RemoveChild(mainActivity);
-			}
-			
+		
 			// ---------- Merge Playscape -------------- //
 			//copyAllManifestTags (psXdoc, destXdoc);
 			//copyAllApplicationTags (psXdoc, destXdoc);
 			
 			// Copy application's android:name tag
 			var destAppNode = destXdoc.SelectSingleNode ("manifest/application");
-			var psAppNode = psXdoc.SelectSingleNode ("manifest/application");
 			
 			if (destAppNode.Attributes ["android:name"] != null) {
 				L.D (Warnings.ANDROID_NAME_EXISTS_IN_MANIFEST);
+				L.W (Warnings.ANDROID_NAME_EXISTS_IN_MANIFEST);
 			} else {
-				if(psAppNode.Attributes["android:name"] != null 
-				   && psAppNode.Attributes["android:name"].Value != null 
-				   && psAppNode.Attributes["android:name"].Value.Length > 0) {
-					var destAppNameAttrib = destXdoc.CreateAttribute ("android:name", ANDROID_XMLNS);
-					destAppNode.Attributes.Append (destAppNameAttrib);
-					destAppNode.Attributes ["android:name"].Value = psAppNode.Attributes ["android:name"].Value;
-				}
+				var destAppNameAttrib = destXdoc.CreateAttribute ("android:name", ANDROID_XMLNS);
+				destAppNode.Attributes.Append (destAppNameAttrib);
+				destAppNode.Attributes ["android:name"].Value = APP_CLASS_NAME;
 			}
 			
 			if (isDebugBuild) {
@@ -67,7 +51,7 @@ namespace Playscape.Editor {
 			using (var writer = XmlWriter.Create(destinationManifest, settings)) {
 				destXdoc.Save (writer);
 			}
-			
+
 		}
 		
 		/// <summary>

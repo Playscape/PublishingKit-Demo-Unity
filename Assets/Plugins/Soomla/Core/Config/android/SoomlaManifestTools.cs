@@ -55,7 +55,7 @@ namespace Soomla
 			SetPermission("android.permission.INTERNET");
 
 			XmlElement applicationElement = FindChildElement(_manifestNode, "application");
-			applicationElement.SetAttribute("name", _namespace, "com.playscape.rolaballapp.RollABallCustomApp");
+			applicationElement.SetAttribute("name", _namespace, "com.soomla.SoomlaApp");
 
 
 			foreach(ISoomlaManifestTools manifestTool in ManTools) {
