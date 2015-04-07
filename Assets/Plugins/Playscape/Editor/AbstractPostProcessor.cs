@@ -20,25 +20,28 @@ namespace Playscape.Editor {
 				ConfigurationInEditor.Instance.ReporterId,
 				Warnings.REPORTED_ID_NOT_SET);
 
+ 			warnings.WarnIfStringIsEmpty(
+				ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey,
+				Warnings.ADS_API_KEY_NOT_SET);
 
-			bool atleastOneIdFilled = false;
-			ConfigurationInEditor.Instance.TraverseAdsConfig (
-					(category, fieldInfo) => 
-						{
-								if (category.GetType () != typeof(Configuration.Ads.AdsConfig)) {
-										if (!string.IsNullOrEmpty (fieldInfo.GetValue (category) as string)) {
-												atleastOneIdFilled = true;
-										}
-								}
-						});
-
-			if (!atleastOneIdFilled) 
-			{
-				warnings.AddWarning(Warnings.ATLEAST_ONE_AD_ID_MUST_BE_FILLED);
-			}
-
-			warnings.WarnIfStringIsEmpty (ConfigurationInEditor.Instance.MyAds.MyAdsConfig.Url, 
-			                              Warnings.AD_CONFIG_URL_MUST_BE_FILLED);
+//			bool atleastOneIdFilled = false;
+//			ConfigurationInEditor.Instance.TraverseAdsConfig (
+//					(category, fieldInfo) => 
+//						{
+//								if (category.GetType () != typeof(Configuration.Ads.AdsConfig)) {
+//										if (!string.IsNullOrEmpty (fieldInfo.GetValue (category) as string)) {
+//												atleastOneIdFilled = true;
+//										}
+//								}
+//						});
+//
+//			if (!atleastOneIdFilled) 
+//			{
+//				warnings.AddWarning(Warnings.ATLEAST_ONE_AD_ID_MUST_BE_FILLED);
+//			}
+//
+//			warnings.WarnIfStringIsEmpty (ConfigurationInEditor.Instance.MyAds.MyAdsConfig.Url, 
+//			                              Warnings.AD_CONFIG_URL_MUST_BE_FILLED);
 		}
 
 		public abstract void Run();

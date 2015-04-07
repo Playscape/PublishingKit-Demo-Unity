@@ -33,7 +33,16 @@ namespace Playscape.Editor {
 		private Boolean isApkBuild() {
 			return mTargetPath.ToLower ().EndsWith (".apk");
 		}
-		
+
+		public override void CheckForWarnings(WarningAccumulator warnings)
+		{
+			base.CheckForWarnings (warnings);
+
+//			warnings.WarnIf (
+//				!Debug.isDebugBuild && !System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable(),
+//				Warnings.RELEASE_BUILD_SHOULD_HAS_INTERNET_CONNECTION);
+		}
+
 		public override void Run()
 		{
 			string publishingKitLibPath = isApkBuild() ? 
@@ -54,16 +63,26 @@ namespace Playscape.Editor {
 				// decompile apk to update resources
 				AndroidApkCreator.decompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
 
+//				Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
+//				if (response != null && response.Success) {
+//					ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+//					
+//					EditorUtility.SetDirty(ConfigurationInEditor.Instance);
+//					AndroidApkCreator.ApplyGameConfiguration(response.GameConfiguration, sourcesPath + "/res/values/strings.xml");
+//				} else {
+//					L.E ("Fetched Game Configuration is broken.");
+//					return;
+//				}
+
 				AndroidApkCreator.applyAspects(mTargetPath, sourcesPath, Debug.isDebugBuild);
 				
 				// recompile apk file and rewrite existing apk
 				AndroidApkCreator.recompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
-				
+
 				DirectoryInfo directoryToRemove = new DirectoryInfo(sourcesPath);
 				if (directoryToRemove != null && directoryToRemove.Exists) {
 					directoryToRemove.Delete (true);
 				} 
-
 			}
 
 			return;
@@ -127,7 +146,7 @@ namespace Playscape.Editor {
 			// Manipulate Config
 			var configDoc = new XmlDocument();
 			configDoc.LoadXml(File.ReadAllText (srcConfig));
-			
+
 			configDoc.SelectSingleNode("resources/string[@name='playscape_reporter_id']").InnerText = 
 				ConfigurationInEditor.Instance.ReporterId;
 			
@@ -136,37 +155,26 @@ namespace Playscape.Editor {
 					: Settings.ReleaseRemoteLoggerUrl;
 			
 			injectABTestingConfig (configDoc);
-			injectAdConfigs (configDoc);			
-			
-			
+			injectAdConfigs (ConfigurationInEditor.Instance.MyGameConfiguration, configDoc);			
+						
 			var writerSettings = new XmlWriterSettings();
-			writerSettings.Indent = true;
 			using (var writer = XmlWriter.Create(dstConfig)) {
 				configDoc.Save(writer);
 			}
 		}
 		
-		private static void injectAdConfigs (XmlDocument configDoc)
+		private static void injectAdConfigs (Configuration.GameConfiguration gameConfig, XmlDocument configDoc)
 		{
-			// Use relfection to enumerate all ad provider identifiers, and inject them into the 
-			// configuration xml.
-			//
-			// Reflection assumes that Ads class contains either fields which are classes with fields of type String.
-			
-			
-			
-			Configuration.Instance.TraverseAdsConfig (
-				(category, settingFieldInfo) =>
-				{
+			gameConfig.EnumerateConfiguration ((category, fieldInfo) => {
 				var settingName = new StringBuilder();
 				settingName.Length = 0;
 				settingName.Append("playscape_")
-					.Append(CamelToSnake(category.GetType().Name));
+					.Append(AndroidPostProcessor.CamelToSnake(category.GetType().Name));
 				
 				settingName.Append("_")
-					.Append(CamelToSnake(settingFieldInfo.Name));
-				object value = settingFieldInfo.GetValue(category);
-				// Ads Config Url
+					.Append(AndroidPostProcessor.CamelToSnake(fieldInfo.Name));
+				object value = fieldInfo.GetValue(category);
+				
 				var xmlElement = configDoc.SelectSingleNode(string.Format("resources/string[@name='{0}']", settingName.ToString()));
 				
 				if (xmlElement == null) {
@@ -174,10 +182,9 @@ namespace Playscape.Editor {
 					                                             "verify playscape_config.xml or your ad provider fields naming conventions.", settingName));
 				}
 				
-				xmlElement.InnerText = 
-					string.Format("{0}", value);
-				
+				xmlElement.InnerText = string.Format("{0}", value);
 			});
+
 			configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
 		}
 		
@@ -231,7 +238,7 @@ namespace Playscape.Editor {
 		/// </summary>
 		/// <returns>Snake cased string.</returns>
 		/// <param name="camelCase">Camel case string.</param>
-		private static string CamelToSnake(string camelCase)
+		public static string CamelToSnake(string camelCase)
 		{
 			var builder = new StringBuilder();
 			

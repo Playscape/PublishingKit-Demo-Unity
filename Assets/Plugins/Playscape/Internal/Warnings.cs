@@ -28,6 +28,14 @@ namespace Playscape.Internal {
 			"Reporter Id not set.",
    			"WARN-G001");
 
+		public static readonly string ADS_API_KEY_NOT_SET = MakeWarning(
+			"AdsConfig ApiKey not set.",
+			"WARN-G002");
+
+		public static readonly string RELEASE_BUILD_SHOULD_HAS_INTERNET_CONNECTION = MakeWarning(
+			"Release build should has internet connection.",
+			"WARN-G003");
+
 		#endregion
 
 		#region Android Warnings

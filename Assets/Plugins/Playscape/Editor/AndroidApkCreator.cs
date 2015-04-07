@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using System;
+using System.Text;
 using System.Diagnostics;
 using System.IO;
 using Playscape.Internal;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.AccessControl;
 using Ionic.Zip;
+using System.Xml;
 
 namespace Playscape.Editor
 {
@@ -41,6 +43,41 @@ namespace Playscape.Editor
 		public static void recompile(string targetPath, string outputPath, bool isDebugBuild) 
 		{
 			useApkTool (true, targetPath, outputPath, isDebugBuild);
+		}
+
+		public static void ApplyGameConfiguration(Configuration.GameConfiguration gameConfiguration, string filePathToApplyConfiguration) {
+			var configDoc = new XmlDocument ();
+			configDoc.LoadXml (File.ReadAllText (filePathToApplyConfiguration));
+
+			injectAdsConfig (gameConfiguration, configDoc);
+
+			var writerSettings = new XmlWriterSettings();
+			writerSettings.Indent = true;
+			using (var writer = XmlWriter.Create(filePathToApplyConfiguration)) {
+				configDoc.Save(writer);
+			}
+		}
+
+		private static void injectAdsConfig(Configuration.GameConfiguration gameConfiguration, XmlDocument configDoc) {
+			gameConfiguration.EnumerateConfiguration ((category, fieldInfo) => {
+				var settingName = new StringBuilder();
+				settingName.Length = 0;
+				settingName.Append("playscape_")
+					.Append(AndroidPostProcessor.CamelToSnake(category.GetType().Name));
+				
+				settingName.Append("_")
+					.Append(AndroidPostProcessor.CamelToSnake(fieldInfo.Name));
+				object value = fieldInfo.GetValue(category);
+
+				var xmlElement = configDoc.SelectSingleNode(string.Format("resources/string[@name='{0}']", settingName.ToString()));
+				
+				if (xmlElement == null) {
+					throw new ApplicationException(string.Format("Unable to find xml element <string name='{0}'>, please " +
+					                                             "verify playscape_config.xml or your ad provider fields naming conventions.", settingName));
+				}
+				
+				xmlElement.InnerText = string.Format("{0}", value);
+			});
 		}
 
 		public static void applyAspects(string targetPath, string outputPath, bool isDebugBuild) 

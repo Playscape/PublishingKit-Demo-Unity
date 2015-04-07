@@ -13,6 +13,7 @@ namespace Playscape.Editor {
 		private const string ANALYTICS_REPORTING = "Analytics Reporting";
 		private const string REPORTER_ID = "Reporter Id";
 		private const string PUSHWOOSH_CONFIG = "PushWoosh Configuration";
+		private const string ADS_CONFIG = "Ads Configuration";
 		private const string ANDROID = "Android";
 		private const string IOS = "iOS";
 		private const string WINDOW_TITLE = "Playscape";
@@ -44,28 +45,75 @@ namespace Playscape.Editor {
             if (GUI.changed) {
 				EditorUtility.SetDirty (ConfigurationInEditor.Instance);
 			}
-		}
-		private void onClose() {
-			string targetManifest = "Assets/Plugins/Android/PlayscapePublishingKit/AndroidManifest.xml";
+		}			
 
+		private void onClose() {
+			WarningAccumulator warningAccumulator = new WarningAccumulator ();
+			warningAccumulator.WarnIfStringIsEmpty (
+				ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey,
+				Warnings.ADS_API_KEY_NOT_SET
+			);
+
+			if (warningAccumulator.HasWarnings()) {
+				warningAccumulator.ShowIfNecessary();
+			} else {
+				//temp check while we don't have API for Game Configuration
+				if (string.IsNullOrEmpty(CommonConsts.GAME_CONFIGURATION_API_URL)) {
+					ApplyChanges();
+				} else {
+					FetchAndApplyGameConfiguration();
+				}
+			}
+		}
+
+		private void FetchAndApplyGameConfiguration() {
+			string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
+			
+			GUI.enabled = false;
+			EditorUtility.DisplayProgressBar ("Playscape Configuration Proccess", 
+			                                  String.Format("Fetching Game Configuration for 'ApiKey': '{0}'", API_KEY), 
+			                                  0);
+			Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
+			if (response.Error == null) {
+				if (response != null && response.Success) {
+					ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+					
+					AssetDatabase.SaveAssets();
+				}
+			} else {
+				EditorUtility.DisplayDialog("Playscape Configuration Proccess", 
+				                            response.Error.Message + " occured while trying fetch game configuration. Last saved Game Configuration will be applied", 
+				                            "OK");
+			}
+
+			ApplyChanges ();
+			
+			GUI.enabled = true;
+			EditorUtility.ClearProgressBar();
+		}
+
+		private void ApplyChanges() {
+			string targetManifest = "Assets/Plugins/Android/PlayscapePublishingKit/AndroidManifest.xml";
+			
 			string manifestContents = File.ReadAllText(CommonConsts.PLAYSCAPE_MANIFEST_PATH);
 			manifestContents = AndroidPostProcessor.ApplyCommonAndroidManifestParams(manifestContents);
 			File.WriteAllText(targetManifest, manifestContents);
-
+			
 			targetManifest = "Assets/Plugins/Android/AndroidManifest.xml";
 			AndroidManifestMerger.Merge (targetManifest, false);
-
+			
 			AndroidPostProcessor.ApplyPlayscapeAndroidConfiguration (AndroidPostProcessor.PLAYSCAPE_CONFIG_XML_PATH,
 			                                                         AndroidPostProcessor.PLAYSCAPE_CONFIG_XML_PATH,
 			                                                         false);
-
+			
 			EditorUtility.DisplayDialog(
 				"Configuration Ended",
 				"The configuration process has ended successfully",
 				"OK");
-
+			
 			Close ();
 		}
+		
 		private void OnABTestingGUI ()
 		{
 			GUILayout.Label (AB_TESTING_TITLE, EditorStyles.boldLabel);
@@ -128,7 +176,7 @@ namespace Playscape.Editor {
 		void OnAdsGUI ()
 		{
 			var categories = new Dictionary<object, bool> ();
-			ConfigurationInEditor.Instance.TraverseAdsConfig ((category, fieldInfo) =>
+			ConfigurationInEditor.Instance.TraverseAdsUIConfig ((category, fieldInfo) =>
 						{
 							if (!categories.ContainsKey(category)) {
 								GUILayout.Label (category.GetType().Name, EditorStyles.boldLabel);

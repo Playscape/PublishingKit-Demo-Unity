@@ -4,6 +4,8 @@ using System;
 using System.IO;
 using System.Text;
 using System.Reflection;
+using Playscape.Editor;
+using Pathfinding.Serialization.JsonFx;
 
 namespace Playscape.Internal {
 
@@ -31,7 +33,7 @@ namespace Playscape.Internal {
 				EnableABTestingSystem =false;
 				NumberOfCustomExperiments = 0;
 				MyCustomExperimentConfig = new CustomExperimentConfig[MAX_NUMBER_OF_EXPERIMENTS];
-				for (int i =0; i< MAX_NUMBER_OF_EXPERIMENTS; i++)
+				for (int i = 0; i < MAX_NUMBER_OF_EXPERIMENTS; i++)
 				{
 					MyCustomExperimentConfig[i] = new CustomExperimentConfig();
 				}
@@ -54,63 +56,17 @@ namespace Playscape.Internal {
 		//        GUI and saving/loading of the config will be done automagically for you.
 		public Ads MyAds = new Ads();
 
+		public GameConfiguration MyGameConfiguration = new GameConfiguration();
+
 		[Serializable]
 		public class Ads
 		{
 			public AdsConfig MyAdsConfig = new AdsConfig();
-			public Admob MyAdMobIds = new Admob();
-			public Adcolony MyAdColonyIds = new Adcolony();
-			public Chartboost MyChartboostIds = new Chartboost();
-			public MillennialMedia MyMillennialMedia = new MillennialMedia();
-			public Startapp MyStartAppIds = new Startapp();
-			public Vungle MyVungle = new Vungle();
-            
-            
+			           
 			[Serializable]
 			public class AdsConfig {
-				public string Url;
+				public string ApiKey;
                 public bool EnableAdsSystem = true;
-			}
-
-			[Serializable]
-			public class Vungle {
-				public string AppId;
-			}
-
-			[Serializable]
-			public class MillennialMedia {
-				public string AppId;
-			}
-
-			
-			[Serializable]
-			public class Chartboost
-			{
-				public string AppId;
-				public string AppSignature;
-			}
-			
-			[Serializable]
-			public class Admob
-			{
-				public string InterstitialsAdUnitId;
-				public string BannersAdUnitId;
-				public string TestDeviceId;
-			}
-			
-			[Serializable]
-			public class Startapp
-			{
-				public string DeveloperId;
-				public string AppId;
-			}
-			
-			[Serializable]
-			public class Adcolony 
-			{
-				public string AppId;
-				public string VideoZoneId;
-				public String IncentivisedVideoZoneId;
 			}
 		}
 
@@ -163,7 +119,7 @@ namespace Playscape.Internal {
 		/// Category is the instance of the category in the ads class.
 		/// field is the field info of that category, you can use it to read and/or set that field.
 		/// </param>
-		public void TraverseAdsConfig(Action<object, FieldInfo> visitor) {
+		public void TraverseAdsUIConfig(Action<object, FieldInfo> visitor) {
 
 			foreach (var categoryFieldInfo in typeof(Configuration.Ads).GetFields()) {
 				if (categoryFieldInfo.IsPublic) {
@@ -180,5 +136,130 @@ namespace Playscape.Internal {
 				}
 			}
 		}
-	}
+
+		public GameConfigurationResponse FetchGameConfigurationForApiKey(string apikey) {			
+			AsyncRequest<GameConfigurationResponse> request = new AsyncRequest<GameConfigurationResponse> (CommonConsts.GAME_CONFIGURATION_API_URL, System.Net.WebRequestMethods.Http.Get);
+			request.addHeader ("X-API-Key", apikey);
+
+			GameConfigurationResponse gameConfiguration = request.Start ();
+			
+			return gameConfiguration;
+		}
+
+		[Serializable]
+		public class GameConfiguration
+		{
+			[JsonName("ads_config")]
+			public AdsConfig MyAdsConfig = new AdsConfig();
+			
+			[JsonName("admob")]
+			public Admob MyAdMobIds = new Admob();
+			
+			[JsonName("chartboost")]
+			public Chartboost MyChartboostIds = new Chartboost ();
+			
+			[JsonName("vungle")]
+			public Vungle MyVungle = new Vungle ();
+			
+			[JsonName("millennialmedia")]
+			public MillennialMedia MyMillennialMedia = new MillennialMedia();
+			
+			[JsonName("startapp")]
+			public Startapp MyStartAppIds = new Startapp ();
+			
+			[JsonName("adcolony")]
+			public Adcolony MyAdColonyIds = new Adcolony();
+			
+			public void EnumerateConfiguration(Action<object, FieldInfo> visitor) {
+				foreach (var categoryFieldInfo in typeof(GameConfiguration).GetFields()) {
+					if (categoryFieldInfo.IsPublic) {
+						var category = categoryFieldInfo.GetValue(this);
+						
+						foreach (var settingFieldInfo in category.GetType().GetFields()) {
+							if (settingFieldInfo.IsPublic) {							
+								visitor(category, settingFieldInfo);
+							}
+						}
+					}
+				}
+			}
+			
+			[Serializable]
+			public class AdsConfig {
+				[JsonName("url")]
+				public string Url;
+			}
+			
+			[Serializable]
+			public class Vungle {
+				[JsonName("app_id")]
+				public string AppId;
+			}
+			
+			[Serializable]
+			public class MillennialMedia {
+				[JsonName("app_id")]
+				public string AppId;
+			}
+			
+			[Serializable]
+			public class Chartboost
+			{
+				[JsonName("app_id")]
+				public string AppId;
+				
+				[JsonName("app_signature")]
+				public string AppSignature;
+			}
+			
+			[Serializable]	
+			public class Admob
+			{
+				[JsonName("interstitials_ad_unit_id")]
+				public string InterstitialsAdUnitId;
+				
+				[JsonName("banners_ad_unit_id")]
+				public string BannersAdUnitId;
+				
+				[JsonName("test_device_id")]
+				public string TestDeviceId;
+			}
+			
+			[Serializable]
+			public class Startapp
+			{
+				[JsonName("developer_id")]
+				public string DeveloperId;
+				
+				[JsonName("app_id")]
+				public string AppId;
+			}
+			
+			[Serializable]
+			public class Adcolony 
+			{
+				[JsonName("app_id")]
+				public string AppId;
+				
+				[JsonName("video_zone_id")]
+				public string VideoZoneId;
+				
+				[JsonName("incentivised_video_zone_id")]
+				public String IncentivisedVideoZoneId;
+			}
+		}
+
+		public class GameConfigurationResponse : AsyncResponse {
+			[JsonName("success")]
+			public bool Success;
+			
+			[JsonName("game_config")]
+			public GameConfiguration GameConfiguration { get; private set; }
+			
+			public GameConfigurationResponse() {
+				this.Success = false;
+				this.GameConfiguration = new GameConfiguration ();
+			}
+		}	
+	}	
 }
