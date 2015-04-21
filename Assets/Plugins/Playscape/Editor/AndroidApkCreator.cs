@@ -21,14 +21,15 @@ namespace Playscape.Editor
 		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/ThirdParty/zipalign";
 		private const string DEX_2_JAR_TOOL_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/dex2jar";
 		private const string ASPECT_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/aspectsj/";
-		private const string ANDROID_JAR = "/usr/local/android-sdk-macosx/platforms/android-19/android.jar";
-		private const string GOOGLE_PLAY_SERVICES_JAR = "/usr/local/android-sdk-macosx/extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar";
+
+		private static string ANDROID_HOME = "/usr/local/android-sdk-macosx";
 
 		// temp solution
 		private const string PATCH_FILE = "../../../bridges/android/playscape_lifecycle/bin/classes.jar";
 		
 		static AndroidApkCreator()
-		{}
+		{
+		}
 		
 		public static void cleanUselessResources(string pathToRemove) 
 		{
@@ -180,6 +181,17 @@ namespace Playscape.Editor
 
 		private static void applyPatch(string inpath, string aspectpath, string outjar) {
 			string command = getJavaCommand ();
+
+			string ANDROID_JAR;
+			string GOOGLE_PLAY_SERVICES_JAR;
+
+			if (isWindows ()) {
+				ANDROID_HOME = System.Environment.GetEnvironmentVariable("ANDROID_HOME");
+			}
+
+			ANDROID_JAR = Path.Combine (ANDROID_HOME, "platforms/android-19/android.jar");
+			GOOGLE_PLAY_SERVICES_JAR = Path.Combine (ANDROID_HOME, 
+			                            "extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar");
 
 			string delimeter = (isWindows ()) ? ";" : ":";
 			string classpath = Path.Combine (ASPECT_HOME_PATH, "aspectjtools.jar") + delimeter
