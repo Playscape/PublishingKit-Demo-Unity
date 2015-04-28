@@ -137,6 +137,12 @@ namespace Playscape.Internal {
 			}
 		}
 
+		/**
+		 * Performing request to GAME API for fetching Game configuration for passed 'apiKey'
+		 * 
+		 * apiKey - API_KEY for which game configuration should be fetched
+		 * 
+		 **/
 		public GameConfigurationResponse FetchGameConfigurationForApiKey(string apikey) {			
 			AsyncRequest<GameConfigurationResponse> request = new AsyncRequest<GameConfigurationResponse> (CommonConsts.GAME_CONFIGURATION_API_URL, System.Net.WebRequestMethods.Http.Get);
 			request.addHeader ("X-API-Key", apikey);
@@ -145,6 +151,11 @@ namespace Playscape.Internal {
 			
 			return gameConfiguration;
 		}
+
+		/**
+		 * Entity class which represents configuration of game
+		 * 
+		 **/
 
 		[Serializable]
 		public class GameConfiguration
@@ -169,7 +180,12 @@ namespace Playscape.Internal {
 			
 			[JsonName("adcolony")]
 			public Adcolony MyAdColonyIds = new Adcolony();
-			
+
+
+			/**
+			 * Traverses the game configuration via given visitor 
+			 * 
+			 **/
 			public void EnumerateConfiguration(Action<object, FieldInfo> visitor) {
 				foreach (var categoryFieldInfo in typeof(GameConfiguration).GetFields()) {
 					if (categoryFieldInfo.IsPublic) {
@@ -249,11 +265,19 @@ namespace Playscape.Internal {
 			}
 		}
 
+		/**
+		 * Entity class which represents GAME API response
+		 * 
+		 **/
 		public class GameConfigurationResponse : AsyncResponse {
+
 			[JsonName("success")]
 			public bool Success;
+
+			[JsonName("message")]
+			public string ErrorDescription;
 			
-			[JsonName("game_config")]
+			[JsonName("config")]
 			public GameConfiguration GameConfiguration { get; private set; }
 			
 			public GameConfigurationResponse() {

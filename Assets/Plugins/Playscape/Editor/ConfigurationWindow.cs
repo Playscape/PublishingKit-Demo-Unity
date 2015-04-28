@@ -57,39 +57,41 @@ namespace Playscape.Editor {
 			if (warningAccumulator.HasWarnings()) {
 				warningAccumulator.ShowIfNecessary();
 			} else {
-				//temp check while we don't have API for Game Configuration
-				if (string.IsNullOrEmpty(CommonConsts.GAME_CONFIGURATION_API_URL)) {
-					ApplyChanges();
-				} else {
-					FetchAndApplyGameConfiguration();
-				}
+				FetchAndApplyGameConfiguration();
 			}
 		}
 
+		/**
+		 * Method which download game configuration for API KEY setted in Game Configuration Window
+		 * 
+		 **/
 		private void FetchAndApplyGameConfiguration() {
-			string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
-			
+			string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;		
+
+			//Show progress dialog to user
 			GUI.enabled = false;
 			EditorUtility.DisplayProgressBar ("Playscape Configuration Proccess", 
 			                                  String.Format("Fetching Game Configuration for 'ApiKey': '{0}'", API_KEY), 
 			                                  0);
 			Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
-			if (response.Error == null) {
-				if (response != null && response.Success) {
-					ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+
+			//If response from servers is success save fetched configuration to AssetDatabse
+			if (response != null && response.Success) {
+				ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
 					
-					AssetDatabase.SaveAssets();
-				}
+				AssetDatabase.SaveAssets();
 			} else {
 				EditorUtility.DisplayDialog("Playscape Configuration Proccess", 
 				                            response.Error.Message + " occured while trying fetch game configuration. Last saved Game Configuration will be applied", 
 				                            "OK");
 			}
-
-			ApplyChanges ();
-			
+						
 			GUI.enabled = true;
 			EditorUtility.ClearProgressBar();
+
+
+			//In any case we apply changes. If request to GAME API was failed, successfully last saved configuration will be applied.
+			ApplyChanges ();
 		}
 
 		private void ApplyChanges() {

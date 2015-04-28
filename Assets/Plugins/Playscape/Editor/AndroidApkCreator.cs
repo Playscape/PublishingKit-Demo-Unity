@@ -22,7 +22,7 @@ namespace Playscape.Editor
 		private const string DEX_2_JAR_TOOL_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/dex2jar";
 		private const string ASPECT_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/aspectsj/";
 
-		private static string ANDROID_HOME = "/usr/local/android-sdk-macosx";
+		private static string ANDROID_HOME = AndroidSDKFolder.Path;
 
 		// temp solution
 		private const string PATCH_FILE = "../../../bridges/android/playscape_lifecycle/bin/classes.jar";
@@ -79,6 +79,9 @@ namespace Playscape.Editor
 				
 				xmlElement.InnerText = string.Format("{0}", value);
 			});
+
+			configDoc.SelectSingleNode("resources/string[@name='playscape_ads_api_key']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey).ToLower();
+			configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
 		}
 
 		public static void applyAspects(string targetPath, string outputPath, bool isDebugBuild) 
@@ -207,7 +210,11 @@ namespace Playscape.Editor
 			
 			int exitCode = runProcessWithCommand (command, arguments);
 			string message = "aspects was applyed" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode;
-			L.W (message);
+			if (exitCode == 0) {
+				L.W (message);
+			} else {
+				L.E (message);
+			}
 		}
 
 		private static void executeLib2dex(string targetPath, string outputPath, bool isDebugBuild) {

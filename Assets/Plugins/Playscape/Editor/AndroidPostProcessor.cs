@@ -34,15 +34,6 @@ namespace Playscape.Editor {
 			return mTargetPath.ToLower ().EndsWith (".apk");
 		}
 
-		public override void CheckForWarnings(WarningAccumulator warnings)
-		{
-			base.CheckForWarnings (warnings);
-
-//			warnings.WarnIf (
-//				!Debug.isDebugBuild && !System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable(),
-//				Warnings.RELEASE_BUILD_SHOULD_HAS_INTERNET_CONNECTION);
-		}
-
 		public override void Run()
 		{
 			string publishingKitLibPath = isApkBuild() ? 
@@ -62,17 +53,6 @@ namespace Playscape.Editor {
 			if (isApkBuild ()) {
 				// decompile apk to update resources
 				AndroidApkCreator.decompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
-
-//				Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
-//				if (response != null && response.Success) {
-//					ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
-//					
-//					EditorUtility.SetDirty(ConfigurationInEditor.Instance);
-//					AndroidApkCreator.ApplyGameConfiguration(response.GameConfiguration, sourcesPath + "/res/values/strings.xml");
-//				} else {
-//					L.E ("Fetched Game Configuration is broken.");
-//					return;
-//				}
 
 				AndroidApkCreator.applyAspects(mTargetPath, sourcesPath, Debug.isDebugBuild);
 				
@@ -185,6 +165,7 @@ namespace Playscape.Editor {
 				xmlElement.InnerText = string.Format("{0}", value);
 			});
 
+			configDoc.SelectSingleNode("resources/string[@name='playscape_ads_api_key']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey).ToLower();
 			configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
 		}
 		

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="mominis.remote_logger_unity"
+    package="com.playscape.publishingkit"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -12,10 +12,10 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="com.playscape.rollaball.customtest.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.playscape.publishingkit.permission.C2D_MESSAGE" />
 
     <permission
-        android:name="com.playscape.rollaball.customtest.permission.C2D_MESSAGE"
+        android:name="com.playscape.publishingkit.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <application
@@ -48,21 +48,21 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <category android:name="com.playscape.rollaball.customtest" />
+                <category android:name="com.playscape.publishingkit" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.playscape.utils.gcm.handlers.NotificationActionListener" >
             <intent-filter>
                 <action android:name="com.playscape.utils.intent.NOTIFICATIONACTION" />
 
-                <category android:name="com.playscape.rollaball.customtest" />
+                <category android:name="com.playscape.publishingkit" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.playscape.utils.gcm.handlers.AutomaticRetryExponentialBackOff" >
             <intent-filter>
                 <action android:name="com.playscape.utils.intent.RETRY_BACKOFF" />
 
-                <category android:name="com.playscape.rollaball.customtest" />
+                <category android:name="com.playscape.publishingkit" />
             </intent-filter>
         </receiver>
 
@@ -166,6 +166,126 @@
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
         </receiver>
+
+		<!-- playscape SDK -->
+
+		<!-- Activities -->
+
+
+        <activity
+            android:name="mominis.gameconsole.activities.GamePageActivity"
+            android:configChanges="keyboard|keyboardHidden"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter>
+                <action android:name="mominis.common.PlayscapeSdk.SHOW_GAME_PAGE_ACTION" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="mominis.gameconsole.activities.RedirectToMarketActivity"
+            android:configChanges="keyboard|keyboardHidden"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+
+        <activity
+            android:name="mominis.gameconsole.views.impl.Catalog"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+
+        <activity android:name="mominis.gameconsole.activities.GameDialogActivity"
+
+			android:theme="@android:style/Theme.Translucent.NoTitleBar">
+        </activity>
+
+		<!-- Notification with promotionUrl trigger this activity -->
+        <activity android:name="mominis.common.services.notifications.PromotionActivity"
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:label="Mominis Promotion"
+			>
+        </activity>
+
+        <!-- Notification with market trigger this activity, it is used merely for analytics and launching the market afterwards -->
+        <activity android:name="mominis.common.services.notifications.NotificationProxyActivity"
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:label="Notification"
+			>
+        </activity>
+
+        <!-- Our Services -->
+
+        <service android:name="mominis.common.services.sync.impl.SyncIntentService">
+			<intent-filter>
+				<action android:name="android.content.Intent.ACTION_SYNC"></action>
+				<action android:name="mominis.common.services.sync.impl.SyncIntentService.SCHEDULE_PERIODIC_SYNC_ACTION"></action>
+			</intent-filter>
+		</service>
+
+		<service android:name="mominis.common.components.mailslot.impl.MailslotIntentService">
+			<intent-filter>
+				<action android:name="mominis.common.components.mailslot.impl.MailslotIntentService.MAILSLOT_ACTION" />
+			</intent-filter>
+		</service>
+
+		<service android:name="mominis.gameconsole.services.impl.SocialService" android:enabled="true" android:exported="true"></service>
+
+
+        <!-- 3rd Party Services -->
+        <service android:name="mobpartner.ad.sdk.MobPartnerSDK$ProcessCode" />
+
+
+
+		<!-- Used to trigger GameApplication.onCreate() to update the master in case of app removal. -->
+		<receiver
+            android:name="mominis.common.services.notifications.PackageStateChangeReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+				<action android:name="android.intent.action.PACKAGE_REMOVED"/>
+				<data android:path="*mominis*"/>
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+
+	  	<!-- Initializes the notifications subsystem -->
+		<receiver
+            android:name="mominis.common.services.notifications.GameNotificationInitReceiver"
+            android:enabled="true"
+            android:exported="true" >
+			<intent-filter>
+				<action android:name="com.mominis.GameNotificationInitReceiver.ACTION" />
+			</intent-filter>
+	  	</receiver>
+
+        <!-- Responds to notifications related alarms -->
+        <receiver
+            android:name="mominis.common.services.notifications.OnGameNotificationAlarmReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.mominis.game.notifications.OnGameNotificationAlarmReceiver.ACTION" />
+            </intent-filter>
+        </receiver>
+
+		<!--  Package changes receiver -->
+	    <receiver android:name="mominis.gameconsole.common.PackageStateReceiverObservable">
+			<intent-filter>
+                 <action android:name="android.intent.action.PACKAGE_REMOVED"/>
+                 <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+                 <action android:name="android.intent.action.PACKAGE_ADDED"/>
+                 <data android:path="*mominis*"/>
+                 <data android:scheme="package"/>
+			</intent-filter>
+		</receiver>
+
     </application>
 
 </manifest>
