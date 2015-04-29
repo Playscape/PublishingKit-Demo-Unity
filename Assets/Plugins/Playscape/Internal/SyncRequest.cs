@@ -41,7 +41,9 @@ namespace Playscape.Internal
 		/// Setups the request.
 		/// </summary>
 		private void setupRequest() {
-			if (!string.IsNullOrEmpty (Url)) {
+			if (!string.IsNullOrEmpty (Url)) {							
+				ServicePointManager.ServerCertificateValidationCallback += (o, ICertificatePolicy, chain, errors) => true;
+
 				HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create (Url);
 				webRequest.Method = Method;
 				webRequest.Timeout = DEFAULT_TIMEOUT;

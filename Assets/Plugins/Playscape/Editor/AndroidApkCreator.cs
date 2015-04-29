@@ -23,7 +23,7 @@ namespace Playscape.Editor
 		private const string DEX_2_JAR_TOOL_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/dex2jar";
 		private const string ASPECT_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/aspectsj/";
 		private const string PATCH_FILE = "Assets/Plugins/Playscape/ThirdParty/playscape_lifecycle.jar";
-		private const string ANDROID_PLATFORM = "android-19";
+		private const string DEFAULT_ANDROID_PLATFORM = "android-19";
 
 		private static string ANDROID_HOME = AndroidSDKFolder.Path;
 		
@@ -206,7 +206,7 @@ namespace Playscape.Editor
 
 			//if android platform jar getted from PlayerSettings doesn't exist will use default 
 			if (!File.Exists (ANDROID_JAR)) {
-				ANDROID_JAR = ANDROID_PLATFORM;
+				ANDROID_JAR = Path.Combine (ANDROID_HOME, string.Format ("platforms/{0}/android.jar", DEFAULT_ANDROID_PLATFORM));
 			}
 
 			GOOGLE_PLAY_SERVICES_JAR = Path.Combine (ANDROID_HOME, 
