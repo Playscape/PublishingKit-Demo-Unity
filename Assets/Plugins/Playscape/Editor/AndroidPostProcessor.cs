@@ -3,7 +3,6 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.Callbacks;
 using Playscape.Internal; 
 using System.Xml;
 using System.Text;
@@ -66,57 +65,59 @@ namespace Playscape.Editor {
 			}
 
 			return;
-			// If our manifests are merged then all manifest fragments will reside in the same file and therefore we point
-			// the various sdks to the main manifest file
-			sourcesPath = isApkBuild () ? 
-				Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) : 
-					mTargetPath + "/" + PlayerSettings.productName;	
+            // ZR-CR: It's time we comment this out
+
+            //// If our manifests are merged then all manifest fragments will reside in the same file and therefore we point
+            //// the various sdks to the main manifest file
+            //sourcesPath = isApkBuild () ? 
+            //    Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) : 
+            //        mTargetPath + "/" + PlayerSettings.productName;	
 			
-			var manifestDst = sourcesPath + "/" + MANIFEST_FILE_NAME;
+            //var manifestDst = sourcesPath + "/" + MANIFEST_FILE_NAME;
 			
-			L.D("mTargetPath: " + mTargetPath);
-			L.D("sourcesPath: " + sourcesPath);
-			
-			
-			if (isApkBuild()) {
-				// decompile apk to update resources
-				AndroidApkCreator.decompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
-			}
-			
-			if (ConfigurationInEditor.Instance.MergeAndroidManifests) 
-			{
-				AndroidManifestMerger.Merge(manifestDst, Debug.isDebugBuild);
-			} else {
-				// Copy fragments
-				File.Copy(CommonConsts.PLAYSCAPE_MANIFEST_PATH, sourcesPath + "/" + new FileInfo(CommonConsts.PLAYSCAPE_MANIFEST_PATH).Name);
-			}
+            //L.D("mTargetPath: " + mTargetPath);
+            //L.D("sourcesPath: " + sourcesPath);
 			
 			
-			string manifestContents = File.ReadAllText(manifestDst);
-			manifestContents = ApplyCommonAndroidManifestParams(manifestContents);
-			File.WriteAllText(manifestDst, manifestContents);
+            //if (isApkBuild()) {
+            //    // decompile apk to update resources
+            //    AndroidApkCreator.decompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
+            //}
 			
-			var configBaseName = isApkBuild () ? "strings.xml"  : new FileInfo(PLAYSCAPE_CONFIG_XML_PATH).Name;
-			var dstConfig = (isApkBuild() ? sourcesPath : publishingKitLibPath) + "/res/values/" + configBaseName;
-			var srcConfig = isApkBuild () ? dstConfig : PLAYSCAPE_CONFIG_XML_PATH;
+            //if (ConfigurationInEditor.Instance.MergeAndroidManifests) 
+            //{
+            //    AndroidManifestMerger.Merge(manifestDst, Debug.isDebugBuild);
+            //} else {
+            //    // Copy fragments
+            //    File.Copy(CommonConsts.PLAYSCAPE_MANIFEST_PATH, sourcesPath + "/" + new FileInfo(CommonConsts.PLAYSCAPE_MANIFEST_PATH).Name);
+            //}
 			
-			ApplyPlayscapeAndroidConfiguration(srcConfig,
-			                                   dstConfig,
-			                                   Debug.isDebugBuild);
 			
-			if (!isApkBuild()) {
-				CopyDepedencyJarsToLibs(mTargetPath, publishingKitLibPath, sourcesPath);
-			}
+            //string manifestContents = File.ReadAllText(manifestDst);
+            //manifestContents = ApplyCommonAndroidManifestParams(manifestContents);
+            //File.WriteAllText(manifestDst, manifestContents);
 			
-			if (isApkBuild ()) {
-				// recompile apk file and rewrite existing apk
-				AndroidApkCreator.recompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
+            //var configBaseName = isApkBuild () ? "strings.xml"  : new FileInfo(PLAYSCAPE_CONFIG_XML_PATH).Name;
+            //var dstConfig = (isApkBuild() ? sourcesPath : publishingKitLibPath) + "/res/values/" + configBaseName;
+            //var srcConfig = isApkBuild () ? dstConfig : PLAYSCAPE_CONFIG_XML_PATH;
+			
+            //ApplyPlayscapeAndroidConfiguration(srcConfig,
+            //                                   dstConfig,
+            //                                   Debug.isDebugBuild);
+			
+            //if (!isApkBuild()) {
+            //    CopyDepedencyJarsToLibs(mTargetPath, publishingKitLibPath, sourcesPath);
+            //}
+			
+            //if (isApkBuild ()) {
+            //    // recompile apk file and rewrite existing apk
+            //    AndroidApkCreator.recompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
 				
-				DirectoryInfo directoryToRemove = new DirectoryInfo(sourcesPath);
-				if (directoryToRemove != null && directoryToRemove.Exists) {
-					directoryToRemove.Delete (true);
-				} 
-			}
+            //    DirectoryInfo directoryToRemove = new DirectoryInfo(sourcesPath);
+            //    if (directoryToRemove != null && directoryToRemove.Exists) {
+            //        directoryToRemove.Delete (true);
+            //    } 
+            //}
 		}
 		
 		public static void ApplyPlayscapeAndroidConfiguration(string srcConfig,

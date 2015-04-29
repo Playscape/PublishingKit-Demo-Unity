@@ -12,7 +12,7 @@ namespace Playscape.Internal {
 	[Serializable]
 	public class Configuration : ScriptableObject {
 		public const string CONFIGURATION_ASSET_NAME = "PlayscapeConfiguration";
-		public const string CONFIGURATION_PATH = "Assets/Plugins/Playscape/Resources/" + CONFIGURATION_ASSET_NAME + ".asset";  
+		public const string CONFIGURATION_PATH = "Assets/Plugins/Playscape/Resources/" + CONFIGURATION_ASSET_NAME + ".asset";
 		public static int MAX_NUMBER_OF_EXPERIMENTS = 20;
 		public static int MAX_NUMBER_OF_VARS_INEXPERIMENT = 50;
 
@@ -50,7 +50,7 @@ namespace Playscape.Internal {
 
 		/* --- Reporting --- */
 		public String ReporterId;
-		
+
 		// Note - to add a new ad provider, simply follow the naming convention in the ads class
 		//        make a subclass for your provider and fill it with ids.
 		//        GUI and saving/loading of the config will be done automagically for you.
@@ -62,7 +62,7 @@ namespace Playscape.Internal {
 		public class Ads
 		{
 			public AdsConfig MyAdsConfig = new AdsConfig();
-			           
+
 			[Serializable]
 			public class AdsConfig {
 				public string ApiKey;
@@ -87,7 +87,7 @@ namespace Playscape.Internal {
 
 		// Disabled for now: not supported at this stage
 		//public InAppItem [] InAppBilling = new InAppItem[4];
-	
+
 		public static Configuration sConfiguration = null;
 
 		public static Configuration Instance {
@@ -125,7 +125,7 @@ namespace Playscape.Internal {
 				if (categoryFieldInfo.IsPublic) {
 
 					var category = categoryFieldInfo.GetValue(Configuration.Instance.MyAds);
-					
+
 					foreach (var settingFieldInfo in category.GetType().GetFields()) {
 						if (settingFieldInfo.IsPublic) {
 
@@ -139,127 +139,140 @@ namespace Playscape.Internal {
 
 		/**
 		 * Performing request to GAME API for fetching Game configuration for passed 'apiKey'
-		 * 
+		 *
 		 * apiKey - API_KEY for which game configuration should be fetched
-		 * 
+		 *
 		 **/
-		public GameConfigurationResponse FetchGameConfigurationForApiKey(string apikey) {			
-			AsyncRequest<GameConfigurationResponse> request = new AsyncRequest<GameConfigurationResponse> (CommonConsts.GAME_CONFIGURATION_API_URL, System.Net.WebRequestMethods.Http.Get);
-			request.addHeader ("X-API-Key", apikey);
+		public GameConfigurationResponse FetchGameConfigurationForApiKey(string apikey) {
+			if (!string.IsNullOrEmpty (apikey)) {
+				string[] splitedIdentifiers = apikey.Split('-');
+				string appIdentifier = "";
 
-			GameConfigurationResponse gameConfiguration = request.Start ();
-			
-			return gameConfiguration;
+				if (splitedIdentifiers.Length > 0) {
+					appIdentifier = splitedIdentifiers[0];
+				}
+
+				string url = string.Format (CommonConsts.GAME_CONFIGURATION_API_URL, appIdentifier);
+
+				// Star synchronous request for getting game configuration
+				SyncRequest<GameConfigurationResponse> request = new SyncRequest<GameConfigurationResponse> (url, System.Net.WebRequestMethods.Http.Get);
+				request.addHeader ("X-API-Key", apikey);
+
+				GameConfigurationResponse gameConfiguration = request.Start ();
+
+				return gameConfiguration;
+			}
+
+			return null;
 		}
 
 		/**
 		 * Entity class which represents configuration of game
-		 * 
+		 *
 		 **/
-
 		[Serializable]
 		public class GameConfiguration
 		{
 			[JsonName("ads_config")]
 			public AdsConfig MyAdsConfig = new AdsConfig();
-			
+
 			[JsonName("admob")]
 			public Admob MyAdMobIds = new Admob();
-			
+
 			[JsonName("chartboost")]
 			public Chartboost MyChartboostIds = new Chartboost ();
-			
+
 			[JsonName("vungle")]
 			public Vungle MyVungle = new Vungle ();
-			
+
 			[JsonName("millennialmedia")]
 			public MillennialMedia MyMillennialMedia = new MillennialMedia();
-			
+
 			[JsonName("startapp")]
 			public Startapp MyStartAppIds = new Startapp ();
-			
+
 			[JsonName("adcolony")]
 			public Adcolony MyAdColonyIds = new Adcolony();
 
 
 			/**
-			 * Traverses the game configuration via given visitor 
-			 * 
+			 * Traverses the game configuration via given visitor
+			 *
 			 **/
 			public void EnumerateConfiguration(Action<object, FieldInfo> visitor) {
 				foreach (var categoryFieldInfo in typeof(GameConfiguration).GetFields()) {
 					if (categoryFieldInfo.IsPublic) {
 						var category = categoryFieldInfo.GetValue(this);
-						
+
 						foreach (var settingFieldInfo in category.GetType().GetFields()) {
-							if (settingFieldInfo.IsPublic) {							
+							if (settingFieldInfo.IsPublic) {
 								visitor(category, settingFieldInfo);
 							}
 						}
 					}
 				}
 			}
-			
+
 			[Serializable]
 			public class AdsConfig {
 				[JsonName("url")]
 				public string Url;
 			}
-			
+
 			[Serializable]
 			public class Vungle {
 				[JsonName("app_id")]
 				public string AppId;
 			}
-			
+
 			[Serializable]
 			public class MillennialMedia {
 				[JsonName("app_id")]
 				public string AppId;
 			}
-			
+
 			[Serializable]
 			public class Chartboost
 			{
 				[JsonName("app_id")]
 				public string AppId;
-				
+
 				[JsonName("app_signature")]
 				public string AppSignature;
 			}
-			
-			[Serializable]	
+
+			[Serializable]
 			public class Admob
 			{
 				[JsonName("interstitials_ad_unit_id")]
 				public string InterstitialsAdUnitId;
-				
+
 				[JsonName("banners_ad_unit_id")]
 				public string BannersAdUnitId;
-				
+
 				[JsonName("test_device_id")]
 				public string TestDeviceId;
 			}
-			
+
 			[Serializable]
 			public class Startapp
 			{
 				[JsonName("developer_id")]
 				public string DeveloperId;
-				
+
 				[JsonName("app_id")]
 				public string AppId;
 			}
-			
+
 			[Serializable]
-			public class Adcolony 
+			public class Adcolony
 			{
 				[JsonName("app_id")]
 				public string AppId;
-				
+
 				[JsonName("video_zone_id")]
 				public string VideoZoneId;
-				
+
 				[JsonName("incentivised_video_zone_id")]
 				public String IncentivisedVideoZoneId;
 			}
@@ -267,23 +280,23 @@ namespace Playscape.Internal {
 
 		/**
 		 * Entity class which represents GAME API response
-		 * 
+		 *
 		 **/
-		public class GameConfigurationResponse : AsyncResponse {
+		public class GameConfigurationResponse {
 
 			[JsonName("success")]
 			public bool Success;
 
 			[JsonName("message")]
 			public string ErrorDescription;
-			
+
 			[JsonName("config")]
 			public GameConfiguration GameConfiguration { get; private set; }
-			
+
 			public GameConfigurationResponse() {
 				this.Success = false;
 				this.GameConfiguration = new GameConfiguration ();
 			}
-		}	
-	}	
+		}
+	}
 }

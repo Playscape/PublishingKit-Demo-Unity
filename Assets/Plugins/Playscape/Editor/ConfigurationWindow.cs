@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections.Generic;
 using System;
 using Playscape.Internal;
+using System.Text.RegularExpressions;
 
 namespace Playscape.Editor {
 	public class ConfigurationWindow : EditorWindow {
@@ -26,7 +27,7 @@ namespace Playscape.Editor {
 			title = WINDOW_TITLE;
 
             GUI.changed = false;
-            
+
 			EditorGUILayout.BeginHorizontal();
 			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width (650), GUILayout.Height (350));
 				OnReportingGUI ();
@@ -38,14 +39,14 @@ namespace Playscape.Editor {
 
 			GUILayout.Space (30);
 
-			if (GUILayout.Button (CLOSE)) {			
+			if (GUILayout.Button (CLOSE)) {
 				onClose();
 			}
-            
+
             if (GUI.changed) {
 				EditorUtility.SetDirty (ConfigurationInEditor.Instance);
 			}
-		}			
+		}
 
 		private void onClose() {
 			WarningAccumulator warningAccumulator = new WarningAccumulator ();
@@ -63,59 +64,91 @@ namespace Playscape.Editor {
 
 		/**
 		 * Method which download game configuration for API KEY setted in Game Configuration Window
-		 * 
+		 *
 		 **/
 		private void FetchAndApplyGameConfiguration() {
-			string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;		
+			if (string.IsNullOrEmpty (CommonConsts.GAME_CONFIGURATION_API_URL)) {
+				EditorUtility.DisplayDialog("Playscape Configuration Proccess",
+				                            "Error!!! Can't find 'GAME API' url",
+				                            "OK");
 
+				return;
+			}
+
+			string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
+			bool applyLastSavedConfiguration = false;
+
+			// CR-ZR: Your both displaying the progress bar and downloading the configuration from the main thread
+			//          Shouldn't you use a background thread in order to keep the UI free?
 			//Show progress dialog to user
 			GUI.enabled = false;
-			EditorUtility.DisplayProgressBar ("Playscape Configuration Proccess", 
-			                                  String.Format("Fetching Game Configuration for 'ApiKey': '{0}'", API_KEY), 
+
+			EditorUtility.ClearProgressBar ();
+			EditorUtility.DisplayProgressBar ("Playscape Configuration Proccess",
+			                                  String.Format("Fetching Game Configuration for 'ApiKey': '{0}'", API_KEY),
 			                                  0);
+
 			Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
 
 			//If response from servers is success save fetched configuration to AssetDatabse
-			if (response != null && response.Success) {
-				ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
-					
-				AssetDatabase.SaveAssets();
+			if (response != null) {
+				if (response.Success) {
+					ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+
+					//Saving new fetched game configuration to the file-system
+					AssetDatabase.SaveAssets();
+				} else {
+					EditorUtility.DisplayDialog("Playscape Configuration Proccess",
+					                            "Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration will be applied.",
+					                            "OK");
+					applyLastSavedConfiguration = true;
+				}
 			} else {
-				EditorUtility.DisplayDialog("Playscape Configuration Proccess", 
-				                            response.Error.Message + " occured while trying fetch game configuration. Last saved Game Configuration will be applied", 
+
+				// CR-ZR: Please do not show unprocesses technical data to users like that. First display a readable message and only later show
+				//        technical details
+				EditorUtility.DisplayDialog("Playscape Configuration Proccess",
+					                        "Error!!! Could not retrieve configuration from the server. Unknown error. Please check that your API KEY is correct.",
 				                            "OK");
+
+				applyLastSavedConfiguration = true;
 			}
-						
+
+			// CR-ZR - you should keep this under a finally clause
 			GUI.enabled = true;
 			EditorUtility.ClearProgressBar();
 
 
 			//In any case we apply changes. If request to GAME API was failed, successfully last saved configuration will be applied.
-			ApplyChanges ();
+			ApplyChanges (applyLastSavedConfiguration);
 		}
 
-		private void ApplyChanges() {
+		private void ApplyChanges(bool applyLastSavedConfiguration) {
 			string targetManifest = "Assets/Plugins/Android/PlayscapePublishingKit/AndroidManifest.xml";
-			
+
 			string manifestContents = File.ReadAllText(CommonConsts.PLAYSCAPE_MANIFEST_PATH);
 			manifestContents = AndroidPostProcessor.ApplyCommonAndroidManifestParams(manifestContents);
 			File.WriteAllText(targetManifest, manifestContents);
-			
+
 			targetManifest = "Assets/Plugins/Android/AndroidManifest.xml";
 			AndroidManifestMerger.Merge (targetManifest, false);
-			
+
 			AndroidPostProcessor.ApplyPlayscapeAndroidConfiguration (AndroidPostProcessor.PLAYSCAPE_CONFIG_XML_PATH,
 			                                                         AndroidPostProcessor.PLAYSCAPE_CONFIG_XML_PATH,
 			                                                         false);
-			
+			string message = "The configuration process has ended successfully";
+			if (applyLastSavedConfiguration) {
+				message = "The last saved configuration was applied successfully";
+			}
+
 			EditorUtility.DisplayDialog(
 				"Configuration Ended",
-				"The configuration process has ended successfully",
+				message,
 				"OK");
-			
+
 			Close ();
 		}
-		
+
 		private void OnABTestingGUI ()
 		{
 			GUILayout.Label (AB_TESTING_TITLE, EditorStyles.boldLabel);
@@ -184,19 +217,19 @@ namespace Playscape.Editor {
 								GUILayout.Label (category.GetType().Name, EditorStyles.boldLabel);
 								categories.Add(category, true);
 							}
-                            
+
                             if (fieldInfo.FieldType == typeof(string)) {
                                 string result = EditorGUILayout.TextField (fieldInfo.Name, fieldInfo.GetValue(category) as string);
                                 if (result != null) {
 								fieldInfo.SetValue(category, result);
-                                }   
+                                }
                             } else if (fieldInfo.FieldType == typeof(bool)) {
                                 bool currentValue =  (bool) fieldInfo.GetValue(category);
                                 bool result  = EditorGUILayout.ToggleLeft (fieldInfo.Name,currentValue);
                                 fieldInfo.SetValue(category, result);
                             }
 						});
-					
+
 		}
 	}
 }

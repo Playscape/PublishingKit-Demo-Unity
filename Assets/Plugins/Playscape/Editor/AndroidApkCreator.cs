@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using Ionic.Zip;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace Playscape.Editor
 {
@@ -21,11 +22,10 @@ namespace Playscape.Editor
 		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/ThirdParty/zipalign";
 		private const string DEX_2_JAR_TOOL_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/dex2jar";
 		private const string ASPECT_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/aspectsj/";
+		private const string PATCH_FILE = "Assets/Plugins/Playscape/ThirdParty/playscape_lifecycle.jar";
+		private const string ANDROID_PLATFORM = "android-19";
 
 		private static string ANDROID_HOME = AndroidSDKFolder.Path;
-
-		// temp solution
-		private const string PATCH_FILE = "../../../bridges/android/playscape_lifecycle/bin/classes.jar";
 		
 		static AndroidApkCreator()
 		{
@@ -119,56 +119,64 @@ namespace Playscape.Editor
 		}
 
 		private static void unifyLibs(string origin, string patch, string dst) {
-			FileStream originStream = new FileStream (origin, FileMode.Open, FileAccess.Read, FileShare.Read);
-			FileStream patchStream = new FileStream (patch, FileMode.Open, FileAccess.Read, FileShare.Read);
-			
-			ZipFile originZipFile = new ZipFile(origin);
-			ZipFile patchZipFile = new ZipFile(patch);
-			List<string> originFiles = new List<string> ();
-			foreach (ZipEntry ze in originZipFile)
-			{
-				if (ze.IsDirectory)
-					continue;
-				if(ze.FileName.EndsWith(".class")) {
-					originFiles.Add(ze.FileName);
-				}        
-			}
-			List<string> patchFiles = new List<string> ();
-			foreach (ZipEntry ze in patchZipFile)
-			{
-				if (ze.IsDirectory)
-					continue;
-				if(ze.FileName.EndsWith(".class")) {
-					patchFiles.Add(ze.FileName);
-				}        
-			}
-			IEnumerable<string> differenceQuery = patchFiles.Except(originFiles);
-			
-			byte[] buf = new byte[4096];
-			
-			File.Copy (origin, dst, true);
-			string unzipFolderName = Path.Combine(Path.GetDirectoryName(patchZipFile.Name),
-			                                      Path.GetFileNameWithoutExtension(patchZipFile.Name));
-			patchZipFile.ExtractAll(unzipFolderName, ExtractExistingFileAction.OverwriteSilently);
-			patchZipFile.Dispose();
+			FileStream originStream = null;
+			FileStream patchStream = null;
 
-			using (ZipFile dstZipFile = new ZipFile(dst))
-			{
-				var differenceQuery_new =
-					differenceQuery.Select(x => x.Insert(0, "/").Insert(0, Path.Combine(Path.GetDirectoryName(patchZipFile.Name),
-					                                                                     Path.GetFileNameWithoutExtension(patchZipFile.Name))));
-				
-				for (int i = 0; i < differenceQuery_new.Count(); i++)
+			try {
+				originStream = new FileStream (origin, FileMode.Open, FileAccess.Read, FileShare.Read);
+				patchStream = new FileStream (patch, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+				ZipFile originZipFile = new ZipFile(origin);
+				ZipFile patchZipFile = new ZipFile(patch);
+				List<string> originFiles = new List<string> ();
+				foreach (ZipEntry ze in originZipFile)
 				{
-					dstZipFile.AddFile(differenceQuery_new.ElementAt(i), Path.GetDirectoryName(differenceQuery.ElementAt(i)));
-					dstZipFile.Save(dst);
+					if (ze.IsDirectory)
+						continue;
+					if(ze.FileName.EndsWith(".class")) {
+						originFiles.Add(ze.FileName);
+					}        
 				}
+				List<string> patchFiles = new List<string> ();
+				foreach (ZipEntry ze in patchZipFile)
+				{
+					if (ze.IsDirectory)
+						continue;
+					if(ze.FileName.EndsWith(".class")) {
+						patchFiles.Add(ze.FileName);
+					}        
+				}
+				IEnumerable<string> differenceQuery = patchFiles.Except(originFiles);
 				
-			}
-			
-			originStream.Close ();
-			patchStream.Close ();
-			File.Delete (origin);
+				byte[] buf = new byte[4096];
+				
+				File.Copy (origin, dst, true);
+				string unzipFolderName = Path.Combine(Path.GetDirectoryName(patchZipFile.Name),
+				                                      Path.GetFileNameWithoutExtension(patchZipFile.Name));
+				patchZipFile.ExtractAll(unzipFolderName, ExtractExistingFileAction.OverwriteSilently);
+				patchZipFile.Dispose();
+				
+				using (ZipFile dstZipFile = new ZipFile(dst))
+				{
+					var differenceQuery_new =
+						differenceQuery.Select(x => x.Insert(0, "/").Insert(0, Path.Combine(Path.GetDirectoryName(patchZipFile.Name),
+						                                                                    Path.GetFileNameWithoutExtension(patchZipFile.Name))));
+					
+					for (int i = 0; i < differenceQuery_new.Count(); i++)
+					{
+						dstZipFile.AddFile(differenceQuery_new.ElementAt(i), Path.GetDirectoryName(differenceQuery.ElementAt(i)));
+						dstZipFile.Save(dst);
+					}
+					
+				}
+			} finally {
+				originStream.Close ();
+				patchStream.Close ();
+
+				if (File.Exists(origin)) {
+					File.Delete (origin);
+				}
+			}			          
 
 			DirectoryInfo downloadedMessageInfo = new DirectoryInfo(Path.Combine(Path.GetDirectoryName(patch), Path.GetFileNameWithoutExtension (patch)));
 			foreach (FileInfo file in downloadedMessageInfo.GetFiles())
@@ -191,8 +199,16 @@ namespace Playscape.Editor
 			if (isWindows ()) {
 				ANDROID_HOME = System.Environment.GetEnvironmentVariable("ANDROID_HOME");
 			}
+			            
+			//Getting android platform jar for minSDK setted in PlayerSettings
+			string platform = string.Format("{0}-{1}", EditorUserBuildSettings.activeBuildTarget.ToString().ToLower(), Regex.Match(PlayerSettings.Android.minSdkVersion.ToString(), @"\d+").Value);
+			ANDROID_JAR = Path.Combine (ANDROID_HOME, string.Format ("platforms/{0}/android.jar", platform));
 
-			ANDROID_JAR = Path.Combine (ANDROID_HOME, "platforms/android-19/android.jar");
+			//if android platform jar getted from PlayerSettings doesn't exist will use default 
+			if (!File.Exists (ANDROID_JAR)) {
+				ANDROID_JAR = ANDROID_PLATFORM;
+			}
+
 			GOOGLE_PLAY_SERVICES_JAR = Path.Combine (ANDROID_HOME, 
 			                            "extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar");
 
