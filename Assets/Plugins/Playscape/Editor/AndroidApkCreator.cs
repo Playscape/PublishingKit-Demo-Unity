@@ -170,8 +170,13 @@ namespace Playscape.Editor
 					
 				}
 			} finally {
-				originStream.Close ();
-				patchStream.Close ();
+				if (originStream != null) {
+					originStream.Close ();
+				}
+
+				if (patchStream != null) {
+					patchStream.Close ();
+				}
 
 				if (File.Exists(origin)) {
 					File.Delete (origin);
