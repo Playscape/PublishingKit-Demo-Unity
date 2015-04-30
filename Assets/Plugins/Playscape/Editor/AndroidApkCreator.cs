@@ -92,12 +92,17 @@ namespace Playscape.Editor
 			string pathName = PATCH_FILE;
 
 			executeDex2jar (dex2jarFile, outputPath, isDebugBuild);
-			unifyLibs (qualifyPath(dex2jarFile), qualifyPath(pathName), qualifyPath(dstFile));
-			applyPatch (qualifyPath(dstFile), qualifyPath(dstFile), qualifyPath(targetFile));
+			unifyLibs (dex2jarFile, pathName, dstFile);
+			applyPatch (dstFile, dstFile, targetFile);
 			executeLib2dex (targetFile, outputPath, isDebugBuild);
 
-			File.Delete (qualifyPath(dstFile));
-			File.Delete (qualifyPath(targetFile));
+			try {
+				File.Delete (dstFile);
+				File.Delete (targetFile);
+				File.Delete (dex2jarFile);
+			} catch (Exception e) {
+				L.W ("Can't make cleanup. Error: {0}", e.Message);
+			}
 		}
 
 		private static void executeDex2jar(string dex2jarFile, string outputPath, bool isDebugBuild) {
@@ -172,14 +177,12 @@ namespace Playscape.Editor
 			} finally {
 				if (originStream != null) {
 					originStream.Close ();
+					originStream = null;
 				}
 
 				if (patchStream != null) {
 					patchStream.Close ();
-				}
-
-				if (File.Exists(origin)) {
-					File.Delete (origin);
+					patchStream = null;
 				}
 			}			          
 
