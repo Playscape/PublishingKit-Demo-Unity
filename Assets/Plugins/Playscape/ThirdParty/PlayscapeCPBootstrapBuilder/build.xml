@@ -1,0 +1,730 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="BootstrapBuilder" default="help">
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+    <property name="local.libs.path" value="libs" />
+    <property name="script.classpath" value="${local.libs.path}/bsf.jar;${local.libs.path}/commons-logging-1.0.4.jar;${local.libs.path}/js.jar;${local.libs.path}/commons-codec-1.6.jar" />
+    
+    <taskdef name="propertyselector" classname="net.sf.antcontrib.property.PropertySelector">
+        <classpath>
+            <pathelement location="${local.libs.path}/ant-contrib.jar"/>
+        </classpath>
+    </taskdef>
+    
+    <taskdef name="for" classname="net.sf.antcontrib.logic.For">
+        <classpath>
+            <pathelement location="${local.libs.path}/ant-contrib.jar"/>
+        </classpath>
+    </taskdef>
+    
+    <taskdef name="propertyregex" classname="net.sf.antcontrib.property.RegexTask">
+        <classpath>
+            <pathelement location="${local.libs.path}/ant-contrib.jar"/>
+        </classpath>
+    </taskdef>
+    
+    <taskdef name="var" classname="net.sf.antcontrib.property.Variable">
+        <classpath>
+            <pathelement location="${local.libs.path}/ant-contrib.jar"/>
+        </classpath>
+    </taskdef>
+    
+    <taskdef name="if" classname="net.sf.antcontrib.logic.IfTask">
+        <classpath>
+            <pathelement location="${local.libs.path}/ant-contrib.jar"/>
+        </classpath>
+    </taskdef>
+
+    <!--
+
+     Call Graph:
+     ===========
+      all -> catalogs    -> .parse_res
+                 resolutions -> .parse_res
+             categories 
+                     missions
+
+
+     Conventions:
+     ============
+
+     External configuration properties must be prefixed with "config".
+     e.g: config.build.path
+
+     Internal properties are prefixed with "internal".
+     e.g: internal.compiler.symbols
+
+     ** REQUIREMENTS **
+
+     1. Ant Contrib Tasks http://ant-contrib.sourceforge.net
+     2. Rhino             http://www.mozilla.org/rhino/download.html
+     3. Apache BSF        http://commons.apache.org/bsf/download_bsf.cgi
+
+        Download all of the above and put the jars in [ant-path]/lib
+
+     Author: Max Raskin (maximr@mominis.com)
+    -->
+
+    <target name="help">
+        <echo>Bootstrap Builder Help:</echo>
+        <echo>=======================</echo>
+        <echo></echo>
+        <echo>   help:              Displays this help.</echo>
+        <echo>   all:               Create everything (should be used initially).</echo>
+        <echo>   catalogs:          Catalogs jsons and images for all resolutions.</echo>
+        <echo>   missions:          Missions jsons and images.</echo>
+        <echo>   categories:        Categories json.</echo>
+        <echo>   resolutions:       Resolutions json.</echo>
+        <echo>   update_manifest:   Updates manifest - sets debuggable to false, config.versionName and config.versioCode.</echo>
+        <echo>   compiler.internal: Builds a catalog for compilation. Usually won't be called manually</echo>
+        <echo>   compiler.verify:   Verifies that a specific package is in the catalog. Uses config.bootstrapDir and config.verifyPackageName. Usually won't be called manually</echo>
+        <echo></echo>
+        <echo>Use -Dconfig.outputDir=[dirname] to specify output directory</echo>
+        <echo>Use -Dconfig.bootstrapDirName=[dirname] to specify the name of the boostrap directory</echo>
+        <echo>Use -Dconfig.catalogName=[catalogName] to specify catalog name</echo>
+        <echo>Use -Dconfig.hostName=[hostName] to specify host to download catalog from</echo>
+        <echo>Use -Dconfig.staticFiles=[dirname] to specify directory with files that should be copied to the target folder as-is</echo>
+        <echo>Use -Dconfig.gameid=[gameid] to specify the game ID to get missions for</echo>
+        <echo>Use -Dconfig.mainCategoryName=[category] to specify which category is the main e.g Featured</echo>
+        <echo>Use -propertyfile config.properties to read above properties from a file</echo>
+        
+        <echo></echo>
+        <echo>Usage example:</echo>
+        <echo>==============</echo>
+        <echo>ant -Dconfig.hostName=http://server.gameconsole.mominis.com -Dconfig.catalogName=Playscape_Launch -Dconfig.outputDir="C:\temp\myassets" -Dconfig.bootstrapDirName="playscape_bootstrap" -Dconfig.mainCategoryName=Featured all</echo>
+        <echo></echo>
+    </target>
+
+    <target name="all" depends=".delbootstrap,update_manifest,catalogs,missions,categories,resolutions,.static_files">
+    </target>
+    
+    <target name="compiler.internal" depends=".delbootstrap,catalogs,missions,categories,resolutions,.static_files">
+    </target>
+
+    <target name=".delbootstrap">
+        <delete dir="${config.outputDir}/${config.bootstrapDir}" />
+    </target>
+
+    <target name="update_manifest">
+        <!-- Download images -->
+        <script language="javascript" manager="bsf" classpath="${script.classpath}">
+        <!-- we use bsf scripting manager + rhino -->
+                <![CDATA[
+                 importClass(java.io.File);
+                 importClass(java.io.FileReader);
+                 importClass(java.io.BufferedWriter);
+             importClass(java.io.BufferedReader); 
+                 importClass(java.io.FileWriter);
+                 importClass(org.apache.tools.ant.util.FileUtils);
+                 importClass(java.net.URL);
+
+                var echo = BootstrapBuilder.createTask("echo");
+
+                var versionCode = BootstrapBuilder.getProperty("config.versionCode");
+
+
+                if (versionCode == null) {
+
+                        // Attempt to take teamcity's build counter from the build number
+                        var buildNumber = BootstrapBuilder.getProperty("build.number");
+                        if (buildNumber != null) {
+                                versionCode = buildNumber.substring(buildNumber.lastIndexOf(".") + 1);
+
+                                if (/^[0-9]+$/.exec(versionCode) == null) {
+                                        echo.setMessage("versionCode is not a number! given: " + versionCode);
+                                        echo.perform();
+                                        versionCode = null;
+                                }
+                        }
+                }
+
+                var versionName = BootstrapBuilder.getProperty("config.versionName");
+
+                if (versionCode != null && versionName != null) {
+                        var file = new File(BootstrapBuilder.getProperty("config.outputDir") + "/../AndroidManifest.xml");
+                        var bufferedReader = new BufferedReader(new FileReader(file));
+                        var data = FileUtils.readFully(bufferedReader);
+
+                        var versionCodeRegex = /android:versionCode=".+"/;
+                        var versionRegex = /android:versionName=".+"/;
+
+                        var versionCodeResult = versionCodeRegex.exec(data);
+                        var versionResult = versionRegex.exec(data);
+
+
+                        echo.setMessage("Setting versionCode to: " + versionCode);
+                        echo.perform();
+                        echo.setMessage("Setting versionName to: " + versionName);
+                        echo.perform();
+
+                        // Set Debuggable = false
+                        data = data.replace("debuggable=\"true\"", "debuggable=\"false\"")
+                                           .replace(versionCodeResult[0], "android:versionCode=\"" + versionCode +  "\"")
+                                           .replace(versionResult[0], "android:versionName=\"" + versionName +  "\"");
+
+                        bufferedReader.close();
+
+                        var writer = new BufferedWriter( new FileWriter(file) );
+
+                        writer.write(data, 0, data.length());
+
+                        writer.close();
+                } else {
+                        echo.setMessage("versionCode or/and versionName are null! ignoring them.");
+                        echo.perform();
+                }
+
+           ]]>
+        </script>
+    </target>
+
+    <target name=".static_files">
+        <echo>Copying static files from ${config.staticFiles}...</echo>
+        <!-- Copy static files to bootstrap dir -->
+        <if>
+            <available file="${config.staticFiles}" type="dir" />
+            <then>
+                <copy todir="${config.outputDir}" overwrite="true">
+                    <fileset dir="${config.staticFiles}">
+                        <include name="**/*.*" />
+                    </fileset>
+                </copy>
+            </then>
+        </if>
+    </target>
+
+    <target name="catalogs" depends=".parse_res">
+        <echo />
+        <echo message="### Creating catalogs for all resolutions ###"/>
+        <echo />
+
+        <for list="${internal.resolutions.list}" param="resolution">
+            <sequential>
+                <!-- parse width -->
+                <propertyregex property="internal.width"
+                    input="${config.resolutions.@{resolution}.val}"
+                    regexp="(\d+)x\d+"
+                    select="\1"
+                    override="true"
+                    casesensitive="false" />
+                <!-- parse height -->
+                <propertyregex property="internal.height"
+                    input="${config.resolutions.@{resolution}.val}"
+                    regexp="\d+x(\d+)"
+                    select="\1"
+                    override="true"
+                    casesensitive="false" />
+
+                <echo message="Creating catalog for resolution: ${internal.width} x ${internal.height}"/>
+
+                <!-- Catalog dir -->
+                <var name="internal.currentCatalogRelativePath" value="catalogs/${internal.width}" />
+                <mkdir dir="${config.outputDir}/${config.bootstrapDirName}/${internal.currentCatalogRelativePath}"/>
+
+                <!-- images dir -->
+                <var name="internal.imagesRelativePath" value="images/${internal.height}" />
+                <var name="internal.imagesPath" value="${config.outputDir}/${config.bootstrapDirName}/${internal.imagesRelativePath}" />
+                <mkdir dir="${internal.imagesPath}"/>
+
+                <!-- Catalog file name -->
+                <var name="internal.catalogFileName" value="${config.outputDir}/${config.bootstrapDirName}/${internal.currentCatalogRelativePath}/${internal.height}_my" />
+                
+                <!-- All catalogs -->
+                <var name="internal.allCatalogFileName" value="${config.outputDir}/${config.bootstrapDirName}/${internal.currentCatalogRelativePath}/${internal.height}" />
+
+                <!-- dl everyone's catalog -->
+                <get src="${config.hostName}/services/CompressedCatalogService/json/getCompressedApps?catalogName=${config.catalogName}&amp;width=${internal.width}&amp;height=${internal.height}" 
+                    dest="${internal.allCatalogFileName}" />	
+                    
+                <!-- dl my app's catalog, contains only current app -->
+                <get src="${config.hostName}/services/CompressedCatalogService/json/getCompressedApps?&amp;gameID=${config.gameid.escaped}&amp;width=${internal.width}&amp;height=${internal.height}" 
+                    dest="${internal.catalogFileName}" />	
+  
+
+                <!-- Download images -->
+                <script language="javascript" manager="bsf" classpath="${script.classpath}"> <!-- we use bsf scripting manager + rhino -->
+                    <![CDATA[
+                             importClass(java.io.File);
+                             importClass(java.io.FileReader);
+                             importClass(java.io.BufferedWriter);
+                             importClass(java.io.BufferedReader); 
+                             importClass(java.io.FileWriter);
+                             importClass(org.apache.tools.ant.util.FileUtils);
+                             importClass(java.net.URL);
+
+                            // Read catalog of all games
+                            
+                            var fileNames = { 'my': BootstrapBuilder.getProperty("internal.catalogFileName"), 
+                                              'all': BootstrapBuilder.getProperty("internal.allCatalogFileName") };
+                    
+                            var data = {};
+                
+                            
+                            var echo = BootstrapBuilder.createTask("echo");
+                            
+                            for (var key in fileNames) {
+                                var file = new File(fileNames[key]);
+                                var bufferedReader = new BufferedReader(new FileReader(file));
+                                data[key] = FileUtils.readFully(bufferedReader);
+                                bufferedReader.close();
+
+                                // "parse" xml, extract data from below gzip, base64
+                                var base64 = />(.*)</i.exec(data[key])[1];
+                                data[key] = FileUtils.readFully(
+                                    new java.io.InputStreamReader(
+                                        new java.util.zip.GZIPInputStream(
+                                            new org.apache.commons.codec.binary.Base64InputStream(
+                                                new java.io.ByteArrayInputStream(
+                                                    new java.lang.String(base64).getBytes("utf-8")
+                                                )
+                                            )
+                                        )
+                                    )
+                                );
+
+                                // Evaluate json
+                                data[key] = JSON.parse(data[key]);
+                            }
+                            
+                            
+                            // Determine whether our game is contained in all games, if not merge it with all games
+                            if (data['my'].d.length > 0) {
+                                var found = false;
+                                for (var i in data['all'].d) {
+                                    if (data['all'].d[i].ExternalId == data['my'].d[0].ExternalId) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                
+                                // We'll use it later with "categories" target
+                                BootstrapBuilder.setProperty("internal.game.ExternalId", data['my'].d[0].ExternalId);
+                                
+                                
+                                // merge if not found
+                                if (!found) {
+                                    echo.setMessage('Game was not found in designated catalog, adding...');
+                                    echo.perform();
+                                    
+                                    data['all'].d.unshift(data['my'].d[0]);
+                                }    
+                            }
+                                                        
+                            var jsonData = data['all'];
+                            
+                            echo.setMessage("\n\nDownloading: " + jsonData.d.length + " Catalog Images...\n\n");
+                            echo.perform();
+                            
+                            for (var i = 0; i < jsonData.d.length; ++i) {
+                                var imageUrl = jsonData.d[i].ThumnailUrl;
+
+                                var imageUrlParts = imageUrl.split('/');
+                                var imageBaseName = imageUrlParts[imageUrlParts.length - 1]; // e.g image.jpg
+
+                                var get = BootstrapBuilder.createTask("get");			
+                                get.setSrc(new URL(imageUrl));
+                                get.setDest( new File(BootstrapBuilder.getProperty("internal.imagesPath")));
+
+                                echo.setMessage("Current image: " + (i+1) + "/" + jsonData.d.length +  "\n");
+                                echo.perform()
+                                get.perform();
+
+                                // set thumbnail url to local url
+                                jsonData.d[i].ThumnailUrl = BootstrapBuilder.getProperty("config.bootstrapDirName") + "/" + BootstrapBuilder.getProperty("internal.imagesRelativePath") + "/" + imageBaseName;
+                            }
+
+                            // Write updated json data to disk.
+                            var writer = new BufferedWriter(new FileWriter( file ));
+                            var jsonString = JSON.stringify(jsonData);
+                            writer.write(jsonString, 0, jsonString.length);
+                            writer.close();
+                            
+                            new File(fileNames.my).delete();
+                   ]]>
+                </script>
+            </sequential>
+        </for>
+
+        <echo />
+        <echo message="### DONE ###"/>
+        <echo />
+    </target>
+
+    <target name="missions" depends=".parse_res">
+        <echo />
+        <echo message="### Creating missions ###"/>
+        <echo />
+
+        <echo message="Creating catalog for resolution: ${internal.width} x ${internal.height}"/>
+
+        <!-- missions dir -->
+        <var name="internal.missionsRelativePath" value="" />
+        <mkdir dir="${config.outputDir}/${config.bootstrapDirName}/${internal.missionsRelativePath}"/>
+
+        <!-- images dir -->
+        <var name="internal.missionsImagesRelativePath" value="images/mission" />
+        <var name="internal.missionsImagesPath" value="${config.outputDir}/${config.bootstrapDirName}/${internal.missionsImagesRelativePath}" />
+        <mkdir dir="${internal.missionsImagesPath}"/>
+
+        <!-- Missions file name -->
+        <var name="internal.missionsFileName" value="${config.outputDir}/${config.bootstrapDirName}/${internal.missionsRelativePath}/missions_my.json" />
+        
+        <!-- all missions  -->
+        <var name="internal.allMissionsFileName" value="${config.outputDir}/${config.bootstrapDirName}/${internal.missionsRelativePath}/missions.json" />
+
+        <!-- Download missions of current game -->
+        <get src="${config.hostName}/services/CompressedCatalogService/json/getCompressedMissions?gameID=${config.gameid.escaped}&amp;removeDeprecated=true" dest="${internal.missionsFileName}" />	
+        
+        <!-- Download all missions -->
+        <get src="${config.hostName}/services/CompressedCatalogService/json/getCompressedMissions?catalogName=${config.catalogName}&amp;removeDeprecated=true" dest="${internal.allMissionsFileName}" />
+
+        <!-- Download images -->
+        <script language="javascript" manager="bsf" classpath="${script.classpath}"> <!-- we use bsf scripting manager + rhino -->
+            <![CDATA[
+            
+                 importClass(java.io.File);
+                 importClass(java.io.FileReader);
+                 importClass(java.io.BufferedWriter);
+                 importClass(java.io.BufferedReader); 
+                 importClass(java.io.FileWriter);
+                 importClass(org.apache.tools.ant.util.FileUtils);
+                 importClass(java.net.URL);
+                
+                var echo = BootstrapBuilder.createTask("echo");
+
+                var fileNames = { 'my': BootstrapBuilder.getProperty("internal.missionsFileName"), 
+                                  'all': BootstrapBuilder.getProperty("internal.allMissionsFileName") };
+                    
+                var data = {};
+                
+                for (var key in fileNames) {
+                    // Read catalog
+                    var file = new File(fileNames[key]);
+                    var bufferedReader = new BufferedReader(new FileReader(file));
+                    data[key] = FileUtils.readFully(bufferedReader);
+                    bufferedReader.close();
+
+                    // "parse" xml, extract data from below gzip, base64
+                    var base64 = />(.*)</i.exec(data[key])[1];
+                    data[key] = FileUtils.readFully(
+                        new java.io.InputStreamReader(
+                            new java.util.zip.GZIPInputStream(
+                                new org.apache.commons.codec.binary.Base64InputStream(
+                                    new java.io.ByteArrayInputStream(
+                                        new java.lang.String(base64).getBytes("utf-8")
+                                    )
+                                )
+                            )
+                        )
+                    );
+                }
+                
+                // Merge my into all
+                var myMissionsJsonData = JSON.parse(data['my']);
+                var allMissionsJsonData = JSON.parse(data['all']);
+
+                // First, remove duplicate missions
+                for (var i = 0; i < myMissionsJsonData.d.length; ++i) {
+                    for (var j = 0; j < allMissionsJsonData.d.length; ++j) {
+                        if (allMissionsJsonData.d[j]['ExternalId'] == myMissionsJsonData.d[i]['ExternalId']) {
+                              allMissionsJsonData.d.splice(j, 1);
+                              break;
+                        }
+                    }
+                }
+                
+                // ==== Re-Adjust sort order ===
+                if (allMissionsJsonData.d.length > 0) {
+                    var maxSortOrder = allMissionsJsonData.d[0].sort;
+                    // Get max sort order value
+                    
+                    for (var i = 1; i < allMissionsJsonData.d.length; ++i) {
+                        if (allMissionsJsonData.d[i].sort > maxSortOrder) {
+                            maxSortOrder = allMissionsJsonData.d[i].sort;
+                        }
+                    }
+                    
+                    // Since the sort order is - highest comes first we'll have to adjust our sortPos
+                    var sortPos = maxSortOrder + myMissionsJsonData.d.length + 1;
+                    
+                    // Make our game missions topmost
+                    for (var i = 0; i < myMissionsJsonData.d.length; ++i) {
+                        myMissionsJsonData.d[i].sort = --sortPos;
+                    }
+                }
+                
+                // Join, first my missions then other missions
+                allMissionsJsonData.d = myMissionsJsonData.d.concat(allMissionsJsonData.d);
+                
+                echo.setMessage("\n\nDownloading: " + allMissionsJsonData.d.length + " Mission Images...\n\n");
+                echo.perform();
+
+               for (var i = 0; i < allMissionsJsonData.d.length; ++i) {
+                        var imageUrl = allMissionsJsonData.d[i].icon;
+
+                        var imageUrlParts = imageUrl.split('/');
+                        var imageBaseName = imageUrlParts[imageUrlParts.length - 1]; // e.g image.jpg
+
+                        var get = BootstrapBuilder.createTask("get");		
+                        get.setSrc(new URL(imageUrl));
+                        get.setDest( new File(BootstrapBuilder.getProperty("internal.missionsImagesPath")));
+
+
+                        echo.setMessage("Current image: " + (i+1) + "/" + allMissionsJsonData.d.length +  "\n");
+                        echo.perform()
+                        get.perform();
+
+                        // set thumbnail url to local url
+                        allMissionsJsonData.d[i].icon = BootstrapBuilder.getProperty("config.bootstrapDirName")
+                                                        + "/" + BootstrapBuilder.getProperty("internal.missionsImagesRelativePath") 
+                                                        + "/" + imageBaseName;
+                }
+
+                // Write updated json data to disk.
+                var writer = new BufferedWriter(new FileWriter( new File(fileNames.all) ));
+                var jsonString = JSON.stringify(allMissionsJsonData);
+                writer.write(jsonString, 0, jsonString.length);
+                writer.close();
+                
+                // Delete my missions file
+                new File(fileNames.my).delete();
+                
+           ]]>
+        </script>
+
+        <echo />
+        <echo message="### DONE ###"/>
+        <echo />
+    </target>
+
+    <target name="categories">
+
+        <echo />
+        <echo message="### Creating categories file ###"/>
+        <echo />
+        
+        <var name="internal.categoriesFileName" value="${config.outputDir}/${config.bootstrapDirName}/categories.json" />
+
+        <get src="${config.hostName}/services/CompressedCatalogService/json/getCompressedTags?catalogName=${config.catalogName}" 
+            dest="${internal.categoriesFileName}" />	
+
+        <!-- decode -->
+        <script language="javascript" manager="bsf" classpath="${script.classpath}"> <!-- we use bsf scripting manager + rhino -->
+            <![CDATA[
+                 importClass(java.io.File);
+                 importClass(java.io.FileReader);
+                 importClass(java.io.BufferedWriter);
+                 importClass(java.io.BufferedReader); 
+                 importClass(java.io.FileWriter);
+                 importClass(org.apache.tools.ant.util.FileUtils);
+                 importClass(java.net.URL);
+                
+                // Read catalog
+                var file = new File(BootstrapBuilder.getProperty("internal.categoriesFileName"));
+                var bufferedReader = new BufferedReader(new FileReader(file));
+                var data = FileUtils.readFully(bufferedReader);
+                bufferedReader.close();
+
+                // "parse" xml, extract data from below gzip, base64
+                var base64 = />(.*)</i.exec(data)[1];
+                data = FileUtils.readFully(
+                    new java.io.InputStreamReader(
+                        new java.util.zip.GZIPInputStream(
+                            new org.apache.commons.codec.binary.Base64InputStream(
+                                new java.io.ByteArrayInputStream(
+                                    new java.lang.String(base64).getBytes("utf-8")
+                                )
+                            )
+                        )
+                    )
+                );
+
+                // Evaluate json
+                var jsonData = JSON.parse(data);
+                
+                var externalId = BootstrapBuilder.getProperty("internal.game.ExternalId");
+                
+                if (externalId != null) {
+                    // Add game to main category
+                    
+                    var mainCategoryName = BootstrapBuilder.getProperty("config.mainCategoryName");
+                    var echo = BootstrapBuilder.createTask("echo");
+                    var categoryIndex = -1;
+                    var gameIndexInMainCategory = -1;
+                    
+                    if (mainCategoryName != null) {
+                        for (var i in jsonData.d) { // loop through categories
+                            var category = jsonData.d[i].Name;
+                            echo.setMessage("Added category: " + category);
+                            echo.perform();
+                            if (category == mainCategoryName) {
+                                categoryIndex = i;
+                                for (var j in jsonData.d[i]) {
+                                    var app = jsonData.d[i].Apps[j];
+                                    
+                                    if (app == externalId) {
+                                        gameIndexInMainCategory = j;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (categoryIndex == -1) {
+                        BootstrapBuilder.setProperty("internal.main.category.found", "true");
+                    } else {                    
+                        // Remove game from categories
+                        if (gameIndexInMainCategory != -1) {
+                            allMissionsJsonData.d.splice(gameIndexInMainCategory, 1);
+                        }
+                    
+                        // Add game to top of mainCategory
+                        jsonData.d[categoryIndex].Apps.unshift("" + externalId /*convert property to javascript string*/);
+                        
+                    }
+                }
+
+                // Write updated json data to disk.
+                var writer = new BufferedWriter(new FileWriter( file ));
+                var jsonString = JSON.stringify(jsonData);
+                writer.write(jsonString, 0, jsonString.length);
+                writer.close();
+           ]]>
+        </script>
+        
+        <fail message="The '${config.mainCategoryName}' category cannot be found in categories.json!!!" if="internal.main.category.found" />
+
+        <echo />
+        <echo message="### DONE ###"/>
+        <echo />
+    </target>
+
+    <target name="resolutions" depends=".parse_res">
+        <echo />
+        <echo message="### Creating resolutions file ###"/>
+        <echo />
+
+        <var name="internal.resolutionsDir" 
+            value="${config.outputDir}/${config.bootstrapDirName}" />
+        <mkdir dir="${internal.resolutionsDir}"/>
+
+        <!-- Create resolutions file json -->
+        <script language="javascript" manager="bsf" classpath="${script.classpath}"> <!-- we use bsf scripting manager + rhino -->
+            <![CDATA[
+                 importClass(java.io.File);
+                 importClass(java.io.FileReader);
+                 importClass(java.io.BufferedWriter);
+                 importClass(java.io.BufferedReader); 
+                 importClass(java.io.FileWriter);
+                 importClass(org.apache.tools.ant.util.FileUtils);
+                 importClass(java.net.URL);
+
+                 var resolutionsCount = BootstrapBuilder.getProperty("internal.resolutions.list").split(",").length;
+                 var jsonData = { "d" : [] };
+                 for (var i = 0; i < resolutionsCount; ++i) {
+
+                        var parts = BootstrapBuilder.getProperty("config.resolutions."+ (i+1) +".val").split("x");
+                        jsonData.d[i] = {"w" : parseInt(parts[0]), "h" : parseInt(parts[1])};
+
+                 }
+
+                 // Write resolutions json data to disk.
+                 var fileName = BootstrapBuilder.getProperty("internal.resolutionsDir") + "/resolutions.json";
+                 var writer = new BufferedWriter(new FileWriter( new File(fileName) ));
+                 var jsonString = JSON.stringify(jsonData);
+                 writer.write(jsonString, 0, jsonString.length);
+                 writer.close();
+           ]]>
+        </script>
+
+        <echo />
+        <echo message="### DONE ###"/>
+        <echo />
+    </target>
+
+    <!-- Convert config.resolutions.x properties into a comma delimited list -->
+    <target name=".parse_res">
+		<script language="javascript" manager="bsf" classpath="${script.classpath}">
+			// The ant Get Task has issues with spaces in urls. So we replace spaces with %20.
+			var gameId = BootstrapBuilder.getProperty('config.gameid');
+			if (gameId != null) {
+				BootstrapBuilder.setProperty("config.gameid.escaped", gameId.replace(' ', '%20'));
+			}
+			
+		</script>
+
+        <propertyselector property="internal.resolutions.list"
+            delimiter=","
+            match="config.resolutions\.([1-9]+)\.val"
+            select="\1"
+            casesensitive="false" />
+    </target>
+
+    <target name="compiler.verify">
+        <script language="javascript" manager="bsf" classpath="${script.classpath}">
+            <![CDATA[
+                 importClass(java.io.File);
+                 importClass(java.io.FileReader);
+                 importClass(java.io.BufferedWriter);
+                 importClass(java.io.BufferedReader); 
+                 importClass(java.io.FileWriter);
+                 importClass(org.apache.tools.ant.util.FileUtils);
+                 importClass(java.net.URL);
+
+                var bootstrapDir = BootstrapBuilder.getProperty("config.outputDir") + "/" + BootstrapBuilder.getProperty("config.bootstrapDirName");
+                var verifyPackage = BootstrapBuilder.getProperty("config.verifyPackageName");
+
+                // Read resolutions
+                var file = new File(bootstrapDir + "/resolutions.json");
+                var bufferedReader = new BufferedReader(new FileReader(file));
+                var data = FileUtils.readFully(bufferedReader);
+                bufferedReader.close();
+
+                // Evaluate json
+                var resData = JSON.parse(data);
+                var echo = BootstrapBuilder.createTask("echo");
+                
+                for (var i in resData['d']) {
+                    resolution = resData['d'][i];
+                    catalogFile = bootstrapDir + "/catalogs/" + resolution['w'] + "/" + resolution['h'];
+
+                    echo.setMessage("Inspecting: " + catalogFile + "...\n");
+                    echo.perform();
+
+                    // Read catalog
+                    var file = new File(catalogFile);
+                    var bufferedReader = new BufferedReader(new FileReader(file));
+                    var data = FileUtils.readFully(bufferedReader);
+                    bufferedReader.close();
+
+                    // Evaluate json
+                    var catalogData = JSON.parse(data);
+
+                    // search package in catalog
+                    var found = false;
+                    for (var j in catalogData['d']) {
+                        app = catalogData['d'][j];
+
+                        if (app['Package'] == verifyPackage) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) {
+                        BootstrapBuilder.setProperty("internal.package.found", "true");
+                        BootstrapBuilder.setProperty("internal.package.error.message",
+                            "Can't find package: " + verifyPackage +
+                            " in bootstrap catalog: " + catalogFile);
+                        break;
+                    }
+                }
+           ]]>
+        </script>
+
+        <fail message="${internal.package.error.message}" if="internal.package.found" />
+
+    </target>
+</project>

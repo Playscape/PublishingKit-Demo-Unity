@@ -57,8 +57,7 @@ namespace Playscape.Internal {
 		public GameConfiguration MyGameConfiguration {
 			set {
 				this._gameConfiguration = value;
-				this.ReporterId = "RollBallAndMultiplier";
-//				this.ReporterId = value.MyAnalyticsReport.ReporterId;
+				this.ReporterId = value.MyAnalyticsReport.ReporterId;
 			}
 			get {
 				return this._gameConfiguration;

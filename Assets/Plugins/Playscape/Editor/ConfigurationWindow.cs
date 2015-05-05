@@ -118,50 +118,46 @@ namespace Playscape.Editor {
 			string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
 			bool applyLastSavedConfiguration = false;
 
-			// CR-ZR: Your both displaying the progress bar and downloading the configuration from the main thread
-			//          Shouldn't you use a background thread in order to keep the UI free?
-			//Show progress dialog to user
-			GUI.enabled = false;
-
-			EditorUtility.ClearProgressBar ();
-			EditorUtility.DisplayProgressBar ("Playscape Configuration Proccess",
-			                                  String.Format("Fetching Game Configuration for 'ApiKey': '{0}'", API_KEY),
-			                                  0);
-
-			Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
-
-			//If response from servers is success save fetched configuration to AssetDatabse
-			if (response != null) {
-				if (response.Success) {
-					ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
-
-					//Saving new fetched game configuration to the file-system
-					AssetDatabase.SaveAssets();
+			try {
+				// CR-ZR: Your both displaying the progress bar and downloading the configuration from the main thread
+				//          Shouldn't you use a background thread in order to keep the UI free?
+				//Show progress dialog to user
+				GUI.enabled = false;
+				
+				EditorUtility.ClearProgressBar ();
+				EditorUtility.DisplayProgressBar ("Playscape Configuration Proccess",
+				                                  String.Format("Fetching Game Configuration for 'ApiKey': '{0}'", API_KEY),
+				                                  0);
+				
+				Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
+				
+				//If response from servers is success save fetched configuration to AssetDatabse
+				if (response != null) {
+					if (response.Success) {
+						ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+						
+						//Saving new fetched game configuration to the file-system
+						AssetDatabase.SaveAssets();
+					} else {
+						EditorUtility.DisplayDialog("Playscape Configuration Proccess",
+						                            "Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration will be applied.",
+						                            "OK");
+						applyLastSavedConfiguration = true;
+					}
 				} else {
-					EditorUtility.DisplayDialog("Playscape Configuration Proccess",
-					                            "Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration will be applied.",
-					                            "OK");
+					L.W("Warning!!! Could not download game configuration. Please check your internet connection");
+					
 					applyLastSavedConfiguration = true;
 				}
-			} else {
 
-				// CR-ZR: Please do not show unprocesses technical data to users like that. First display a readable message and only later show
-				//        technical details
-				EditorUtility.DisplayDialog("Playscape Configuration Proccess",
-					                        "Error!!! Could not retrieve configuration from the server. Unknown error. Please check that your API KEY is correct.",
-				                            "OK");
-
-				applyLastSavedConfiguration = true;
+			} finally {
+				GUI.enabled = true;
+				EditorUtility.ClearProgressBar();
+				
+				
+				//In any case we apply changes. If request to GAME API was failed, successfully last saved configuration will be applied.
+				ApplyChanges (applyLastSavedConfiguration);
 			}
-
-
-			// CR-ZR - you should keep this under a finally clause
-			GUI.enabled = true;
-			EditorUtility.ClearProgressBar();
-
-
-			//In any case we apply changes. If request to GAME API was failed, successfully last saved configuration will be applied.
-			ApplyChanges (applyLastSavedConfiguration);
 		}
 
 		private void ApplyChanges(bool applyLastSavedConfiguration) {
