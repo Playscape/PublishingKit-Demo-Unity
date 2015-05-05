@@ -17,6 +17,10 @@ namespace Playscape.Internal
 		private static LogLevel mCurrentLogLevel = LogLevel.Info;
 
 		public static LogLevel CurrentLogLevel {
+            get
+            {
+                return mCurrentLogLevel;
+            }
 			set {
 				mCurrentLogLevel = value;
 			}

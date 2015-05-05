@@ -9,7 +9,8 @@ using Playscape.Internal;
 using System.Text.RegularExpressions;
 
 namespace Playscape.Editor {
-	public class ConfigurationWindow : EditorWindow {
+    public class ConfigurationWindow : ThreadingEditorWindow
+    {
 		private const string APP_ID = "App Id";
 		private const string ANALYTICS_REPORTING = "Analytics Reporting";
 		private const string REPORTER_ID = "Reporter Id";
@@ -19,6 +20,7 @@ namespace Playscape.Editor {
 		private const string IOS = "iOS";
 		private const string WINDOW_TITLE = "Playscape";
 		private const string CLOSE = "Apply Changes";
+        private const string TEST_BUILD = "Test";
 		private Vector2  scrollPos;
 
 		private const string AB_TESTING_TITLE = "AB Testing Configuration";
@@ -29,9 +31,7 @@ namespace Playscape.Editor {
             GUI.changed = false;
 
 			EditorGUILayout.BeginHorizontal();
-			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width (650), GUILayout.Height (350));
-				OnReportingGUI ();
-				OnPushWooshGUI ();
+			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width (650), GUILayout.Height (350));				
 				OnAdsGUI ();
 				OnABTestingGUI ();
 			EditorGUILayout.EndScrollView ();
@@ -43,24 +43,64 @@ namespace Playscape.Editor {
 				onClose();
 			}
 
+
+            if (GUILayout.Button(TEST_BUILD))
+            {
+                TestBuild();
+            }
+
             if (GUI.changed) {
 				EditorUtility.SetDirty (ConfigurationInEditor.Instance);
 			}
 		}
 
 		private void onClose() {
-			WarningAccumulator warningAccumulator = new WarningAccumulator ();
-			warningAccumulator.WarnIfStringIsEmpty (
-				ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey,
-				Warnings.ADS_API_KEY_NOT_SET
-			);
+            WarningAccumulator warningAccumulator = new WarningAccumulator();
+            warningAccumulator.WarnIfStringIsEmpty(
+                ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey,
+                Warnings.ADS_API_KEY_NOT_SET
+            );
 
-			if (warningAccumulator.HasWarnings()) {
-				warningAccumulator.ShowIfNecessary();
-			} else {
-				FetchAndApplyGameConfiguration();
-			}
+            if (warningAccumulator.HasWarnings())
+            {
+                warningAccumulator.ShowIfNecessary();
+            }
+            else
+            {
+                FetchAndApplyGameConfiguration();
+            }
 		}
+
+        private void TestBuild()
+        {
+            AndroidPostProcessor app = new AndroidPostProcessor(@"c:\temp\rollaball_release_1.apk");
+
+            EditorUtility.ClearProgressBar();
+            EditorUtility.DisplayProgressBar("Publishing kit post-process", "Build Started", 0);
+
+            app.build(true, completed, onProgress);
+        }
+
+        private void onProgress(object sender, string info, int progress)
+        {
+            if (!isUIThread)
+            {
+                this.RunOnUIThread(new BuildProcess.BuildProgressChanged(onProgress), new object[] { sender, info, progress });
+                return;
+            }
+
+            EditorUtility.DisplayProgressBar("Publishing kit post-process", info, (float)progress / 100);
+        }
+
+		private void completed (object sender) {
+            if (!isUIThread)
+            {
+                this.RunOnUIThread(new BuildProcess.BuildCompleted(completed), new object[] { sender });
+                return;
+            }
+
+            EditorUtility.ClearProgressBar();
+        }
 
 		/**
 		 * Method which download game configuration for API KEY setted in Game Configuration Window
@@ -78,48 +118,50 @@ namespace Playscape.Editor {
 			string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
 			bool applyLastSavedConfiguration = false;
 
-			try {
-				// CR-ZR: Your both displaying the progress bar and downloading the configuration from the main thread
-				//          Shouldn't you use a background thread in order to keep the UI free?
-				//Show progress dialog to user
-				GUI.enabled = false;
-				
-				EditorUtility.ClearProgressBar ();
-				EditorUtility.DisplayProgressBar ("Playscape Configuration Proccess",
-				                                  String.Format("Fetching Game Configuration for 'ApiKey': '{0}'", API_KEY),
-				                                  0);
-				
-				Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
-				
-				//If response from servers is success save fetched configuration to AssetDatabse
-				if (response != null) {
-					if (response.Success) {
-						ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
-						
-						//Saving new fetched game configuration to the file-system
-						AssetDatabase.SaveAssets();
-					} else {
-						EditorUtility.DisplayDialog("Playscape Configuration Proccess",
-						                            "Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration will be applied.",
-						                            "OK");
-						applyLastSavedConfiguration = true;
-					}
+			// CR-ZR: Your both displaying the progress bar and downloading the configuration from the main thread
+			//          Shouldn't you use a background thread in order to keep the UI free?
+			//Show progress dialog to user
+			GUI.enabled = false;
+
+			EditorUtility.ClearProgressBar ();
+			EditorUtility.DisplayProgressBar ("Playscape Configuration Proccess",
+			                                  String.Format("Fetching Game Configuration for 'ApiKey': '{0}'", API_KEY),
+			                                  0);
+
+			Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
+
+			//If response from servers is success save fetched configuration to AssetDatabse
+			if (response != null) {
+				if (response.Success) {
+					ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+
+					//Saving new fetched game configuration to the file-system
+					AssetDatabase.SaveAssets();
 				} else {
-					L.W ("Warning!!! Could not download game configuration. Please check your internet connection");
-					
+					EditorUtility.DisplayDialog("Playscape Configuration Proccess",
+					                            "Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration will be applied.",
+					                            "OK");
 					applyLastSavedConfiguration = true;
 				}
-			} catch (Exception e) {
-				L.W ("Warning!!! Could not download game configuration. Please check your internet connection");
-				
-				applyLastSavedConfiguration = true;
-			} finally {
-				GUI.enabled = true;
-				EditorUtility.ClearProgressBar();
+			} else {
 
-				//In any case we apply changes. If request to GAME API was failed, successfully last saved configuration will be applied.
-				ApplyChanges (applyLastSavedConfiguration);
+				// CR-ZR: Please do not show unprocesses technical data to users like that. First display a readable message and only later show
+				//        technical details
+				EditorUtility.DisplayDialog("Playscape Configuration Proccess",
+					                        "Error!!! Could not retrieve configuration from the server. Unknown error. Please check that your API KEY is correct.",
+				                            "OK");
+
+				applyLastSavedConfiguration = true;
 			}
+
+
+			// CR-ZR - you should keep this under a finally clause
+			GUI.enabled = true;
+			EditorUtility.ClearProgressBar();
+
+
+			//In any case we apply changes. If request to GAME API was failed, successfully last saved configuration will be applied.
+			ApplyChanges (applyLastSavedConfiguration);
 		}
 
 		private void ApplyChanges(bool applyLastSavedConfiguration) {
@@ -186,24 +228,6 @@ namespace Playscape.Editor {
 						ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentVars[j] = varName;
 					}
 				}
-			}
-		}
-
-		private void OnReportingGUI ()
-		{
-			GUILayout.Label (ANALYTICS_REPORTING, EditorStyles.boldLabel);
-			string result = EditorGUILayout.TextField (REPORTER_ID, ConfigurationInEditor.Instance.ReporterId);
-			if (result != null) {
-				ConfigurationInEditor.Instance.ReporterId = result;
-			}
-		}
-
-		private void OnPushWooshGUI ()
-		{
-			GUILayout.Label (PUSHWOOSH_CONFIG, EditorStyles.boldLabel);
-			string result = EditorGUILayout.TextField (IOS + " " + APP_ID, ConfigurationInEditor.Instance.PushWooshIosId);
-			if (result != null) {
-				ConfigurationInEditor.Instance.PushWooshIosId = result;
 			}
 		}
 

@@ -16,10 +16,6 @@ namespace Playscape.Editor {
 		
 		public virtual void CheckForWarnings(WarningAccumulator warnings)
 		{
-			warnings.WarnIfStringIsEmpty(
-				ConfigurationInEditor.Instance.ReporterId,
-				Warnings.REPORTED_ID_NOT_SET);
-
  			warnings.WarnIfStringIsEmpty(
 				ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey,
 				Warnings.ADS_API_KEY_NOT_SET);

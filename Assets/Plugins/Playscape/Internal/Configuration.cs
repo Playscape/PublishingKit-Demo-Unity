@@ -48,15 +48,22 @@ namespace Playscape.Internal {
 			}
 		}
 
-		/* --- Reporting --- */
-		public String ReporterId;
-
 		// Note - to add a new ad provider, simply follow the naming convention in the ads class
 		//        make a subclass for your provider and fill it with ids.
 		//        GUI and saving/loading of the config will be done automagically for you.
 		public Ads MyAds = new Ads();
 
-		public GameConfiguration MyGameConfiguration = new GameConfiguration();
+		private GameConfiguration _gameConfiguration = new GameConfiguration();
+		public GameConfiguration MyGameConfiguration {
+			set {
+				this._gameConfiguration = value;
+				this.ReporterId = "RollBallAndMultiplier";
+//				this.ReporterId = value.MyAnalyticsReport.ReporterId;
+			}
+			get {
+				return this._gameConfiguration;
+			}
+		}
 
 		[Serializable]
 		public class Ads
@@ -69,6 +76,9 @@ namespace Playscape.Internal {
                 public bool EnableAdsSystem = true;
 			}
 		}
+
+		/* -- Analytics Reporting -- */
+		public string ReporterId;
 
 		/* --- Push Woosh --- */
 		public string PushWooshIosId;
@@ -145,14 +155,7 @@ namespace Playscape.Internal {
 		 **/
 		public GameConfigurationResponse FetchGameConfigurationForApiKey(string apikey) {
 			if (!string.IsNullOrEmpty (apikey)) {
-				string[] splitedIdentifiers = apikey.Split('-');
-				string appIdentifier = "";
-
-				if (splitedIdentifiers.Length > 0) {
-					appIdentifier = splitedIdentifiers[0];
-				}
-
-				string url = string.Format (CommonConsts.GAME_CONFIGURATION_API_URL, appIdentifier);
+				string url = string.Format ("{0}/config", CommonConsts.GAME_CONFIGURATION_API_URL);
 
 				// Star synchronous request for getting game configuration
 				SyncRequest<GameConfigurationResponse> request = new SyncRequest<GameConfigurationResponse> (url, System.Net.WebRequestMethods.Http.Get);
@@ -173,27 +176,29 @@ namespace Playscape.Internal {
 		[Serializable]
 		public class GameConfiguration
 		{
-			[JsonName("ads_config")]
+			[PlayscapeJsonName("ads_config")]
 			public AdsConfig MyAdsConfig = new AdsConfig();
 
-			[JsonName("admob")]
+			[PlayscapeJsonName("admob")]
 			public Admob MyAdMobIds = new Admob();
 
-			[JsonName("chartboost")]
+			[PlayscapeJsonName("chartboost")]
 			public Chartboost MyChartboostIds = new Chartboost ();
 
-			[JsonName("vungle")]
+			[PlayscapeJsonName("vungle")]
 			public Vungle MyVungle = new Vungle ();
 
-			[JsonName("millennialmedia")]
+			[PlayscapeJsonName("millennialmedia")]
 			public MillennialMedia MyMillennialMedia = new MillennialMedia();
 
-			[JsonName("startapp")]
+			[PlayscapeJsonName("startapp")]
 			public Startapp MyStartAppIds = new Startapp ();
 
-			[JsonName("adcolony")]
+			[PlayscapeJsonName("adcolony")]
 			public Adcolony MyAdColonyIds = new Adcolony();
 
+			[PlayscapeJsonName("analytics_report", false)]
+			public AnalyticsReport MyAnalyticsReport = new AnalyticsReport ();
 
 			/**
 			 * Traverses the game configuration via given visitor
@@ -202,11 +207,24 @@ namespace Playscape.Internal {
 			public void EnumerateConfiguration(Action<object, FieldInfo> visitor) {
 				foreach (var categoryFieldInfo in typeof(GameConfiguration).GetFields()) {
 					if (categoryFieldInfo.IsPublic) {
-						var category = categoryFieldInfo.GetValue(this);
 
-						foreach (var settingFieldInfo in category.GetType().GetFields()) {
-							if (settingFieldInfo.IsPublic) {
-								visitor(category, settingFieldInfo);
+						//Getting property's attributes list
+						object[] attrs = categoryFieldInfo.GetCustomAttributes(typeof(PlayscapeJsonName), false);
+
+						foreach (var attr in attrs) {
+							PlayscapeJsonName playscapeAttr = attr as PlayscapeJsonName;
+
+							if (playscapeAttr != null) {
+								//check if traverse is allowed for property
+								if (playscapeAttr.Traversable) {
+									var category = categoryFieldInfo.GetValue(this);
+									
+									foreach (var settingFieldInfo in category.GetType().GetFields()) {
+										if (settingFieldInfo.IsPublic) {
+											visitor(category, settingFieldInfo);
+										}
+									}
+								}
 							}
 						}
 					}
@@ -215,66 +233,73 @@ namespace Playscape.Internal {
 
 			[Serializable]
 			public class AdsConfig {
-				[JsonName("url")]
+				[PlayscapeJsonName("url")]
 				public string Url;
 			}
 
 			[Serializable]
 			public class Vungle {
-				[JsonName("app_id")]
+				[PlayscapeJsonName("app_id")]
 				public string AppId;
 			}
 
 			[Serializable]
 			public class MillennialMedia {
-				[JsonName("app_id")]
+				[PlayscapeJsonName("app_id")]
 				public string AppId;
 			}
 
 			[Serializable]
 			public class Chartboost
 			{
-				[JsonName("app_id")]
+				[PlayscapeJsonName("app_id")]
 				public string AppId;
 
-				[JsonName("app_signature")]
+				[PlayscapeJsonName("app_signature")]
 				public string AppSignature;
 			}
 
 			[Serializable]
 			public class Admob
 			{
-				[JsonName("interstitials_ad_unit_id")]
+				[PlayscapeJsonName("interstitials_ad_unit_id")]
 				public string InterstitialsAdUnitId;
 
-				[JsonName("banners_ad_unit_id")]
+				[PlayscapeJsonName("banners_ad_unit_id")]
 				public string BannersAdUnitId;
 
-				[JsonName("test_device_id")]
+				[PlayscapeJsonName("test_device_id")]
 				public string TestDeviceId;
 			}
 
 			[Serializable]
 			public class Startapp
 			{
-				[JsonName("developer_id")]
+				[PlayscapeJsonName("developer_id")]
 				public string DeveloperId;
 
-				[JsonName("app_id")]
+				[PlayscapeJsonName("app_id")]
 				public string AppId;
 			}
 
 			[Serializable]
 			public class Adcolony
 			{
-				[JsonName("app_id")]
+				[PlayscapeJsonName("app_id")]
 				public string AppId;
 
-				[JsonName("video_zone_id")]
+				[PlayscapeJsonName("video_zone_id")]
 				public string VideoZoneId;
 
-				[JsonName("incentivised_video_zone_id")]
+				[PlayscapeJsonName("incentivised_video_zone_id")]
 				public String IncentivisedVideoZoneId;
+			}
+
+			[Serializable]
+			public class AnalyticsReport {
+
+				[PlayscapeJsonName("reporter_id")]
+				public string ReporterId;
 			}
 		}
 
@@ -284,13 +309,13 @@ namespace Playscape.Internal {
 		 **/
 		public class GameConfigurationResponse {
 
-			[JsonName("success")]
+			[PlayscapeJsonName("success")]
 			public bool Success;
 
-			[JsonName("message")]
+			[PlayscapeJsonName("message")]
 			public string ErrorDescription;
 
-			[JsonName("config")]
+			[PlayscapeJsonName("config")]
 			public GameConfiguration GameConfiguration { get; private set; }
 
 			public GameConfigurationResponse() {

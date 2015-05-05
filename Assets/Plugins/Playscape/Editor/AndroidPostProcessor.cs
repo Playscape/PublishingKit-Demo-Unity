@@ -9,18 +9,18 @@ using System.Text;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
-
+using Ionic.Zip;
+using System.Threading;
 
 namespace Playscape.Editor {
 	
 	class AndroidPostProcessor : AbstractPostProcessor {
-		
 		public const string PLAYSCAPE_CONFIG_XML_PATH = CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/res/values/playscape_config.xml";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH = "/libs/android-support-v4.jar";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT  = "/libs/android-support-v4.jar_v19.1";
 		private const string LIBS_UNITY_CLASSES_PATH = "/libs/unity-classes.jar";
 		private const string LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH = "/libs/playscape_lifecycle.jar";
-		
+
 		private const string MANIFEST_FILE_NAME = "AndroidManifest.xml";
 		
 		private  string mTargetPath;
@@ -33,93 +33,87 @@ namespace Playscape.Editor {
 			return mTargetPath.ToLower ().EndsWith (".apk");
 		}
 
-		public override void Run()
-		{
-			string publishingKitLibPath = isApkBuild() ? 
-				Environment.CurrentDirectory + "/Assets/Plugins/Android/PlayscapePublishingKit" : 
-					mTargetPath + "/PlayscapePublishingKit";
-			if (!isApkBuild()) {
-				if(File.Exists(publishingKitLibPath + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH)) {
-					File.Delete(publishingKitLibPath + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH);
-				}
-			}
+		public void build(bool async, BuildProcess.BuildCompleted completedCallback, BuildProcess.BuildProgressChanged progressCallback) {
+            BuildParams bp = ConstructBuildParams();
+            BuildProcess process = new BuildProcess(bp, new UnityDebugLogger(), completedCallback, progressCallback);
+            
 
-			// the various sdks to the main manifest file
-			string sourcesPath = isApkBuild () ? 
-				Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) : 
-					mTargetPath + "/" + PlayerSettings.productName;	
+            if (async) {
+                process.BuildAsync(mTargetPath);
+            } else
+            {
+                process.Build(mTargetPath);
+            }
 
-			if (isApkBuild ()) {
-				// decompile apk to update resources
-				AndroidApkCreator.decompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
-
-				AndroidApkCreator.applyAspects(mTargetPath, sourcesPath, Debug.isDebugBuild);
-				
-				// recompile apk file and rewrite existing apk
-				AndroidApkCreator.recompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
-
-				DirectoryInfo directoryToRemove = new DirectoryInfo(sourcesPath);
-				if (directoryToRemove != null && directoryToRemove.Exists) {
-					directoryToRemove.Delete (true);
-				} 
-			}
-
-			return;
-            // ZR-CR: It's time we comment this out
-
-            //// If our manifests are merged then all manifest fragments will reside in the same file and therefore we point
-            //// the various sdks to the main manifest file
-            //sourcesPath = isApkBuild () ? 
-            //    Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ()) : 
-            //        mTargetPath + "/" + PlayerSettings.productName;	
-			
-            //var manifestDst = sourcesPath + "/" + MANIFEST_FILE_NAME;
-			
-            //L.D("mTargetPath: " + mTargetPath);
-            //L.D("sourcesPath: " + sourcesPath);
-			
-			
-            //if (isApkBuild()) {
-            //    // decompile apk to update resources
-            //    AndroidApkCreator.decompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
-            //}
-			
-            //if (ConfigurationInEditor.Instance.MergeAndroidManifests) 
-            //{
-            //    AndroidManifestMerger.Merge(manifestDst, Debug.isDebugBuild);
-            //} else {
-            //    // Copy fragments
-            //    File.Copy(CommonConsts.PLAYSCAPE_MANIFEST_PATH, sourcesPath + "/" + new FileInfo(CommonConsts.PLAYSCAPE_MANIFEST_PATH).Name);
-            //}
-			
-			
-            //string manifestContents = File.ReadAllText(manifestDst);
-            //manifestContents = ApplyCommonAndroidManifestParams(manifestContents);
-            //File.WriteAllText(manifestDst, manifestContents);
-			
-            //var configBaseName = isApkBuild () ? "strings.xml"  : new FileInfo(PLAYSCAPE_CONFIG_XML_PATH).Name;
-            //var dstConfig = (isApkBuild() ? sourcesPath : publishingKitLibPath) + "/res/values/" + configBaseName;
-            //var srcConfig = isApkBuild () ? dstConfig : PLAYSCAPE_CONFIG_XML_PATH;
-			
-            //ApplyPlayscapeAndroidConfiguration(srcConfig,
-            //                                   dstConfig,
-            //                                   Debug.isDebugBuild);
-			
-            //if (!isApkBuild()) {
-            //    CopyDepedencyJarsToLibs(mTargetPath, publishingKitLibPath, sourcesPath);
-            //}
-			
-            //if (isApkBuild ()) {
-            //    // recompile apk file and rewrite existing apk
-            //    AndroidApkCreator.recompile (mTargetPath, sourcesPath, Debug.isDebugBuild);
-				
-            //    DirectoryInfo directoryToRemove = new DirectoryInfo(sourcesPath);
-            //    if (directoryToRemove != null && directoryToRemove.Exists) {
-            //        directoryToRemove.Delete (true);
-            //    } 
-            //}
 		}
-		
+
+        private BuildParams ConstructBuildParams()
+        {
+            BuildParams bp = new BuildParams
+            {
+                isDebug = Debug.isDebugBuild,
+                sdkVersion = PlayerSettings.Android.minSdkVersion.ToString(),
+                keysotre_path = PlayerSettings.Android.keystoreName,
+                alias = PlayerSettings.Android.keyaliasName,
+                storepass = PlayerSettings.Android.keystorePass,
+                keypass = PlayerSettings.Android.keyaliasPass
+            };
+
+            if (bp.isDebug || string.IsNullOrEmpty(bp.keysotre_path))
+            {
+                bp.keysotre_path = (PlatformUtils.isWindows() ? System.Environment.GetEnvironmentVariable("USERPROFILE") :
+                                 Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).FullName)
+                    + "/.android/debug.keystore";
+                bp.alias = "androiddebugkey";
+                bp.storepass = "android";
+                bp.keypass = "android";
+            }
+            return bp;
+        }
+
+
+
+        public override void Run()
+        {
+            EditorUtility.ClearProgressBar();
+            EditorUtility.DisplayProgressBar("Publishing kit post-process", "Applying publishing kit logic", 0);
+
+            string publishingKitLibPath = isApkBuild() ?
+                Environment.CurrentDirectory + "/Assets/Plugins/Android/PlayscapePublishingKit" :
+                    mTargetPath + "/PlayscapePublishingKit";
+
+            try
+            {
+                if (isApkBuild())
+                {
+                    build(false, onComplete, onProgress);
+                }
+
+                else
+                {
+                    if (File.Exists(publishingKitLibPath + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH))
+                    {
+                        File.Delete(publishingKitLibPath + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                EditorUtility.DisplayDialog("Publishing Kit Error", "An error occured while applying post-build logic: " + e.Message, "OK");
+            }
+
+        }
+
+        public static void onProgress(object sender, string info, int percentage)
+        {
+            EditorUtility.DisplayProgressBar("Publishing kit post-process", info, percentage);
+        }
+
+        public static void onComplete(object sender)
+        {
+            EditorUtility.ClearProgressBar();
+        }
+	
 		public static void ApplyPlayscapeAndroidConfiguration(string srcConfig,
 		                                                      string dstConfig,
 		                                                      bool isDebugBuild)
@@ -293,11 +287,8 @@ namespace Playscape.Editor {
 				File.Delete(pathToPublishingKitLibSources + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH);
 			}
 		}
+
 	}
-	
-	/// <summary>
-	/// Handles the OnPostProcessBuild callback, in which we apply configurations to the sdks in the various platforms
-	/// </summary>
-	
+
 }
 #endif
