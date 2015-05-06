@@ -35,10 +35,11 @@ namespace Soomla.Store {
 		#pragma warning disable 0414
 		private static StoreEventPusher sep = null;
 		#pragma warning restore 0414
-
+#if REMOVE_FROM_LINKAGE
 #if UNITY_IOS && !UNITY_EDITOR
 		[DllImport ("__Internal")]
 		private static extern void eventDispatcher_Init();
+#endif
 #endif
 
 
@@ -77,9 +78,11 @@ namespace Soomla.Store {
 			AndroidJNI.PopLocalFrame(IntPtr.Zero);
 
 			sep = new StoreEventPusherAndroid();
+#if REMOVE_FROM_LINKAGE
 #elif UNITY_IOS && !UNITY_EDITOR
 			eventDispatcher_Init();
 			sep = new StoreEventPusherIOS();
+#endif
 #endif
 		}
 

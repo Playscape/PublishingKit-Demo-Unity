@@ -25,7 +25,7 @@ namespace Soomla.Store {
 	/// This is the only class you need to initialize in order to use the SOOMLA SDK.
 	/// </summary>
 	public class SoomlaStoreAndroid : SoomlaStore {
-
+#if REMOVE_FROM_LINKAGE
 #if UNITY_ANDROID && !UNITY_EDITOR
 		private static AndroidJavaObject jniSoomlaStore = null;
 
@@ -120,6 +120,7 @@ namespace Soomla.Store {
 			jniSoomlaStore.Call("stopIabServiceInBg");
 			AndroidJNI.PopLocalFrame(IntPtr.Zero);
 		}
+#endif
 #endif
 	}
 }

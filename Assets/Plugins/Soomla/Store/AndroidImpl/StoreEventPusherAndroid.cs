@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 namespace Soomla.Store {
 
 	public class StoreEventPusherAndroid : StoreEvents.StoreEventPusher {
-
+#if REMOVE_FROM_LINKAGE
 #if UNITY_ANDROID && !UNITY_EDITOR
 
 		protected override void _pushEventSoomlaStoreInitialized(string message) {
@@ -59,7 +59,7 @@ namespace Soomla.Store {
 			}
 			AndroidJNI.PopLocalFrame(IntPtr.Zero);
 		}
-
+#endif
 #endif
 	}
 }

@@ -18,7 +18,7 @@ using System;
 namespace Soomla {
 	
 	public class KeyValueStorageAndroid : KeyValueStorage {
-
+#if REMOVE_FROM_LINKAGE
 #if UNITY_ANDROID && !UNITY_EDITOR
 
 		override protected string _getValue(string key) {
@@ -46,6 +46,7 @@ namespace Soomla {
 			}
 			AndroidJNI.PopLocalFrame(IntPtr.Zero);
 		}
+#endif
 #endif
 	}
 }

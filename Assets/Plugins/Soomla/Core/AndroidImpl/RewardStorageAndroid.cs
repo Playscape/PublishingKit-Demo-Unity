@@ -18,7 +18,7 @@ using System;
 namespace Soomla {
 	
 	public class RewardStorageAndroid : RewardStorage {
-
+#if REMOVE_FROM_LINKAGE
 #if UNITY_ANDROID && !UNITY_EDITOR
 		
 		override protected int _getLastSeqIdxGiven(SequenceReward reward) {
@@ -70,7 +70,7 @@ namespace Soomla {
 			return new DateTime(time.Ticks);
 		}
 
-
+#endif
 #endif
 	}
 }

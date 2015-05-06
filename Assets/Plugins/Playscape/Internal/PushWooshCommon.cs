@@ -94,14 +94,18 @@ namespace Playscape.Internal {
 		}
 
 		public void ReportAllTags() {
+			#if REMOVE_FROM_LINKAGE
 			#if !UNITY_EDITOR
 			playscape_TagReporter_reportAllTags();
+			#endif
 			#endif
 		}
 
 		private void ReportSentTags(string tagName, string tagValue) {
 			#if !UNITY_EDITOR
+			#if !UNITY_EDITOR
 			playscape_TagReporter_setTag(tagName, tagValue);
+			#endif
 			#endif
 
 			var sb = new StringBuilder();
