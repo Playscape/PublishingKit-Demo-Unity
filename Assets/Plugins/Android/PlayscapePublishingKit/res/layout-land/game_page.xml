@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/screen_bg" >-->
+    <LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/screen_bg"
+    android:orientation="vertical" 
+    >
+
+    <RelativeLayout
+        android:id="@+id/top_container"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/catalog_tabs_height"
+        android:paddingBottom="3dp"
+        android:paddingTop="3dp" >
+
+
+        <com.playscape.utils.AspectRatioImageView
+            android:id="@+id/logo"
+            android:layout_width="@dimen/catalog_playbox_width"
+            android:layout_height="fill_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:clickable="true"
+            android:focusableInTouchMode="true"
+            android:src="@drawable/logo_selected" />
+
+
+        <com.playscape.utils.AspectRatioImageView
+            android:id="@+id/all_games_button"
+            android:layout_width="@dimen/game_page_all_games_width"
+            android:layout_height="fill_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:clickable="true"
+            android:src="@drawable/more_games_button" />
+
+         <!--<Button
+             android:id="@+id/all_games_button"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignBottom="@+id/logo"
+             android:layout_alignParentRight="true"
+             android:layout_alignParentTop="true"
+             android:background="@drawable/more_games_button_selector" />-->
+ 
+    </RelativeLayout>
+    
+   <LinearLayout
+        android:id="@+id/game_image_and_mission_container"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:orientation="horizontal"
+        >
+         
+    <RelativeLayout
+        android:id="@+id/game_image_container"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        >
+         
+
+        	<LinearLayout
+        	    android:layout_width="wrap_content"
+        	    android:layout_height="wrap_content"
+        	    android:layout_alignParentLeft="true"
+        	    android:background="@drawable/flipped_card"
+        	    android:orientation="vertical" >
+
+
+
+        	        <com.playscape.utils.AspectRatioImageView
+        	            android:id="@+id/game_page_image"
+        	            style="@style/game_page_game_image_style"
+        	            android:layout_width="fill_parent"
+        	            android:layout_height="wrap_content"
+        	            android:adjustViewBounds="true"
+        	            android:baselineAlignBottom="false"
+        	            android:clickable="true"
+        	            android:cropToPadding="false"
+        	            android:focusable="true"
+        	            android:src="@drawable/game_page_button" />
+		    
+			    <RelativeLayout
+			        android:layout_weight="2"
+			        android:layout_height="0dp"
+			        android:layout_width="fill_parent"
+			        >
+			        
+
+
+
+
+
+
+
+
+
+				    <TextView
+				        android:id="@+id/game_page_game_description"
+				        android:layout_width="fill_parent"
+				        android:layout_height="fill_parent"
+				        android:layout_marginLeft="10dp"
+				        android:layout_marginTop="2dp"
+				        android:text="My very long description My very long description My very long description My very long description My very long description My very long description"
+				        android:textColor="#FFFFFF"
+				        android:textSize="14dp" />
+
+					 <TextView
+					    android:id="@+id/game_page_game_title"  
+					    android:visibility="invisible"
+					    android:layout_width="0dp"
+				        android:layout_height="0dp" />
+				    
+				    <Button
+				        android:id="@+id/game_page_action"
+				        android:layout_width="@dimen/game_page_play_button_width"
+				        android:layout_height="@dimen/game_page_play_button_height"
+				        android:layout_alignParentRight="true"
+				        android:layout_alignParentBottom="true"
+				        android:background="@drawable/game_page_play_button_selector" />
+
+			    </RelativeLayout>
+			    
+		    
+		    </LinearLayout>			
+		    
+		 
+	</RelativeLayout>
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:gravity="fill_horizontal"
+        android:orientation="vertical"
+        android:clickable="true">
+		    
+         <include layout="@layout/game_page_mission_wall" />
+    </RelativeLayout>
+    	</LinearLayout>
+    
+    <include layout="@layout/personal_bar" />
+</LinearLayout>
+<!-- </RelativeLayout> -->

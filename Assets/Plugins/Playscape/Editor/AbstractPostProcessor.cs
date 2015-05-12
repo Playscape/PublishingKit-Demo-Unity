@@ -36,6 +36,8 @@ namespace Playscape.Editor {
 //				warnings.AddWarning(Warnings.ATLEAST_ONE_AD_ID_MUST_BE_FILLED);
 //			}
 //
+//			warnings.WarnIfStringIsEmpty (ConfigurationInEditor.Instance.MyAds.MyAdsConfig.Url, 
+//			                              Warnings.AD_CONFIG_URL_MUST_BE_FILLED);
 		}
 
 		public abstract void Run();

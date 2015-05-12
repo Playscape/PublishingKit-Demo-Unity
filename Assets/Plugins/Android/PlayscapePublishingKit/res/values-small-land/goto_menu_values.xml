@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="goto_menu_title_text_size">21dp</dimen>
+    <dimen name="goto_menu_container_margin_top">0dp</dimen>
+    
+    <dimen name="goto_menu_title_underline_margin">40dp</dimen>
+     
+     <dimen name="goto_menu_button_more_missions_layout_width">80dp</dimen>
+     <dimen name="goto_menu_button_more_missions_layout_height">80dp</dimen>
+     
+     <dimen name="goto_menu_button_text_size">12dp</dimen>
+     
+     <dimen name="goto_menu_land_back_to_game_width">154dp</dimen>
+     <dimen name="goto_menu_land_back_to_game_height">35.87dp</dimen>
+     
+     <dimen name="goto_menu_button_container_width">92dp</dimen>
+     
+     <dimen name="goto_menu_back_to_game_button_margin_top">0dp</dimen>
+     <dimen name="goto_menu_back_to_game_button_margin_bottom">0dp</dimen>
+     
+          
+     <dimen name="goto_menu_top_buttons_margin_top">10dp</dimen>
+     <dimen name="goto_menu_top_buttons_side_margin">45dp</dimen>
+     
+     <dimen name="goto_menu_lower_buttons_margin_top">40dp</dimen>
+</resources>
