@@ -29,7 +29,6 @@ namespace Soomla.Store {
 	/// virtual non-consumable items definitions
 	/// </summary>
 	public class StoreInfoAndroid : StoreInfo {
-#if REMOVE_FROM_LINKAGE
 #if UNITY_ANDROID && !UNITY_EDITOR
 
 		/// <summary>
@@ -62,7 +61,6 @@ namespace Soomla.Store {
 			}
 			AndroidJNI.PopLocalFrame(IntPtr.Zero);
 		}
-#endif
 #endif
 	}
 }
