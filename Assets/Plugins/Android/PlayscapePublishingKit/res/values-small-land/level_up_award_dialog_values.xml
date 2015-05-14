@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="level_up_award_dialog_title_margin_left">10dp</dimen>
+    <dimen name="level_up_award_dialog_title_margin_top">10dp</dimen>
+    <dimen name="level_up_award_dialog_title_margin_text_size">18dp</dimen>
+    
+    <dimen name="level_up_award_dalog_level_up_desc_margin_top">10dp</dimen>
+    <dimen name="level_up_award_dalog_level_up_desc_text_size">17dp</dimen>
+    
+    <dimen name="level_up_award_dialog_bonus_title_margin_top">50dp</dimen>
+    <dimen name="level_up_award_dialog_bonus_coins_title_margin_left">8dp</dimen>
+    <dimen name="level_up_award_dialog_bonus_coins_title_margin_top">7dp</dimen>
+    
+    <dimen name="award_dialog_level_up_coins_icon_margin_bottom">20dp</dimen>
+    
+    <dimen name="level_up_award_dialog_level_up_bonus_text_Size">14dp</dimen>
+    
+    <dimen name="level_up_award_dialog_icon_margin_top">-25dp</dimen>
+    <dimen name="level_up_award_dialog_icon_margin_right">6dp</dimen>
+    
+    <dimen name="level_up_award_dialog_stars_top_width">160dp</dimen>
+    <dimen name="level_up_award_dialog_stars_top_height">106dp</dimen>
+    
+    <dimen name="level_up_award_dialog_stars_bottom_width">166dp</dimen>
+    <dimen name="level_up_award_dialog_stars_bottom_height">144dp</dimen>
+    
+    <dimen name="level_up_award_dialog_stars_bottom_margin_bottom">40dp</dimen>
+	
+</resources>

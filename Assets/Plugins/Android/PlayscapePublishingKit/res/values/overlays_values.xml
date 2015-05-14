@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="overlay_button_text_size">17dp</dimen>
+    
+    
+    <dimen name="overlay_button_width">150dp</dimen>
+    <dimen name="overlay_button_height">32.67dp</dimen>
+    
+	<dimen name="overlay_height">324dp</dimen>
+    
+    
+	
+	<dimen name="overlay_level_up_container_margin_left">10dp</dimen>
+	<dimen name="overlay_level_up_image_margin_left">-22dp</dimen>
+</resources>

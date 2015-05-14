@@ -1,0 +1,88 @@
+<!--  This is a basic mission wall with sort bar, list view and loading mission text viwe -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/black"
+    android:orientation="vertical" >
+    
+    <RelativeLayout
+        android:id="@+id/mission_wall_sort_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mw_sort_area"
+        android:clickable="true"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <RelativeLayout
+            android:id="@+id/StaticHeaderTextContainer"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/MissionSortLabelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mission_sort"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/mission_wall_sort_text_size" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/CurrenltySortedByLabelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/MissionSortLabelTextView"
+                android:layout_marginRight="2dp"
+                android:text="@string/currently_sorted_by"
+                android:textSize="@dimen/mission_wall_current_sort_text_size" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/SortOptionTextView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                style="@style/mission_wall_sort_option_text_style"
+                android:layout_alignBottom="@+id/CurrenltySortedByLabelTextView"
+                android:layout_toRightOf="@+id/CurrenltySortedByLabelTextView"
+                android:textSize="@dimen/mission_wall_current_sort_text_size"
+                android:text="@string/featured" />
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/mw_btn_sort" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/loadingMissionsText"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="top|center_horizontal"
+        android:layout_marginBottom="@dimen/loading_missions_text_margin"
+        android:layout_marginTop="@dimen/loading_missions_text_margin"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:textColor="@color/white"
+        android:text="@string/mw_loading_missions"
+        android:textAppearance="?android:attr/textAppearanceLarge" >
+    </TextView>
+
+    <GridView
+        android:visibility="gone"
+        android:id="@+id/MissionWallListView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" 
+        android:listSelector="@android:color/transparent"
+		android:gravity="center">
+    </GridView>
+
+</LinearLayout>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <!-- Title -->
+
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/title_underline"
+        android:layout_centerHorizontal="true"
+        android:text="What would you like to do next?"
+        android:textColor="@color/white"
+        android:textSize="@dimen/goto_menu_title_text_size" />
+
+    <ImageView
+        android:id="@+id/title_underline"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="@dimen/goto_menu_title_underline_margin"
+        android:layout_marginTop="@dimen/title_underline_margin_top"
+        android:background="@drawable/separator" />
+
+    <!-- Title End -->
+
+</merge>

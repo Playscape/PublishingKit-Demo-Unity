@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/gt_welcome_overlay"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="center">
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/gt_welcome_dialog_box_width"
+    android:layout_height="@dimen/gt_welcome_dialog_box_height"
+    android:layout_gravity="center"
+    android:background="@drawable/gt_welcome_dialog_box">
+
+   <TextView
+       android:id="@+id/gt_welcome_text"
+       android:layout_width="fill_parent"
+       android:layout_height="@dimen/gt_welcome_web_view_container_height"
+       android:layout_above="@+id/gt_close_ok_btn"
+       android:gravity="center"
+       android:layout_alignParentTop="true"
+       android:textSize="@dimen/gt_welcome_text_size" />
+
+   <ImageButton
+       android:id="@+id/gt_close_ok_btn"
+       android:layout_width="@dimen/gt_close_ok_btn_width"
+       android:layout_height="@dimen/gt_close_ok_btn_height"
+       android:layout_alignParentBottom="true"
+       android:layout_centerHorizontal="true"
+       android:background="@drawable/ad_next_btn_background"
+       android:layout_marginBottom="4dp"
+       android:scaleType="center" />
+  
+</RelativeLayout>
+
+</FrameLayout>
