@@ -51,6 +51,7 @@ namespace Playscape.Internal
 			AddABTesingScripts();
 			AddPushWooshScripts();
 			AddAdScripts();
+            AddCatalogcripts();
 
 			// Makes this game object live forever
 			DontDestroyOnLoad(gameObject);
@@ -108,6 +109,18 @@ namespace Playscape.Internal
 			gameObject.AddComponent(typeof(PlayscapeABTestingMock));
 			#endif
 		}
+
+        /// <summary>
+        /// Adds the abtesting scripts.
+        /// </summary>
+        private void AddCatalogcripts()
+        {
+            #if UNITY_ANDROID && !UNITY_EDITOR
+            gameObject.AddComponent(typeof(PlayscapeCatalogAndroid));
+            #else
+            gameObject.AddComponent(typeof(PlayscapeCatalogMock));
+            #endif
+        }
 
 	    /// <summary>
 	    /// Update
