@@ -9,7 +9,7 @@ namespace Playscape.Internal
 	public class PlayscapeCatalogMock : PlayscapeCatalogBase {
 
 		public override void showCatalog() {
-			L.I ("Mock showCatalog({) called");
+			L.I ("Mock showCatalog() called");
 		}
 
 		

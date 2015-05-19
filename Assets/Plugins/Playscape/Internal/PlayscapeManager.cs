@@ -111,7 +111,7 @@ namespace Playscape.Internal
 		}
 
         /// <summary>
-        /// Adds the abtesting scripts.
+        /// Adds the catalog scripts.
         /// </summary>
         private void AddCatalogcripts()
         {
