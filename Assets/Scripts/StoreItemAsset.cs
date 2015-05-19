@@ -23,7 +23,7 @@ namespace Soomla.Store {
 		/// see parent.
 		/// </summary>
 		public int GetVersion() {
-			return 1;
+			return 2;
 		}
 		
 		/// <summary>
@@ -63,8 +63,8 @@ namespace Soomla.Store {
 
 		public const string BALLS_CURRENCY_ITEM_ID      = "currency_balls";
 
-		public const string DARK_MATTER_PRODUCT_ID      = "dark_matter_unmanaged";
-		public const string DIAMOND_PRODUCT_ID      = "diamond_item_unmanaged";
+		public const string DARK_MATTER_PRODUCT_ID      = "dark_matter";
+		public const string DIAMOND_PRODUCT_ID      = "diamond_item";
 		public const string FIRE_BALL_PRODUCT_ID      = "buy_fail";
 
 
@@ -77,7 +77,7 @@ namespace Soomla.Store {
 		public static VirtualCurrencyPack DARK_MATTER = new VirtualCurrencyPack(
 			"Dark Matter",                                   // name
 			"Test refund of an item",                       // description
-			"dark_matter_item",                                   // item id
+			"dark_matter",                                   // item id
 			1,												// number of currencies in the pack
 			BALLS_CURRENCY_ITEM_ID,                        // the currency associated with this pack
 			new PurchaseWithMarket(DARK_MATTER_PRODUCT_ID, 9.99)
@@ -86,7 +86,7 @@ namespace Soomla.Store {
 		public static VirtualCurrencyPack DIAMOND = new VirtualCurrencyPack(
 			"Diamond",                                   // name
 			"Test refund of an item",                       // description
-			"diamond_item",                                   // item id
+			"diamond",                                   // item id
 			1,												// number of currencies in the pack
 			BALLS_CURRENCY_ITEM_ID,                        // the currency associated with this pack
 			new PurchaseWithMarket(DIAMOND_PRODUCT_ID, 49.99)

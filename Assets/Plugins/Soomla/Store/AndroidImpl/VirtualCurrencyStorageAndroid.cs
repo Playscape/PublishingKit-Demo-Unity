@@ -21,7 +21,6 @@ namespace Soomla.Store
 	/// abstract <c>VirtualCurrencyStorage</c> for Android.
 	/// </summary>
 	public class VirtualCurrencyStorageAndroid : VirtualCurrencyStorage {
-#if REMOVE_FROM_LINKAGE
 #if UNITY_ANDROID && !UNITY_EDITOR
 
 		protected override int _getBalance(VirtualItem item) {
@@ -71,7 +70,6 @@ namespace Soomla.Store
 			AndroidJNI.PopLocalFrame(IntPtr.Zero);
 			return retBalance;
 		}
-#endif	
 #endif
 	}
 }

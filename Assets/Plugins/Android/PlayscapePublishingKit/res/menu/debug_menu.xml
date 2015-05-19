@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+  <item
+        android:id="@+id/refresh"
+        android:title="@string/menu_refresh"/>
+    <item
+        android:id="@+id/exception"
+        android:enabled="true"
+        android:title="Exception"
+        android:visible="true">
+    </item>
+    <item
+        android:id="@+id/award_dialog_in_debug"
+        android:title="award dialog">
+    </item>
+    <item
+        android:id="@+id/award_dialog_in_debug_levelup"
+        android:title="level up dialog">
+    </item>
+    <item android:id="@+id/unlock_badge" android:title="Unlock Badge">
+    </item>
+        
+    <item android:id="@+id/show_goto_menu" android:title="Show GoTo Menu">
+    </item>
+    
+    <item android:id="@+id/show_goto_menu_mini" android:title="Show Mini GoTo Menu">
+    </item>
+</menu>

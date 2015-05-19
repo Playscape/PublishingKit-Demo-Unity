@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/content_container"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_below="@+id/title_underline"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true"
+    android:layout_marginTop="@dimen/goto_menu_container_margin_top" >
+
+    <ImageButton
+        android:id="@+id/goto_menu_button_more_missions"
+        android:layout_width="@dimen/goto_menu_button_more_missions_layout_width"
+        android:layout_height="@dimen/goto_menu_button_more_missions_layout_height"
+        android:layout_marginLeft="@dimen/goto_menu_top_buttons_side_margin"
+        android:layout_marginTop="@dimen/goto_menu_top_buttons_margin_top"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/goto_menu_btn_more_missions" />
+
+    <TextView
+        android:id="@+id/txt_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/goto_menu_button_more_missions"
+        android:layout_alignRight="@+id/goto_menu_button_more_missions"
+        android:layout_below="@+id/goto_menu_button_more_missions"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/goto_menu_more_missions"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/goto_menu_button_text_size" />
+
+    <ImageButton
+        android:id="@+id/goto_menu_button_more_missions_other_games"
+        android:layout_width="@dimen/goto_menu_button_more_missions_layout_width"
+        android:layout_height="@dimen/goto_menu_button_more_missions_layout_height"
+        android:layout_marginRight="@dimen/goto_menu_top_buttons_side_margin"
+        android:layout_marginTop="@dimen/goto_menu_top_buttons_margin_top"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/goto_menu_btn_more_games"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/txt_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/goto_menu_button_more_missions_other_games"
+        android:layout_alignRight="@+id/goto_menu_button_more_missions_other_games"
+        android:layout_below="@+id/goto_menu_button_more_missions_other_games"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/goto_menu_more_missions_in_other_games"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/goto_menu_button_text_size" />
+
+    <ImageButton
+        android:id="@+id/goto_menu_button_more_games"
+        android:layout_width="@dimen/goto_menu_button_more_missions_layout_width"
+        android:layout_height="@dimen/goto_menu_button_more_missions_layout_height"
+        android:layout_alignLeft="@+id/goto_menu_button_more_missions"
+        android:layout_alignRight="@+id/goto_menu_button_more_missions"
+        android:layout_below="@+id/goto_menu_button_more_missions"
+        android:layout_marginTop="@dimen/goto_menu_lower_buttons_margin_top"
+        android:background="@drawable/goto_menu_btn_more_missions_other_games"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/txt_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/goto_menu_button_more_games"
+        android:layout_alignRight="@+id/goto_menu_button_more_games"
+        android:layout_below="@+id/goto_menu_button_more_games"
+        android:layout_marginBottom="@dimen/goto_txt_3_marginBottom_15dp"
+        android:layout_marginTop="@dimen/goto_txt_3_marginTop_5dp"
+        android:gravity="center"
+        android:text="@string/goto_menu_more_games"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/goto_menu_button_text_size" />
+
+    <ImageButton
+        android:id="@+id/goto_menu_button_back_to_game"
+        android:layout_width="@dimen/goto_menu_button_more_missions_layout_width"
+        android:layout_height="@dimen/goto_menu_button_more_missions_layout_height"
+        android:layout_alignLeft="@+id/goto_menu_button_more_missions_other_games"
+        android:layout_alignRight="@+id/goto_menu_button_more_missions_other_games"
+        android:layout_below="@+id/goto_menu_button_more_missions_other_games"
+        android:layout_marginTop="@dimen/goto_menu_lower_buttons_margin_top"
+        android:background="@drawable/goto_menu_btn_back_to_game"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/txt_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/goto_menu_button_back_to_game"
+        android:layout_alignRight="@+id/goto_menu_button_back_to_game"
+        android:layout_below="@+id/goto_menu_button_back_to_game"
+        android:layout_marginBottom="@dimen/goto_txt_4_marginBottom_15dp"
+        android:layout_marginTop="@dimen/goto_txt_4_marginTop_5dp"
+        android:gravity="center"
+        android:text="@string/goto_menu_back_to_game"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/goto_menu_button_text_size" />
+
+</RelativeLayout>

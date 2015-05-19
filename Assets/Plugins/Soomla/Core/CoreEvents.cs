@@ -50,7 +50,6 @@ namespace Soomla {
 
 		public static void Initialize() {
 			SoomlaUtils.LogDebug(TAG, "Initializing CoreEvents and Soomla Core ...");
-#if REMOVE_FROM_LINKAGE
 #if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJNI.PushLocalFrame(100);
 
@@ -68,6 +67,7 @@ namespace Soomla {
 				jniSoomlaClass.CallStatic("initialize", CoreSettings.SoomlaSecret);
 			}
 			AndroidJNI.PopLocalFrame(IntPtr.Zero);
+#if REMOVE_FROM_LINKAGE
 #elif UNITY_IOS && !UNITY_EDITOR
 			soomlaCore_Init(CoreSettings.SoomlaSecret, CoreSettings.DebugMessages);
 #endif

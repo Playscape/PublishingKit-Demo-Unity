@@ -21,7 +21,6 @@ namespace Soomla.Store {
 	/// This class uses JNI and provides functions that call SOOMLA's android-store.
 	/// </summary>
 	public static class AndroidJNIHandler {
-#if REMOVE_FROM_LINKAGE
 #if UNITY_ANDROID && !UNITY_EDITOR
 
 		/// <summary>
@@ -212,7 +211,6 @@ namespace Soomla.Store {
 				Debug.Log("SOOMLA/UNITY Got an exception but can't identify it!");
 			}
 		}
-#endif
 #endif
 	}
 }

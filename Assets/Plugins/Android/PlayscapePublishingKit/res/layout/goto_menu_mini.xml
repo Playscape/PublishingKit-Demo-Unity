@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/award_dialog_background_main"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <RelativeLayout
+        android:id="@+id/award_dialog_background"
+        android:layout_width="@dimen/goto_menu_mini_width"
+        android:layout_height="@dimen/goto_menu_mini_height"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="@dimen/goto_menu_container_margin_top"
+        android:background="@drawable/dialog_shape_outlined_90" >
+
+        <include layout="@layout/goto_menu_title_mini" />
+
+        <include layout="@layout/goto_menu_body_mini" />
+    </RelativeLayout>
+
+</RelativeLayout>

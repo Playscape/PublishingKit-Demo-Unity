@@ -38,14 +38,14 @@ namespace Soomla.Store
 		static StoreInfo instance {
 			get {
 				if(_instance == null) {
-					#if REMOVE_FROM_LINKAGE
 					#if UNITY_ANDROID && !UNITY_EDITOR
 					_instance = new StoreInfoAndroid();
+					#if REMOVE_FROM_LINKAGE
 					#elif UNITY_IOS && !UNITY_EDITOR
 					_instance = new StoreInfoIOS();
+					#endif
 					#else
 					_instance = new StoreInfo();
-					#endif
 					#endif
 				}
 				return _instance;
