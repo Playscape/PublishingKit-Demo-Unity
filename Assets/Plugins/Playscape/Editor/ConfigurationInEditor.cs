@@ -41,6 +41,10 @@ namespace Playscape.Editor {
 				return Configuration.Instance;
 			}
 		}
+
+		public static void Save() {
+			AssetDatabase.SaveAssets();
+		}
 	}
 }
 #endif

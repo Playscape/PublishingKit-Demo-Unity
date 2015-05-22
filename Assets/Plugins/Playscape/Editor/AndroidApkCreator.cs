@@ -574,6 +574,7 @@ namespace Playscape.Editor
 
             configDoc.SelectSingleNode("resources/string[@name='playscape_ads_api_key']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey).ToLower();
             configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
+			configDoc.SelectSingleNode("resources/string[@name='playscape_reporter_id']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.ReporterId);
         }
     }
 

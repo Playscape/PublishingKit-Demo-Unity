@@ -60,6 +60,8 @@ namespace Playscape.Editor {
                 ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey,
                 Warnings.ADS_API_KEY_NOT_SET
             );
+			L.E ("API_KEY = {0}", ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey);
+			L.E ("REPORTER_ID = {0}", ConfigurationInEditor.Instance.ReporterId);
 
             if (warningAccumulator.HasWarnings())
             {
@@ -67,18 +69,18 @@ namespace Playscape.Editor {
             }
             else
             {
-                FetchAndApplyGameConfiguration();
+				ApplyChanges();
             }
 		}
 
         private void TestBuild()
         {
-            AndroidPostProcessor app = new AndroidPostProcessor(@"c:\temp\rollaball_release_1.apk");
-
-            EditorUtility.ClearProgressBar();
+			AndroidPostProcessor app = new AndroidPostProcessor(@"/Users/artem/Desktop/test/Untitled.apk");
+			
+			EditorUtility.ClearProgressBar();
             EditorUtility.DisplayProgressBar("Publishing kit post-process", "Build Started", 0);
 
-            app.build(true, completed, onProgress);
+            app.build(false, completed, onProgress);
         }
 
         private void onProgress(object sender, string info, int progress)
@@ -102,65 +104,65 @@ namespace Playscape.Editor {
             EditorUtility.ClearProgressBar();
         }
 
-		/**
-		 * Method which download game configuration for API KEY setted in Game Configuration Window
-		 *
-		 **/
-		private void FetchAndApplyGameConfiguration() {
-			if (string.IsNullOrEmpty (CommonConsts.GAME_CONFIGURATION_API_URL)) {
-				EditorUtility.DisplayDialog("Playscape Configuration Proccess",
-				                            "Error!!! Can't find 'GAME API' url",
-				                            "OK");
+//		/**
+//		 * Method which download game configuration for API KEY setted in Game Configuration Window
+//		 *
+//		 **/
+//		private void FetchAndApplyGameConfiguration() {
+//			if (string.IsNullOrEmpty (CommonConsts.GAME_CONFIGURATION_API_URL)) {
+//				EditorUtility.DisplayDialog("Playscape Configuration Proccess",
+//				                            "Error!!! Can't find 'GAME API' url",
+//				                            "OK");
+//
+//				return;
+//			}
+//
+//			string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
+//			bool applyLastSavedConfiguration = false;
+//
+//			try {
+//				// CR-ZR: Your both displaying the progress bar and downloading the configuration from the main thread
+//				//          Shouldn't you use a background thread in order to keep the UI free?
+//				//Show progress dialog to user
+//				GUI.enabled = false;
+//				
+//				EditorUtility.ClearProgressBar ();
+//				EditorUtility.DisplayProgressBar ("Playscape Configuration Proccess",
+//				                                  String.Format("Fetching Game Configuration for 'ApiKey': '{0}'", API_KEY),
+//				                                  0);
+//				
+//				Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
+//				
+//				//If response from servers is success save fetched configuration to AssetDatabse
+//				if (response != null) {
+//					if (response.Success) {
+//						ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+//						
+//						//Saving new fetched game configuration to the file-system
+//						AssetDatabase.SaveAssets();
+//					} else {
+//						EditorUtility.DisplayDialog("Playscape Configuration Proccess",
+//						                            "Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration will be applied.",
+//						                            "OK");
+//						applyLastSavedConfiguration = true;
+//					}
+//				} else {
+//					L.W("Warning!!! Could not download game configuration. Please check your internet connection");
+//					
+//					applyLastSavedConfiguration = true;
+//				}
+//
+//			} finally {
+//				GUI.enabled = true;
+//				EditorUtility.ClearProgressBar();
+//				
+//				
+//				//In any case we apply changes. If request to GAME API was failed, successfully last saved configuration will be applied.
+//				ApplyChanges (applyLastSavedConfiguration);
+//			}
+//		}
 
-				return;
-			}
-
-			string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
-			bool applyLastSavedConfiguration = false;
-
-			try {
-				// CR-ZR: Your both displaying the progress bar and downloading the configuration from the main thread
-				//          Shouldn't you use a background thread in order to keep the UI free?
-				//Show progress dialog to user
-				GUI.enabled = false;
-				
-				EditorUtility.ClearProgressBar ();
-				EditorUtility.DisplayProgressBar ("Playscape Configuration Proccess",
-				                                  String.Format("Fetching Game Configuration for 'ApiKey': '{0}'", API_KEY),
-				                                  0);
-				
-				Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
-				
-				//If response from servers is success save fetched configuration to AssetDatabse
-				if (response != null) {
-					if (response.Success) {
-						ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
-						
-						//Saving new fetched game configuration to the file-system
-						AssetDatabase.SaveAssets();
-					} else {
-						EditorUtility.DisplayDialog("Playscape Configuration Proccess",
-						                            "Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration will be applied.",
-						                            "OK");
-						applyLastSavedConfiguration = true;
-					}
-				} else {
-					L.W("Warning!!! Could not download game configuration. Please check your internet connection");
-					
-					applyLastSavedConfiguration = true;
-				}
-
-			} finally {
-				GUI.enabled = true;
-				EditorUtility.ClearProgressBar();
-				
-				
-				//In any case we apply changes. If request to GAME API was failed, successfully last saved configuration will be applied.
-				ApplyChanges (applyLastSavedConfiguration);
-			}
-		}
-
-		private void ApplyChanges(bool applyLastSavedConfiguration) {
+		private void ApplyChanges() {
 			string targetManifest = "Assets/Plugins/Android/PlayscapePublishingKit/AndroidManifest.xml";
 
 			string manifestContents = File.ReadAllText(CommonConsts.PLAYSCAPE_MANIFEST_PATH);
@@ -170,17 +172,9 @@ namespace Playscape.Editor {
 			targetManifest = "Assets/Plugins/Android/AndroidManifest.xml";
 			AndroidManifestMerger.Merge (targetManifest, false);
 
-			AndroidPostProcessor.ApplyPlayscapeAndroidConfiguration (AndroidPostProcessor.PLAYSCAPE_CONFIG_XML_PATH,
-			                                                         AndroidPostProcessor.PLAYSCAPE_CONFIG_XML_PATH,
-			                                                         false);
-			string message = "The configuration process has ended successfully";
-			if (applyLastSavedConfiguration) {
-				message = "The last saved configuration was applied successfully";
-			}
-
 			EditorUtility.DisplayDialog(
 				"Configuration Ended",
-				message,
+				"The configuration process has ended successfully",
 				"OK");
 
 			Close ();
