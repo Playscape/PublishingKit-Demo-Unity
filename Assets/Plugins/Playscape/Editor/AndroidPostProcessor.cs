@@ -15,7 +15,7 @@ using System.Threading;
 namespace Playscape.Editor {
 	
 	class AndroidPostProcessor : AbstractPostProcessor {
-		public const string PLAYSCAPE_CONFIG_XML_PATH = CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/res/values/playscape_config.xml";
+		public const string PLAYSCAPE_CONFIG_XML_PATH = "Assets/StreamingAssets/playscape/PlayscapeConfig.xml";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH = "/libs/android-support-v4.jar";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT  = "/libs/android-support-v4.jar_v19.1";
 		private const string LIBS_UNITY_CLASSES_PATH = "/libs/unity-classes.jar";
