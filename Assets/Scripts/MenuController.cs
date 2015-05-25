@@ -23,8 +23,10 @@ public class MenuController : MonoBehaviour {
 	void Start () {
 		SocialController.Instance.OnSocialRequestReceived += HandleOnSocialRequestReceived;
 		Banners.Instance.Hide ();
+		// uncomment for disable ads
+//		Playscape.Analytics.Report.Instance.CustomVariables["disable_ads"] = "true";
 	}
-	
+
 	void Destroy() {
 		SocialController.Instance.OnSocialRequestReceived -= HandleOnSocialRequestReceived;
 		StopCoroutine( "ChangeLoadChar" );
