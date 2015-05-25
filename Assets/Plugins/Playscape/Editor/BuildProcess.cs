@@ -105,7 +105,7 @@ namespace Playscape.Editor
                 string patchedClassesJarFile = GetNewTempFolder("jar");
                 string alignedFile = GetNewTempFolder();
 
-				//0. download game configuration
+				//0. download game configuration and apply game configuration
                 //1. unzip the apk
                 //2. extract the dex and convert it into .jar file
                 //3. unify the libraries with the patcher
@@ -129,13 +129,9 @@ namespace Playscape.Editor
 							ConfigurationInEditor.Save();
 						} else {
 							mLogger.E("Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration was applied.");
-
-							applyLastSavedConfiguration = true;
 						}
 					} else {
 						L.W("Warning!!! Could not download game configuration. Please check your internet connection");
-						
-						applyLastSavedConfiguration = true;
 					}
 					
 				} finally {

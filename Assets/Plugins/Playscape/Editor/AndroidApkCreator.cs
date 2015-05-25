@@ -538,7 +538,12 @@ namespace Playscape.Editor
             var configDoc = new XmlDocument();
             configDoc.LoadXml(File.ReadAllText(filePathToApplyConfiguration));
 
-            injectAdsConfig(gameConfiguration, configDoc);
+            injectAdsConfig (gameConfiguration, configDoc);
+			injectABTestingConfig (configDoc);
+
+			configDoc.SelectSingleNode("resources/string[@name='playscape_remote_logger_url']").InnerText = 
+				UnityEngine.Debug.isDebugBuild ? Settings.DebugRemoteLoggerUrl
+					: Settings.ReleaseRemoteLoggerUrl;
 
             var writerSettings = new XmlWriterSettings();
             writerSettings.Indent = true;
@@ -576,6 +581,50 @@ namespace Playscape.Editor
             configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
 			configDoc.SelectSingleNode("resources/string[@name='playscape_reporter_id']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.ReporterId);
         }
+
+		private static void injectABTestingConfig(XmlDocument configDoc)
+		{
+			XmlNode rootResources = configDoc.SelectSingleNode("resources");
+			XmlNode lastExperimentsElement = configDoc.SelectSingleNode("resources/string[@name='playscape_enable_ab_testing_system']");
+			
+			configDoc.SelectSingleNode("resources/string[@name='playscape_amazon_abtesing_public_key']").InnerText = 
+				ConfigurationInEditor.Instance.MyABTesting.AmazonPublicKey;
+			configDoc.SelectSingleNode("resources/string[@name='playscape_amazon_abtesing_private_key']").InnerText = 
+				ConfigurationInEditor.Instance.MyABTesting.AmazonPrivateKey;
+			configDoc.SelectSingleNode("resources/string[@name='playscape_enable_ab_testing_system']").InnerText = 
+				ConfigurationInEditor.Instance.MyABTesting.EnableABTestingSystem.ToString().ToLower();
+			
+			//TODO: remove all previous experiments - or simply generate this into a different file
+			for (int i = 0; i < ConfigurationInEditor.Instance.MyABTesting.NumberOfCustomExperiments; i++) 
+			{
+				string elementName = "playscape_experiment_" + (i + 1).ToString();
+				XmlElement playscapeExperimentElement = configDoc.CreateElement("string-array");
+				playscapeExperimentElement.SetAttribute("name",elementName);
+				
+				XmlElement experimentNameElement = configDoc.CreateElement("item");
+				experimentNameElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentName;
+				playscapeExperimentElement.AppendChild(experimentNameElement);
+				
+				XmlElement experimentTypeElement = configDoc.CreateElement("item");
+				experimentTypeElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentType;
+				playscapeExperimentElement.AppendChild(experimentTypeElement);
+				
+				for (int j =0; j <   ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].NumberOfVarsInExperiment; j++)
+				{
+					XmlElement experimentVariableElement = configDoc.CreateElement("item");
+					experimentVariableElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentVars[j];
+					playscapeExperimentElement.AppendChild(experimentVariableElement);
+				}
+				
+				XmlNode oldNode = configDoc.SelectSingleNode(string.Format ("resources/string-array[@name='{0}']", elementName));
+				if (oldNode != null) {
+					rootResources.ReplaceChild(playscapeExperimentElement, oldNode);
+				} else {
+					rootResources.InsertAfter(playscapeExperimentElement, lastExperimentsElement);
+				}
+				lastExperimentsElement = playscapeExperimentElement;
+			}
+		}
     }
 
     /// <summary>
