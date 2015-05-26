@@ -5,6 +5,7 @@ using System.Text;
 using Playscape.Ads;
 using Playscape.Notifications;
 using Soomla.Store;
+using Playscape.Internal;
 
 public class MenuController : MonoBehaviour {
 
@@ -13,6 +14,10 @@ public class MenuController : MonoBehaviour {
 	const string PLAY_A_RANDOM_GAME = "PLAY A RANDOM GAME";
 	const string PLAY_WITH_FRIENDS = "PLAY GAME WITH FRIENDS";
 	const string STORE = "STORE";
+	const string SHOW_INTESITIAL = "Show Interstitial";
+	const string DISABLE_ADS = "Disable ads";
+	const string ENABLE_ADS = "Enable ads";
+	const string SET_PW_CUSTOM_TAG = "Set PW custom tags";
 	const string QUIT = "QUIT";
 
 
@@ -50,7 +55,7 @@ public class MenuController : MonoBehaviour {
 		GUI.Box (new Rect (Screen.width / 2 - boxWidth / 2, 10, boxWidth, boxHeight), MENU_TITLE);
 
 		float buttonWidth = boxWidth * 0.85f;
-		float buttonHeight = boxHeight / 11;
+		float buttonHeight = boxHeight / 14;
 		float marginTop = 80;
 
 
@@ -75,7 +80,7 @@ public class MenuController : MonoBehaviour {
 			GameState.CurrentGameType = GameState.GameType.SinglePlayer;
 			Application.LoadLevel ("level1");
 		}
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight + marginTop * 1.2f, buttonWidth, buttonHeight), PLAY_A_RANDOM_GAME)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight + marginTop * 1.4f, buttonWidth, buttonHeight), PLAY_A_RANDOM_GAME)) {
 			GameState.IsHost = true;
 			GameState.CurrentGameType = GameState.GameType.MultiplayerPublicGame;
 			Application.LoadLevel ("lobby");
@@ -86,15 +91,23 @@ public class MenuController : MonoBehaviour {
 			Application.LoadLevel ("invite_screen");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop * 1.6f, buttonWidth, buttonHeight), STORE)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop * 1.4f, buttonWidth, buttonHeight), STORE)) {
 			Application.LoadLevel ("store");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop * 1.8f, buttonWidth, buttonHeight), "Show Interstitial")) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop * 1.4f, buttonWidth, buttonHeight), SHOW_INTESITIAL)) {
 			Playscape.Ads.Interstitials.Instance.Display(Interstitials.Kind.Both, "main-menu");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 2.0f, buttonWidth, buttonHeight), "Set PW custom tags")) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 1.4f, buttonWidth, buttonHeight), DISABLE_ADS)) {
+			AdManager.disableAds();
+		}
+
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 6 + marginTop * 1.4f, buttonWidth, buttonHeight), ENABLE_ADS)) {
+			AdManager.enableAds();
+		}
+
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 1.4f, buttonWidth, buttonHeight), SET_PW_CUSTOM_TAG)) {
 			int randomValue = (int) Random.Range(0, 20000);
 
 			PushWoosh.Instance.SetTag("customTag1", randomValue.ToString());
@@ -103,11 +116,11 @@ public class MenuController : MonoBehaviour {
 			PushWoosh.Instance.SetTag("customTag4Numeric", randomValue + 4);
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 6 + marginTop * 2.2f, buttonWidth, buttonHeight), "Get AB Testing Values")) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 8 + marginTop * 1.4f, buttonWidth, buttonHeight), "Get AB Testing Values")) {
 			Application.LoadLevel("ab_testing");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 2.4f, buttonWidth, buttonHeight), QUIT)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 9 + marginTop * 1.4f, buttonWidth, buttonHeight), QUIT)) {
 			Application.Quit ();
 		}
 	}
