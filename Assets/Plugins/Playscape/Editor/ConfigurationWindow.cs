@@ -60,8 +60,6 @@ namespace Playscape.Editor {
                 ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey,
                 Warnings.ADS_API_KEY_NOT_SET
             );
-			L.E ("API_KEY = {0}", ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey);
-			L.E ("REPORTER_ID = {0}", ConfigurationInEditor.Instance.ReporterId);
 
             if (warningAccumulator.HasWarnings())
             {
