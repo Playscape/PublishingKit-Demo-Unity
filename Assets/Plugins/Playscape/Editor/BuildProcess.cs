@@ -116,69 +116,65 @@ namespace Playscape.Editor
 				
 				string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
 				bool applyLastSavedConfiguration = false;
+
+				Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
 				
-				try {
-					Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
-					
-					//If response from servers is success save fetched configuration to AssetDatabse
-					if (response != null) {
-						if (response.Success) {
-							ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
-							
-							//Saving new fetched game configuration to the file-system
-							ConfigurationInEditor.Save();
-						} else {
-							mLogger.E("Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration was applied.");
-						}
+				//If response from servers is success save fetched configuration to AssetDatabse
+				if (response != null) {
+					if (response.Success) {
+						ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+						
+						//Saving new fetched game configuration to the file-system
+						ConfigurationInEditor.Save();
 					} else {
-						L.W("Warning!!! Could not download game configuration. Please check your internet connection");
+						mLogger.W("Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration was applied.");
 					}
-					
-				} finally {
-
-					OnProgress("Applying configuration", 5);
-					apkCreator.ExtractEntry(file, CONFIG_FILE, extractedPath);
-					apkCreator.ApplyGameConfiguration(ConfigurationInEditor.Instance.MyGameConfiguration, configFilePath);
-					apkCreator.AddFileToZip(file, configFilePath, "assets/playscape");
-
-					OnProgress("Extracting resrouces", 10);
-					mLogger.V("BuildProcess - Build - UnzipAPK " + sw.ElapsedMilliseconds);
-					apkCreator.ExtractEntry(file, "classes.dex", extractedPath);
-					
-					OnProgress("Extracting jar files", 20);
-					mLogger.V("BuildProcess - Build - executing dex2jar " + sw.ElapsedMilliseconds);
-					apkCreator.Dex2jar(dexFilePath, classesJarFile);
-					
-					OnProgress("Unifying libraries", 20);
-					mLogger.V("BuildProcess - Build - unify libs " + sw.ElapsedMilliseconds);
-					apkCreator.unifyLibs(classesJarFile, PATCH_FILE, unifiedLibJarFile);
-					
-					OnProgress("Applying analytics", 30);
-					mLogger.V("BuildProcess - Build - Apply Patch " + sw.ElapsedMilliseconds);
-					apkCreator.applyPatch(unifiedLibJarFile, unifiedLibJarFile, patchedClassesJarFile);
-					
-					OnProgress("Re-dexing libraries", 60);
-					mLogger.V("BuildProcess - Build - Executing lib2dex " + sw.ElapsedMilliseconds);
-					apkCreator.Jar2dex(patchedClassesJarFile, dexFilePath);
-					
-					OnProgress("Packaging apk", 80);
-					mLogger.V("BuildProcess - Build - archiving sources " + sw.ElapsedMilliseconds);
-					apkCreator.AddFileToZip(file, dexFilePath, null);
-					
-					OnProgress("Signing apk", 87);
-					mLogger.V("BuildProcess - Build - signing APK " + sw.ElapsedMilliseconds);
-					apkCreator.signApk(file);
-					
-					OnProgress("running zipalign on apk", 95);
-					mLogger.V("BuildProcess - Build - zip align " + sw.ElapsedMilliseconds);
-					apkCreator.applyZipalign(file, alignedFile);
-					File.Delete(file);
-					File.Move(alignedFile, file);
-					
-					OnProgress("Cleaning up", 98);
-					
-					sw.Stop();
+				} else {
+					L.W("Warning!!! Could not download game configuration. Please check your internet connection");
 				}
+
+				OnProgress("Applying configuration", 5);
+				apkCreator.ExtractEntry(file, CONFIG_FILE, extractedPath);
+				apkCreator.ApplyGameConfiguration(ConfigurationInEditor.Instance.MyGameConfiguration, configFilePath);
+				apkCreator.AddFileToZip(file, configFilePath, "assets/playscape");
+				
+				OnProgress("Extracting resrouces", 10);
+				mLogger.V("BuildProcess - Build - UnzipAPK " + sw.ElapsedMilliseconds);
+				apkCreator.ExtractEntry(file, "classes.dex", extractedPath);
+				
+				OnProgress("Extracting jar files", 20);
+				mLogger.V("BuildProcess - Build - executing dex2jar " + sw.ElapsedMilliseconds);
+				apkCreator.Dex2jar(dexFilePath, classesJarFile);
+				
+				OnProgress("Unifying libraries", 20);
+				mLogger.V("BuildProcess - Build - unify libs " + sw.ElapsedMilliseconds);
+				apkCreator.unifyLibs(classesJarFile, PATCH_FILE, unifiedLibJarFile);
+				
+				OnProgress("Applying analytics", 30);
+				mLogger.V("BuildProcess - Build - Apply Patch " + sw.ElapsedMilliseconds);
+				apkCreator.applyPatch(unifiedLibJarFile, unifiedLibJarFile, patchedClassesJarFile);
+				
+				OnProgress("Re-dexing libraries", 60);
+				mLogger.V("BuildProcess - Build - Executing lib2dex " + sw.ElapsedMilliseconds);
+				apkCreator.Jar2dex(patchedClassesJarFile, dexFilePath);
+				
+				OnProgress("Packaging apk", 80);
+				mLogger.V("BuildProcess - Build - archiving sources " + sw.ElapsedMilliseconds);
+				apkCreator.AddFileToZip(file, dexFilePath, null);
+				
+				OnProgress("Signing apk", 87);
+				mLogger.V("BuildProcess - Build - signing APK " + sw.ElapsedMilliseconds);
+				apkCreator.signApk(file);
+				
+				OnProgress("running zipalign on apk", 95);
+				mLogger.V("BuildProcess - Build - zip align " + sw.ElapsedMilliseconds);
+				apkCreator.applyZipalign(file, alignedFile);
+				File.Delete(file);
+				File.Move(alignedFile, file);
+				
+				OnProgress("Cleaning up", 98);
+				
+				sw.Stop();
             } 
             finally
             {
