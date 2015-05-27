@@ -144,8 +144,7 @@ namespace Playscape.Editor
 						return;
 					}
 				} else {
-					OnFailed("Warning!!! Could not download game configuration. Please check your internet connection");
-					return;
+					mLogger.W("Warning!!! Could not download game configuration. Please check your internet connection");
 				}
 				
 				OnProgress("Applying configuration", 5);
