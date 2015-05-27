@@ -129,22 +129,35 @@ namespace Playscape.Editor
 				
 				string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
 				bool applyLastSavedConfiguration = false;
+
+				try {
+					Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
 				
-				Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
-				
-				//If response from servers is success save fetched configuration to AssetDatabse
-				if (response != null) {
-					if (response.Success) {
-						ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
-						
-						//Saving new fetched game configuration to the file-system
-						ConfigurationInEditor.Save();
-					} else {
-						OnFailed("Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription);
-						return;
+					//If response from servers is success save fetched configuration to AssetDatabse
+					if (response != null) {
+						if (response.Success) {
+							ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+							
+							//Saving new fetched game configuration to the file-system
+							ConfigurationInEditor.Save();
+						} else {
+							OnFailed("Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription);
+							return;
+						}
 					}
-				} else {
-					mLogger.W("Warning!!! Could not download game configuration. Please check your internet connection");
+				} catch (System.Net.WebException e) {
+					System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)e.Response;
+
+					if (response == null) {
+						mLogger.W("Warning!!! Could not download game configuration. Please check your internet connection");
+					} else {
+						switch (response.StatusCode) {
+						case System.Net.HttpStatusCode.InternalServerError:
+						case System.Net.HttpStatusCode.NotFound:
+							OnFailed("Error!!! Could not retrieve configuration from the server");
+							return;
+						}
+					}
 				}
 				
 				OnProgress("Applying configuration", 5);
