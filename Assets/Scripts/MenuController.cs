@@ -18,6 +18,8 @@ public class MenuController : MonoBehaviour {
 	const string DISABLE_ADS = "Disable ads";
 	const string ENABLE_ADS = "Enable ads";
 	const string SET_PW_CUSTOM_TAG = "Set PW custom tags";
+	const string SHOW_CATALOG = "Show Catalog";
+	const string GET_A_TESTING_VALUES = "Get AB Testing Values";
 	const string QUIT = "QUIT";
 
 
@@ -114,11 +116,16 @@ public class MenuController : MonoBehaviour {
 			PushWoosh.Instance.SetTag("customTag4Numeric", randomValue + 4);
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 8 + marginTop * 1.4f, buttonWidth, buttonHeight), "Get AB Testing Values")) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 8 + marginTop * 1.4f, buttonWidth, buttonHeight), GET_A_TESTING_VALUES)) {
 			Application.LoadLevel("ab_testing");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 9 + marginTop * 1.4f, buttonWidth, buttonHeight), QUIT)) {
+        if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth / 2, buttonHeight * 9 + marginTop * 2.4f, buttonWidth, buttonHeight), SHOW_CATALOG))
+        {
+            Playscape.Catalog.Catalog.Instance.showCatalog();
+        }
+
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 10 + marginTop * 2.6f, buttonWidth, buttonHeight), QUIT)) {
 			Application.Quit ();
 		}
 	}
