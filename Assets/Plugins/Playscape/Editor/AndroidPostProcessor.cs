@@ -33,9 +33,9 @@ namespace Playscape.Editor {
 			return mTargetPath.ToLower ().EndsWith (".apk");
 		}
 
-		public void build(bool async, BuildProcess.BuildCompleted completedCallback, BuildProcess.BuildProgressChanged progressCallback) {
+		public void build(bool async, BuildProcess.BuildCompleted completedCallback, BuildProcess.BuildProgressChanged progressCallback, BuildProcess.BuildFailed failedCallback) {
             BuildParams bp = ConstructBuildParams();
-            BuildProcess process = new BuildProcess(bp, new UnityDebugLogger(), completedCallback, progressCallback);
+			BuildProcess process = new BuildProcess(bp, new UnityDebugLogger(), completedCallback, progressCallback, failedCallback);
             
 
             if (async) {
@@ -86,7 +86,7 @@ namespace Playscape.Editor {
             {
                 if (isApkBuild())
                 {
-                    build(false, onComplete, onProgress);
+                    build(false, onComplete, onProgress, OnFailed);
                 }
 
                 else
@@ -113,6 +113,14 @@ namespace Playscape.Editor {
         {
             EditorUtility.ClearProgressBar();
         }
+
+		public static void OnFailed(object sender, string message) {
+			EditorUtility.DisplayDialog (
+				"Playscape Post Proccessor",
+				message,
+				"OK"
+			);
+		}
 	
 		public static void ApplyPlayscapeAndroidConfiguration(string srcConfig,
 		                                                      string dstConfig,

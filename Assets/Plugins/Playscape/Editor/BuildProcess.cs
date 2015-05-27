@@ -38,6 +38,12 @@ namespace Playscape.Editor
         /// <param name="sender">The sender of the event</param>
         public delegate void BuildCompleted(object sender);
 
+		/// <summary>
+		/// A delegate used to report the build failed
+		/// </summary>
+		/// <param name="sender">The sender of the event</param>
+		public delegate void BuildFailed (object sender, String failedMessage);
+
         /// <summary>
         /// Invoked when the build is completed
         /// </summary>
@@ -47,6 +53,11 @@ namespace Playscape.Editor
         /// Invoked when the build progress changes
         /// </summary>
         private BuildProgressChanged mBuildProgressChanged;
+
+		/// <summary>
+		/// Invoked when the build progress was failed
+		/// </summary>
+		private BuildFailed mBuildFailed;
 
         /// <summary>
         /// Holds this build params
@@ -73,7 +84,8 @@ namespace Playscape.Editor
         public BuildProcess(BuildParams buildParams, 
             ILogger logger,
             BuildCompleted buildCompleted, 
-            BuildProgressChanged buildProgressChanged)
+            BuildProgressChanged buildProgressChanged,
+		    BuildFailed buildFailed)
         {
             if (logger == null) throw new ArgumentException("logger cannot be null");
             if (buildParams == null) throw new ArgumentException("buildParams cannot be null");
@@ -81,6 +93,7 @@ namespace Playscape.Editor
             mLogger = logger;
             mBuildCompleted = buildCompleted;
             mBuildProgressChanged = buildProgressChanged;
+			mBuildFailed = buildFailed;
             this.mBuildParams = buildParams;
         }
 
@@ -116,7 +129,7 @@ namespace Playscape.Editor
 				
 				string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
 				bool applyLastSavedConfiguration = false;
-
+				
 				Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
 				
 				//If response from servers is success save fetched configuration to AssetDatabse
@@ -127,12 +140,14 @@ namespace Playscape.Editor
 						//Saving new fetched game configuration to the file-system
 						ConfigurationInEditor.Save();
 					} else {
-						mLogger.W("Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription + "\n\n Last saved game configuration was applied.");
+						OnFailed("Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription);
+						return;
 					}
 				} else {
-					L.W("Warning!!! Could not download game configuration. Please check your internet connection");
+					OnFailed("Warning!!! Could not download game configuration. Please check your internet connection");
+					return;
 				}
-
+				
 				OnProgress("Applying configuration", 5);
 				apkCreator.ExtractEntry(file, CONFIG_FILE, extractedPath);
 				apkCreator.ApplyGameConfiguration(ConfigurationInEditor.Instance.MyGameConfiguration, configFilePath);
@@ -175,15 +190,26 @@ namespace Playscape.Editor
 				OnProgress("Cleaning up", 98);
 				
 				sw.Stop();
-            } 
-            finally
-            {
-                // cleanup the files and call the onComplete delegate
-                Cleanup();
-                OnProgress("Done", 100);
-                OnCompleted();
-            }            
+			} 
+			finally
+			{
+				// cleanup the files and call the onComplete delegate
+				Cleanup();
+				OnProgress("Done", 100);
+				OnCompleted();
+			}                  
         }
+
+		/// <summary>
+		/// Invokes the mBuildFailed delegate
+		/// </summary>
+		/// <param name="message">The message of the failed reason</param>
+		private void OnFailed(string message) 
+		{
+			if (mBuildFailed != null) {
+				mBuildFailed(this, message);
+			}
+		}
 
         /// <summary>
         /// Invokes the mBuildProgressChanged delegate

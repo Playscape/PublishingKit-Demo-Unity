@@ -78,7 +78,7 @@ namespace Playscape.Editor {
 			EditorUtility.ClearProgressBar();
             EditorUtility.DisplayProgressBar("Publishing kit post-process", "Build Started", 0);
 
-            app.build(false, completed, onProgress);
+            app.build(false, completed, onProgress, OnFailed);
         }
 
         private void onProgress(object sender, string info, int progress)
@@ -101,6 +101,21 @@ namespace Playscape.Editor {
 
             EditorUtility.ClearProgressBar();
         }
+
+		public void OnFailed(object sender, string message) 
+		{
+			if (!isUIThread)
+			{
+				this.RunOnUIThread(new BuildProcess.BuildProgressChanged(onProgress), new object[] { sender, message });
+				return;
+			}
+
+			EditorUtility.DisplayDialog (
+				"Playscape Build Post Proccessor",
+				message,
+				"OK"
+				);
+		}
 			
 		private void ApplyChanges() {
 			string targetManifest = "Assets/Plugins/Android/PlayscapePublishingKit/AndroidManifest.xml";
