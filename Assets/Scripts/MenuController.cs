@@ -28,8 +28,6 @@ public class MenuController : MonoBehaviour {
 	void Start () {
 		SocialController.Instance.OnSocialRequestReceived += HandleOnSocialRequestReceived;
 		Banners.Instance.Hide ();
-		// uncomment for disable ads
-//		Playscape.Analytics.Report.Instance.CustomVariables["disable_ads"] = "true";
 	}
 
 	void Destroy() {
@@ -100,11 +98,11 @@ public class MenuController : MonoBehaviour {
 		}
 
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 1.4f, buttonWidth, buttonHeight), DISABLE_ADS)) {
-			AdManager.disableAds();
+			AdManager.Instance.DisableAds();
 		}
 
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 6 + marginTop * 1.4f, buttonWidth, buttonHeight), ENABLE_ADS)) {
-			AdManager.enableAds();
+			AdManager.Instance.EnableAds();
 		}
 
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 1.4f, buttonWidth, buttonHeight), SET_PW_CUSTOM_TAG)) {
