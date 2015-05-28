@@ -89,7 +89,7 @@ namespace Playscape.Internal
 		/// <summary>
 		/// Start executing of this request.
 		/// </summary>
-		public T Start() {
+		public T Start() { 
 			T response = default(T);
 
 			if (this.Request != null) {
@@ -98,9 +98,13 @@ namespace Playscape.Internal
 				try {
 					webResponse = this.Request.GetResponse ();
 					response = processResponseStream (webResponse.GetResponseStream ());
-				} catch (Exception e) {
-					L.E ("An error occured while fetching Game Configuration: " + e.Message);
+				} 
+				finally {
+					if (webResponse != null) {
+						webResponse.Close();
+					}
 				}
+
 			}
 
 			return response;

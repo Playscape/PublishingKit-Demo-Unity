@@ -159,10 +159,11 @@ namespace Playscape.Internal {
 				string url = string.Format ("{0}/config", CommonConsts.GAME_CONFIGURATION_API_URL);
 
 				// Star synchronous request for getting game configuration
+				GameConfigurationResponse gameConfiguration = null;
 				SyncRequest<GameConfigurationResponse> request = new SyncRequest<GameConfigurationResponse> (url, System.Net.WebRequestMethods.Http.Get);
 				request.addHeader ("X-API-Key", apikey);
-
-				GameConfigurationResponse gameConfiguration = request.Start ();
+				
+				gameConfiguration = request.Start ();
 
 				return gameConfiguration;
 			}
@@ -200,6 +201,9 @@ namespace Playscape.Internal {
 
 			[PlayscapeJsonName("analytics_report", false)]
 			public AnalyticsReport MyAnalyticsReport = new AnalyticsReport ();
+
+			[PlayscapeJsonName("published_by_playscape", false)]
+			public bool PublishedByPlayscape;
 
 			/**
 			 * Traverses the game configuration via given visitor

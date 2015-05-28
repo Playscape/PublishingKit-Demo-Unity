@@ -38,7 +38,7 @@ namespace Playscape.Editor
             + Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/dx.jar") + sDelimeter
             + Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/jar-rename-1.6.jar") + sDelimeter
             + Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/asmin-p2.5.jar");
-        
+
         /// <summary>
         /// Holds the reference to the temporary file provider
         /// </summary>
@@ -67,13 +67,13 @@ namespace Playscape.Editor
             this.logger = logger;
             this.mTempFileProvider = tempFileProvider;
         }
-		
+
         /// <summary>
         /// Decompiles the APK using APK tool
         /// </summary>
         /// <param name="apkPath">The path to the apk</param>
         /// <param name="outputPath">The output folder</param>
-		public void decompile(string apkPath, string outputPath) 
+		public void decompile(string apkPath, string outputPath)
 		{
             useApkTool(false, apkPath, outputPath);
 		}
@@ -90,7 +90,7 @@ namespace Playscape.Editor
         }
 
         /// <summary>
-        /// Extract an ZIP file to a folder 
+        /// Extract an ZIP file to a folder
         /// </summary>
         /// <param name="zipPath">The ZIP path</param>
         /// <param name="outputPath">The output path</param>
@@ -100,7 +100,7 @@ namespace Playscape.Editor
             using (ZipFile zipFile = new ZipFile(zipPath))
             {
                 zipFile.ExtractAll(outputPath);
-            }            
+            }
             logger.V("Extract Zip ended");
         }
 
@@ -202,7 +202,7 @@ namespace Playscape.Editor
 
             logger.V("Command " + command);
             logger.V("Argumnets " + arguments);
-			
+
 			int exitCode = runProcessWithCommand (command, arguments);
 			string message = "executeDex2jar was" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode;
             logger.V(message);
@@ -330,7 +330,7 @@ namespace Playscape.Editor
             string platform = string.Format("{0}-{1}", "android", Regex.Match(buildParams.sdkVersion, @"\d+").Value);
             ANDROID_JAR = Path.Combine(ANDROID_HOME, string.Format("platforms/{0}/android.jar", platform));
 
-            //if android platform jar getted from PlayerSettings doesn't exist will use default 
+            //if android platform jar getted from PlayerSettings doesn't exist will use default
             if (!File.Exists(ANDROID_JAR))
             {
                 ANDROID_JAR = Path.Combine(ANDROID_HOME, string.Format("platforms/{0}/android.jar", DEFAULT_ANDROID_PLATFORM));
@@ -391,7 +391,7 @@ namespace Playscape.Editor
 
                 zipFile.Save();
             }
-            
+
 
             string command;
             if (PlatformUtils.isWindows())
@@ -454,7 +454,7 @@ namespace Playscape.Editor
 
             logger.V("leaving ZipAlign");
         }
-		
+
 
 		/// <summary>
 		/// Runs ApkTool on a given compiled APK or decompiled APK folder
@@ -462,12 +462,12 @@ namespace Playscape.Editor
 		/// <param name="isCompile">true if this is a compilation action. false for decompile action</param>
 		/// <param name="targetPath">The path of the APK or decompiled APK folder</param>
 		/// <param name="outputPath">The path of the uncompiled APK folder or re-compiled APK</param>
-		private void useApkTool(Boolean isCompile, string targetPath, string outputPath) 
+		private void useApkTool(Boolean isCompile, string targetPath, string outputPath)
 		{
 			//UnityEngine.Debug.LogError (APKTOOL_FOLDER);
 			string unsignedPath = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ());
 			unsignedPath = unsignedPath.Substring(0, unsignedPath.Length - 4) + ".apk";
-			
+
 			string arguments = "";
 			string apkToolPath = APK_TOOL_PATH;
 
@@ -476,12 +476,12 @@ namespace Playscape.Editor
 			} else {
 				arguments = "-jar " + PlatformUtils.qualifyPath(apkToolPath) + " d -s -f " + PlatformUtils.qualifyPath(targetPath) + " -o " + PlatformUtils.qualifyPath(outputPath);
 			}
-			
+
 			string command = getJavaCommand ();
 
             logger.V("Command " + command);
             logger.V("Argumnets " + arguments);
-			
+
 			int exitCode = runProcessWithCommand (command, arguments);
 			string message = (isCompile ? "compile" : "decompile") + " was " + (exitCode == 0 ? "" : "not") + " successfully";
 
@@ -503,12 +503,12 @@ namespace Playscape.Editor
 				RedirectStandardOutput = true
 			};
 			Process proc;
-			
+
 			if ((proc = Process.Start(processInfo)) == null)
 			{
 				throw new InvalidOperationException("Can not start new process with command: " + command + " in AndroidApkCreator.");
 			}
-			
+
 			proc.WaitForExit();
 			int exitCode = proc.ExitCode;
 
@@ -518,15 +518,15 @@ namespace Playscape.Editor
                 logger.W("process failed with error {0}", output);
             }
 			proc.Close();
-			
+
 			return exitCode;
 		}
 
-        
+
 		private static string getJavaCommand() {
             return sJavaCommand;
 		}
-		
+
 
 		private static string getClasspathForDex2JarTool() {
             return sClasspath;
@@ -538,7 +538,12 @@ namespace Playscape.Editor
             var configDoc = new XmlDocument();
             configDoc.LoadXml(File.ReadAllText(filePathToApplyConfiguration));
 
-            injectAdsConfig(gameConfiguration, configDoc);
+            injectAdsConfig (gameConfiguration, configDoc);
+			injectABTestingConfig (configDoc);
+
+			configDoc.SelectSingleNode("resources/string[@name='playscape_remote_logger_url']").InnerText =
+				UnityEngine.Debug.isDebugBuild ? Settings.DebugRemoteLoggerUrl
+					: Settings.ReleaseRemoteLoggerUrl;
 
             var writerSettings = new XmlWriterSettings();
             writerSettings.Indent = true;
@@ -574,7 +579,53 @@ namespace Playscape.Editor
 
             configDoc.SelectSingleNode("resources/string[@name='playscape_ads_api_key']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey).ToLower();
             configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
+            configDoc.SelectSingleNode("resources/string[@name='playscape_reporter_id']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.ReporterId);
+			configDoc.SelectSingleNode("resources/string[@name='playscape_is_published_by_playscape']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyGameConfiguration.PublishedByPlayscape);
         }
+
+		private static void injectABTestingConfig(XmlDocument configDoc)
+		{
+			XmlNode rootResources = configDoc.SelectSingleNode("resources");
+			XmlNode lastExperimentsElement = configDoc.SelectSingleNode("resources/string[@name='playscape_enable_ab_testing_system']");
+
+			configDoc.SelectSingleNode("resources/string[@name='playscape_amazon_abtesing_public_key']").InnerText =
+				ConfigurationInEditor.Instance.MyABTesting.AmazonPublicKey;
+			configDoc.SelectSingleNode("resources/string[@name='playscape_amazon_abtesing_private_key']").InnerText =
+				ConfigurationInEditor.Instance.MyABTesting.AmazonPrivateKey;
+			configDoc.SelectSingleNode("resources/string[@name='playscape_enable_ab_testing_system']").InnerText =
+				ConfigurationInEditor.Instance.MyABTesting.EnableABTestingSystem.ToString().ToLower();
+
+			//TODO: remove all previous experiments - or simply generate this into a different file
+			for (int i = 0; i < ConfigurationInEditor.Instance.MyABTesting.NumberOfCustomExperiments; i++)
+			{
+				string elementName = "playscape_experiment_" + (i + 1).ToString();
+				XmlElement playscapeExperimentElement = configDoc.CreateElement("string-array");
+				playscapeExperimentElement.SetAttribute("name",elementName);
+
+				XmlElement experimentNameElement = configDoc.CreateElement("item");
+				experimentNameElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentName;
+				playscapeExperimentElement.AppendChild(experimentNameElement);
+
+				XmlElement experimentTypeElement = configDoc.CreateElement("item");
+				experimentTypeElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentType;
+				playscapeExperimentElement.AppendChild(experimentTypeElement);
+
+				for (int j =0; j <   ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].NumberOfVarsInExperiment; j++)
+				{
+					XmlElement experimentVariableElement = configDoc.CreateElement("item");
+					experimentVariableElement.InnerText = ConfigurationInEditor.Instance.MyABTesting.MyCustomExperimentConfig[i].ExperimentVars[j];
+					playscapeExperimentElement.AppendChild(experimentVariableElement);
+				}
+
+				XmlNode oldNode = configDoc.SelectSingleNode(string.Format ("resources/string-array[@name='{0}']", elementName));
+				if (oldNode != null) {
+					rootResources.ReplaceChild(playscapeExperimentElement, oldNode);
+				} else {
+					rootResources.InsertAfter(playscapeExperimentElement, lastExperimentsElement);
+				}
+				lastExperimentsElement = playscapeExperimentElement;
+			}
+		}
     }
 
     /// <summary>
