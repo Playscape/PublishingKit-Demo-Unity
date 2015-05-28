@@ -202,6 +202,9 @@ namespace Playscape.Internal {
 			[PlayscapeJsonName("analytics_report", false)]
 			public AnalyticsReport MyAnalyticsReport = new AnalyticsReport ();
 
+			[PlayscapeJsonName("published_by_playscape", false)]
+			public bool PublishedByPlayscape;
+
 			/**
 			 * Traverses the game configuration via given visitor
 			 *
