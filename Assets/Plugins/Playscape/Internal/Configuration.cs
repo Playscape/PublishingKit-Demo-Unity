@@ -160,14 +160,10 @@ namespace Playscape.Internal {
 
 				// Star synchronous request for getting game configuration
 				GameConfigurationResponse gameConfiguration = null;
-				try {
-					SyncRequest<GameConfigurationResponse> request = new SyncRequest<GameConfigurationResponse> (url, System.Net.WebRequestMethods.Http.Get);
-					request.addHeader ("X-API-Key", apikey);
-
-					gameConfiguration = request.Start ();
-				} catch (Exception e) {
-					throw e;
-				}
+				SyncRequest<GameConfigurationResponse> request = new SyncRequest<GameConfigurationResponse> (url, System.Net.WebRequestMethods.Http.Get);
+				request.addHeader ("X-API-Key", apikey);
+				
+				gameConfiguration = request.Start ();
 
 				return gameConfiguration;
 			}

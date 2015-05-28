@@ -98,9 +98,13 @@ namespace Playscape.Internal
 				try {
 					webResponse = this.Request.GetResponse ();
 					response = processResponseStream (webResponse.GetResponseStream ());
-				} catch (Exception e) {
-					throw e;
+				} 
+				finally {
+					if (webResponse != null) {
+						webResponse.Close();
+					}
 				}
+
 			}
 
 			return response;
