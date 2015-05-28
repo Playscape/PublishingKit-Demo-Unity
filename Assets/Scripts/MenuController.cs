@@ -105,7 +105,12 @@ public class MenuController : MonoBehaviour {
 			Application.LoadLevel("ab_testing");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 2.4f, buttonWidth, buttonHeight), QUIT)) {
+        if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 2.4f, buttonWidth, buttonHeight), "Show Catalog"))
+        {
+            Playscape.Catalog.Catalog.Instance.showCatalog();
+        }
+
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 8 + marginTop * 2.6f, buttonWidth, buttonHeight), QUIT)) {
 			Application.Quit ();
 		}
 	}
