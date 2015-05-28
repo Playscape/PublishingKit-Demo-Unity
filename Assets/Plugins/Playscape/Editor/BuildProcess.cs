@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
+using Playscape.Internal;
 
 namespace Playscape.Editor
 {
@@ -14,6 +15,10 @@ namespace Playscape.Editor
     /// </summary>
     public class BuildProcess : ITempFileProvider
     {
+		/// <summary>
+		/// The name of the configuration file
+		/// </summary>
+		private const string CONFIG_FILE = "assets/playscape/PlayscapeConfig.xml";
         /// <summary>
         /// The location of the patch file (aspectj hooks and logic)
         /// </summary>
@@ -33,6 +38,12 @@ namespace Playscape.Editor
         /// <param name="sender">The sender of the event</param>
         public delegate void BuildCompleted(object sender);
 
+		/// <summary>
+		/// A delegate used to report the build failed
+		/// </summary>
+		/// <param name="sender">The sender of the event</param>
+		public delegate void BuildFailed (object sender, String failedMessage);
+
         /// <summary>
         /// Invoked when the build is completed
         /// </summary>
@@ -42,6 +53,11 @@ namespace Playscape.Editor
         /// Invoked when the build progress changes
         /// </summary>
         private BuildProgressChanged mBuildProgressChanged;
+
+		/// <summary>
+		/// Invoked when the build progress was failed
+		/// </summary>
+		private BuildFailed mBuildFailed;
 
         /// <summary>
         /// Holds this build params
@@ -68,7 +84,8 @@ namespace Playscape.Editor
         public BuildProcess(BuildParams buildParams, 
             ILogger logger,
             BuildCompleted buildCompleted, 
-            BuildProgressChanged buildProgressChanged)
+            BuildProgressChanged buildProgressChanged,
+		    BuildFailed buildFailed)
         {
             if (logger == null) throw new ArgumentException("logger cannot be null");
             if (buildParams == null) throw new ArgumentException("buildParams cannot be null");
@@ -76,6 +93,7 @@ namespace Playscape.Editor
             mLogger = logger;
             mBuildCompleted = buildCompleted;
             mBuildProgressChanged = buildProgressChanged;
+			mBuildFailed = buildFailed;
             this.mBuildParams = buildParams;
         }
 
@@ -94,11 +112,13 @@ namespace Playscape.Editor
                 // dex2jar can oonly work with .jar extentions
                 string extractedPath = GetNewTempFolder();
                 string dexFilePath = extractedPath + "/classes.dex";
+				string configFilePath = extractedPath + "/" + CONFIG_FILE;
                 string classesJarFile = GetNewTempFolder("jar");
                 string unifiedLibJarFile = GetNewTempFolder("jar");
                 string patchedClassesJarFile = GetNewTempFolder("jar");
                 string alignedFile = GetNewTempFolder();
 
+				//0. download game configuration and apply game configuration
                 //1. unzip the apk
                 //2. extract the dex and convert it into .jar file
                 //3. unify the libraries with the patcher
@@ -106,52 +126,102 @@ namespace Playscape.Editor
                 //5. convert back the .jar into dex
                 //6. package the apk
                 //7. sign and run zipalign
-                OnProgress("Extracting resrouces", 10);
-                mLogger.V("BuildProcess - Build - UnzipAPK " + sw.ElapsedMilliseconds);
-                apkCreator.ExtractEntry(file, "classes.dex", extractedPath);
+				
+				string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
+				bool applyLastSavedConfiguration = false;
 
-                OnProgress("Extracting jar files", 20);
-                mLogger.V("BuildProcess - Build - executing dex2jar " + sw.ElapsedMilliseconds);
-                apkCreator.Dex2jar(dexFilePath, classesJarFile);
-                
-                OnProgress("Unifying libraries", 20);
-                mLogger.V("BuildProcess - Build - unify libs " + sw.ElapsedMilliseconds);
-                apkCreator.unifyLibs(classesJarFile, PATCH_FILE, unifiedLibJarFile);
-                
-                OnProgress("Applying analytics", 30);
-                mLogger.V("BuildProcess - Build - Apply Patch " + sw.ElapsedMilliseconds);
-                apkCreator.applyPatch(unifiedLibJarFile, unifiedLibJarFile, patchedClassesJarFile);
-                
-                OnProgress("Re-dexing libraries", 60);
-                mLogger.V("BuildProcess - Build - Executing lib2dex " + sw.ElapsedMilliseconds);
-                apkCreator.Jar2dex(patchedClassesJarFile, dexFilePath);
+				try {
+					Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
+				
+					//If response from servers is success save fetched configuration to AssetDatabse
+					if (response != null) {
+						if (response.Success) {
+							ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+							
+							//Saving new fetched game configuration to the file-system
+							ConfigurationInEditor.Save();
+						} else {
+							OnFailed("Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription);
+							return;
+						}
+					}
+				} catch (System.Net.WebException e) {
+					System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)e.Response;
 
-                OnProgress("Packaging apk", 80);
-                mLogger.V("BuildProcess - Build - archiving sources " + sw.ElapsedMilliseconds);
-                apkCreator.AddFileToZip(file, dexFilePath, null);
-
-                OnProgress("Signing apk", 87);
-                mLogger.V("BuildProcess - Build - signing APK " + sw.ElapsedMilliseconds);
-                apkCreator.signApk(file);
-
-                OnProgress("running zipalign on apk", 95);
-                mLogger.V("BuildProcess - Build - zip align " + sw.ElapsedMilliseconds);
-                apkCreator.applyZipalign(file, alignedFile);
-                File.Delete(file);
-                File.Move(alignedFile, file);
-
-                OnProgress("Cleaning up", 98);
-
-                sw.Stop();
-            } 
-            finally
-            {
-                // cleanup the files and call the onComplete delegate
-                Cleanup();
-                OnProgress("Done", 100);
-                OnCompleted();
-            }            
+					if (response == null) {
+						mLogger.W("Warning!!! Could not download game configuration. Please check your internet connection");
+					} else {
+						switch (response.StatusCode) {
+						case System.Net.HttpStatusCode.InternalServerError:
+						case System.Net.HttpStatusCode.NotFound:
+							OnFailed("Error!!! Could not retrieve configuration from the server");
+							return;
+						}
+					}
+				}
+				
+				OnProgress("Applying configuration", 5);
+				apkCreator.ExtractEntry(file, CONFIG_FILE, extractedPath);
+				apkCreator.ApplyGameConfiguration(ConfigurationInEditor.Instance.MyGameConfiguration, configFilePath);
+				apkCreator.AddFileToZip(file, configFilePath, "assets/playscape");
+				
+				OnProgress("Extracting resrouces", 10);
+				mLogger.V("BuildProcess - Build - UnzipAPK " + sw.ElapsedMilliseconds);
+				apkCreator.ExtractEntry(file, "classes.dex", extractedPath);
+				
+				OnProgress("Extracting jar files", 20);
+				mLogger.V("BuildProcess - Build - executing dex2jar " + sw.ElapsedMilliseconds);
+				apkCreator.Dex2jar(dexFilePath, classesJarFile);
+				
+				OnProgress("Unifying libraries", 20);
+				mLogger.V("BuildProcess - Build - unify libs " + sw.ElapsedMilliseconds);
+				apkCreator.unifyLibs(classesJarFile, PATCH_FILE, unifiedLibJarFile);
+				
+				OnProgress("Applying analytics", 30);
+				mLogger.V("BuildProcess - Build - Apply Patch " + sw.ElapsedMilliseconds);
+				apkCreator.applyPatch(unifiedLibJarFile, unifiedLibJarFile, patchedClassesJarFile);
+				
+				OnProgress("Re-dexing libraries", 60);
+				mLogger.V("BuildProcess - Build - Executing lib2dex " + sw.ElapsedMilliseconds);
+				apkCreator.Jar2dex(patchedClassesJarFile, dexFilePath);
+				
+				OnProgress("Packaging apk", 80);
+				mLogger.V("BuildProcess - Build - archiving sources " + sw.ElapsedMilliseconds);
+				apkCreator.AddFileToZip(file, dexFilePath, null);
+				
+				OnProgress("Signing apk", 87);
+				mLogger.V("BuildProcess - Build - signing APK " + sw.ElapsedMilliseconds);
+				apkCreator.signApk(file);
+				
+				OnProgress("running zipalign on apk", 95);
+				mLogger.V("BuildProcess - Build - zip align " + sw.ElapsedMilliseconds);
+				apkCreator.applyZipalign(file, alignedFile);
+				File.Delete(file);
+				File.Move(alignedFile, file);
+				
+				OnProgress("Cleaning up", 98);
+				
+				sw.Stop();
+			} 
+			finally
+			{
+				// cleanup the files and call the onComplete delegate
+				Cleanup();
+				OnProgress("Done", 100);
+				OnCompleted();
+			}                  
         }
+
+		/// <summary>
+		/// Invokes the mBuildFailed delegate
+		/// </summary>
+		/// <param name="message">The message of the failed reason</param>
+		private void OnFailed(string message) 
+		{
+			if (mBuildFailed != null) {
+				mBuildFailed(this, message);
+			}
+		}
 
         /// <summary>
         /// Invokes the mBuildProgressChanged delegate
