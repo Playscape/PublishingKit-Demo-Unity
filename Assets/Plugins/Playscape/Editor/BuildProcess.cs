@@ -126,22 +126,21 @@ namespace Playscape.Editor
                 //5. convert back the .jar into dex
                 //6. package the apk
                 //7. sign and run zipalign
-				
-				string API_KEY = ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey;
-				bool applyLastSavedConfiguration = false;
+
+				Configuration.GameConfigurationResponse gameConfigResponse = null;
 
 				try {
-					Configuration.GameConfigurationResponse response = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (Configuration.Instance.MyAds.MyAdsConfig.ApiKey);;
-				
+					gameConfigResponse = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey);
+
 					//If response from servers is success save fetched configuration to AssetDatabse
-					if (response != null) {
-						if (response.Success) {
-							ConfigurationInEditor.Instance.MyGameConfiguration = response.GameConfiguration;
+					if (gameConfigResponse != null) {
+						if (gameConfigResponse.Success) {
+							ConfigurationInEditor.Instance.MyGameConfiguration = gameConfigResponse.GameConfiguration;
 							
 							//Saving new fetched game configuration to the file-system
 							ConfigurationInEditor.Save();
 						} else {
-							OnFailed("Error!!! Could not retrieve configuration from the server. Message: " + response.ErrorDescription);
+							OnFailed("Error!!! Could not retrieve configuration from the server. Message: " + gameConfigResponse.ErrorDescription);
 							return;
 						}
 					}
@@ -151,9 +150,7 @@ namespace Playscape.Editor
 					if (response == null) {
 						mLogger.W("Warning!!! Could not download game configuration. Please check your internet connection");
 					} else {
-						switch (response.StatusCode) {
-						case System.Net.HttpStatusCode.InternalServerError:
-						case System.Net.HttpStatusCode.NotFound:
+						if ((int)response.StatusCode >= 400) {
 							OnFailed("Error!!! Could not retrieve configuration from the server");
 							return;
 						}
