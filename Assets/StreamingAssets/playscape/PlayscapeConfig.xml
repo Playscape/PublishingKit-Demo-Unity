@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="facebook_app_id">274700456018483</string>
+    <string name="game_app_id">172026865991</string>
+
+    <string name="ga_trackingId">UA-27827375-1</string>
+    <string name="ga_dispatchPeriod">30</string>
+    <string name="ga_autoActivityTracking">true</string>
+    <string name="ga_reportUncaughtExceptions">true</string>
+    <string name="playscape_remote_logger_url">https://server.gameconsole.mominis.com/services/LoggingService/WriteToLog</string>
+    <string name="playscape_remote_logger_campaign_id">campaign_id</string>
+    <string name="playscape_remote_logger_dump_size_threshold_bytes">2048</string>
+    <string name="playscape_remote_logger_file_size_limit_bytes">2097152</string>
+    <string name="playscape_remote_logger_entry_size_limit_bytes">2048</string>
+    <string name="playscape_remote_logger_force_dump_now">false</string>
+    <string name="playscape_publishing_kit_version">1.6.117</string>
+    <string name="playscape_reporter_id">TestGame</string>
+    <string name="playscape_is_alive_service_reschedule_delay_seconds">86400</string>
+
+    <!-- Ads -->
+    <string name="playscape_ads_api_key">%{API_KEY}</string>
+    <string name="playscape_ads_config_url">%{ADS_CONFIG_URL}</string>
+    <string name="playscape_ads_config_enable_ads_system">true</string>
+    <string name="playscape_chartboost_app_id">531c4f442d42da19400a5d75</string>
+    <string name="playscape_chartboost_app_signature">3cf6252e06d08e7afa7fbc7532b916a7fd52a01e</string>
+    <string name="playscape_millennial_media_app_id"></string>
+    <string name="playscape_admob_interstitials_ad_unit_id"></string>
+    <string name="playscape_admob_banners_ad_unit_id"></string>
+    <string name="playscape_admob_test_device_id"></string>
+    <string name="playscape_startapp_developer_id"></string>
+    <string name="playscape_startapp_app_id"></string>
+    <string name="playscape_adcolony_app_id"></string>
+    <string name="playscape_adcolony_video_zone_id"></string>
+    <string name="playscape_adcolony_incentivised_video_zone_id"></string>
+    <string name="playscape_vungle_app_id"></string>
+    <string name="playscape_ads_max_delay_interval_between_failures_ms">60000</string>
+    <string name="playscape_ads_delay_interval_between_failures_ms">15000</string>
+    <string name="playscape_ads_retry_wait_secs">10</string>
+    <string name="playscape_ads_refresh_interval_secs">15</string>
+    <string name="playscape_ads_min_interval_between_syncs">900000</string>
+    <string name="playscape_adience_key">5f6d5af0df237cd8b2bb7ed2a3098254</string>
+    <string name="playscape_is_published_by_playscape">false</string>
+
+    <!-- Experiments -->
+    <string name="playscape_amazon_abtesing_public_key"></string>
+    <string name="playscape_amazon_abtesing_private_key"></string>
+    <string name="playscape_enable_ab_testing_system"></string>
+
+    <!-- Cocos 2D-x specific -->
+    <string name="playscape_google_sender_id">95276907422</string>
+	 <string name="playscape_google_sender_id_test">818047653528</string>
+    <string name="playscape_gcm_api_url">https://api.playscape.com</string>
+    <string name="playscape_gcm_api_url_test">https://playscape-gcm-test.appspot.com</string>
+    <string name="playscape_tag_api_url">https://api.playscape.com</string>
+    <string name="playscape_tag_api_url_test">https://playscape-gcm-test.appspot.com</string>
+    <!-- <string name="playscape_gcm_api_url">http://playscape-gcm.appspot.com</string> -->
+
+	<!-- playscape cross promotion -->
+
+	<string name="playscape_cp_catalog_main_category">Featured</string>
+	<string name="playscape_cp_init_timeout">5</string>
+
+	<string name="playscape_cp_welcome_notification_url">http://server.notification.mominis.com/Services/CompressedNotificationService/json/GetWelcomeNotification_PS2.json</string>
+	<string name="playscape_cp_user_data_update_url">https://server.gameconsole.mominis.com/Services/ClientAccountService/json/UpdateUserData</string>
+	<string name="playscape_cp_user_data_login_url">https://server.gameconsole.mominis.com/Services/ClientAccountService/json/GetServerUserId?clientUserId={clientUserId}&amp;idType={idType}</string>
+	<string name="playscape_cp_categories_url">http://server.gameconsole.mominis.com/services/CompressedCatalogService/json/GetCompressedTags?catalogName=Playscape_Launch</string>
+	<string name="playscape_cp_resolutions_url">http://playscape.s3.amazonaws.com/playscape_launch/getallresolutions</string>
+	<string name="playscape_cp_catalog_url">http://server.gameconsole.mominis.com/services/CompressedCatalogService/json/GetCompressedApps?catalogName=Playscape_Launch&amp;width=%1$d&amp;height=%2$d&amp;supportDiff=true</string>
+	<string name="playscape_cp_missions_url">http://server.gameconsole.mominis.com/services/CompressedCatalogService/json/GetCompressedMissions?catalogName=Playscape_Launch&amp;supportDiff=true</string>
+	<string name="playscape_cp_notification_download_url">http://server.notification.mominis.com/Services/CompressedNotificationService/json/GetGamesNotifications.json</string>
+
+	<string name="playscape_cp_sync_initial_failure_delay_min">2</string> 			<!-- Default: 2 Minutes -->
+	<string name="playscape_cp_sync_failure_recede_factor">1.5</string>				<!-- Default: 1.5 -->
+	<string name="playscape_cp_sync_max_failure_delay_min">300</string>				<!-- Default: 300 Minutes = 5hours * 60minutes -->
+	<string name="playscape_cp_sync_random_delay_sec">0</string>					<!-- Default: 0 Seconds -->
+	<string name="playscape_cp_sync_max_random_delay_sec">60</string>				<!-- Default: 60 Seconds -->
+	<string name="playscape_cp_sync_min_minutes_between_syncs">2</string>			<!-- Default: 2 Minutes -->
+	<string name="playscape_cp_sync_periodic_sync_minutes">1500</string>			<!-- Default: 1500 = 25hours x 60minutes -->
+	<string name="playscape_cp_sync_max_minutes_from_last_launch">10080</string>
+
+	<string name="playscape_cp_mobpartner_campaign_id">558</string>
+
+</resources>

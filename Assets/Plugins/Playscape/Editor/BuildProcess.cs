@@ -126,12 +126,12 @@ namespace Playscape.Editor
                 //5. convert back the .jar into dex
                 //6. package the apk
                 //7. sign and run zipalign
-
+				
 				Configuration.GameConfigurationResponse gameConfigResponse = null;
-
+				
 				try {
 					gameConfigResponse = ConfigurationInEditor.Instance.FetchGameConfigurationForApiKey (ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey);
-
+					
 					//If response from servers is success save fetched configuration to AssetDatabse
 					if (gameConfigResponse != null) {
 						if (gameConfigResponse.Success) {
@@ -146,7 +146,7 @@ namespace Playscape.Editor
 					}
 				} catch (System.Net.WebException e) {
 					System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)e.Response;
-
+					
 					if (response == null) {
 						mLogger.W("Warning!!! Could not download game configuration. Please check your internet connection");
 					} else {

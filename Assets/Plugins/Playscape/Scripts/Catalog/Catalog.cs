@@ -7,10 +7,19 @@ using System;
 
 namespace Playscape.Catalog
 {
+    /// <summary>
+    /// This class handles the playscape exchange catalog
+    /// </summary>
     public class Catalog
     {
+        /// <summary>
+        /// Communicates with the internal catalog part.
+        /// </summary>
         private PlayscapeCatalogBase mPlayscapeCatalog;
 
+        /// <summary>
+        /// Singleton
+        /// </summary>
         Catalog()
         {
             GameObject go = GameObject.Find(PlayscapeManager.PLAYSCAPE_MANAGER_GAMEOBJECT_NAME);

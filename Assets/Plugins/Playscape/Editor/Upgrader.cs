@@ -6,14 +6,14 @@ namespace Playscape.Editor {
 	public  static class Upgrader {
 		/// <summary>
 		/// Runs upgrade mechanism if needed.
-		/// 
-		/// How it works - 
-		/// 
+		///
+		/// How it works -
+		///
 		/// 1. Read contents of /Assets/Plugins/Playscape/Version/my_version
 		///    The contents are the current version number.
 		/// 2. Let's assume we've read "1.3.0". We look for a file named 1.3.0, if its contents are empty proceed with upgrade.
 		/// 3. If-else statements which check on previous version files and perform upgrade actions are required.
-		/// 
+		///
 		/// </summary>
 		public static void Upgrade() {
 			string myVersion = null;
@@ -43,13 +43,17 @@ namespace Playscape.Editor {
                     DeleteFileForUpgrade(CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/libs/com.adience.adience-1.4.1-RELEASE.jar");
                     DeleteFileForUpgrade(CommonConsts.PUBLISHING_PATH_ANDROID_LIB_PATH + "/libs/com.mopub.mobileads.mopub-sdk-1.0.3-RELEASE.jar");
                 }
-				
+
 				// delete the PlayScapeActivity source file if exist (it is not compiled into a .jar file
 				string playScapeActivitySourcePath = "Assets/Plugins/Android/PlayscapePublishingKit/src/com/playscape/publishingkit/PlayscapeActivity.java";
 				DeleteFileForUpgrade(playScapeActivitySourcePath);
 				DeleteFileForUpgrade(playScapeActivitySourcePath + ".meta");
+
+				string startappJar = "Assets/Plugins/Android/PlayscapePublishingKit/libs/com.startapp.startapp-2.4.1-RELEASE.jar";
+				DeleteFileForUpgrade(startappJar);
+				DeleteFileForUpgrade(startappJar + ".meta");
             }
-            
+
             File.WriteAllText(CommonConsts.PLUGINS_PLAYSCAPE_VERSION_PATH + "/" + myVersion, "upgraded");
 		}
 

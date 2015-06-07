@@ -19,7 +19,7 @@ namespace Playscape.Internal
 		public abstract bool onBackPressed ();
 		public abstract void disableAds();
 		public abstract void enableAds();
-		
+
 		/// <summary>
 		/// Triggered by internal android code when interstitial display ends.
 		/// </summary>
@@ -29,7 +29,7 @@ namespace Playscape.Internal
 				OnInterstitialDisplayEndedInternal(payload);
 			}
 		}
-		
+
 		/// <summary>
 		/// Triggered by internal android code when video display end.
 		/// </summary>
@@ -39,7 +39,7 @@ namespace Playscape.Internal
 				OnVideoDisplayEndedInternal(payload);
 			}
 		}
-		
+
 		/// <summary>
 		/// Triggered by internal android code when an interstitial is shown.
 		/// </summary>

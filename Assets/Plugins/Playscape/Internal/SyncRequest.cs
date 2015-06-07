@@ -89,12 +89,12 @@ namespace Playscape.Internal
 		/// <summary>
 		/// Start executing of this request.
 		/// </summary>
-		public T Start() { 
+		public T Start() {
 			T response = default(T);
-
+			
 			if (this.Request != null) {
 				WebResponse webResponse = null;
-
+				
 				try {
 					webResponse = this.Request.GetResponse ();
 					response = processResponseStream (webResponse.GetResponseStream ());
@@ -104,7 +104,7 @@ namespace Playscape.Internal
 						webResponse.Close();
 					}
 				}
-
+				
 			}
 
 			return response;

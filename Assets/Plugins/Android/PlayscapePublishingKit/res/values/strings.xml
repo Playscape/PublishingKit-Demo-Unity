@@ -176,7 +176,7 @@
 
     <!-- Opt Dialog -->
     <string name="opt_alright">Alright!</string>
-    <string name="opt_title">tempora incidunt</string>
-    <string name="opt_detail">dignissmos ducimus qui blanditiis praesentium volutum deleniti atque corrupti quos dolores et quas molestias</string>
-    
+    <string name="opt_title">Find The Ultimate Game</string>
+    <string name="opt_detail">Playscape provides you with great personalized game recommendations. You can opt-out at any time from the catalog</string>
+	
 </resources>

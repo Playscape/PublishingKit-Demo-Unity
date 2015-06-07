@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System;
 using System.IO;
@@ -157,14 +157,14 @@ namespace Playscape.Internal {
 		public GameConfigurationResponse FetchGameConfigurationForApiKey(string apikey) {
 			if (!string.IsNullOrEmpty (apikey)) {
 				string url = string.Format ("{0}/config", CommonConsts.GAME_CONFIGURATION_API_URL);
-
+				
 				// Star synchronous request for getting game configuration
 				GameConfigurationResponse gameConfiguration = null;
 				SyncRequest<GameConfigurationResponse> request = new SyncRequest<GameConfigurationResponse> (url, System.Net.WebRequestMethods.Http.Get);
 				request.addHeader ("X-API-Key", apikey);
 				
 				gameConfiguration = request.Start ();
-
+				
 				return gameConfiguration;
 			}
 
@@ -223,7 +223,7 @@ namespace Playscape.Internal {
 								//check if traverse is allowed for property
 								if (playscapeAttr.Traversable) {
 									var category = categoryFieldInfo.GetValue(this);
-									
+
 									foreach (var settingFieldInfo in category.GetType().GetFields()) {
 										if (settingFieldInfo.IsPublic) {
 											visitor(category, settingFieldInfo);

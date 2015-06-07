@@ -21,6 +21,7 @@ namespace Playscape.Editor {
 		private const string WINDOW_TITLE = "Playscape";
 		private const string CLOSE = "Apply Changes";
         private const string TEST_BUILD = "Test";
+        private const string PLAYSCAPE_CONFIGURATION_TITLE = "Playscape Configuration";
 		private Vector2  scrollPos;
 
 		private const string AB_TESTING_TITLE = "AB Testing Configuration";
@@ -31,9 +32,8 @@ namespace Playscape.Editor {
             GUI.changed = false;
 
 			EditorGUILayout.BeginHorizontal();
-			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width (650), GUILayout.Height (350));				
+			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width (650), GUILayout.Height (80));
 				OnAdsGUI ();
-				OnABTestingGUI ();
 			EditorGUILayout.EndScrollView ();
 			EditorGUILayout.EndHorizontal ();
 
@@ -42,12 +42,6 @@ namespace Playscape.Editor {
 			if (GUILayout.Button (CLOSE)) {
 				onClose();
 			}
-
-
-            if (GUILayout.Button(TEST_BUILD))
-            {
-                TestBuild();
-            }
 
             if (GUI.changed) {
 				EditorUtility.SetDirty (ConfigurationInEditor.Instance);
@@ -74,7 +68,7 @@ namespace Playscape.Editor {
         private void TestBuild()
         {
 			AndroidPostProcessor app = new AndroidPostProcessor(@"/Users/artem/Desktop/test/Untitled.apk");
-			
+
 			EditorUtility.ClearProgressBar();
             EditorUtility.DisplayProgressBar("Publishing kit post-process", "Build Started", 0);
 
@@ -102,7 +96,7 @@ namespace Playscape.Editor {
             EditorUtility.ClearProgressBar();
         }
 
-		public void OnFailed(object sender, string message) 
+		public void OnFailed(object sender, string message)
 		{
 			if (!isUIThread)
 			{
@@ -116,7 +110,7 @@ namespace Playscape.Editor {
 				"OK"
 				);
 		}
-			
+
 		private void ApplyChanges() {
 			string targetManifest = "Assets/Plugins/Android/PlayscapePublishingKit/AndroidManifest.xml";
 
@@ -176,13 +170,14 @@ namespace Playscape.Editor {
 			}
 		}
 
+
 		void OnAdsGUI ()
 		{
 			var categories = new Dictionary<object, bool> ();
 			ConfigurationInEditor.Instance.TraverseAdsUIConfig ((category, fieldInfo) =>
 						{
 							if (!categories.ContainsKey(category)) {
-								GUILayout.Label (category.GetType().Name, EditorStyles.boldLabel);
+								GUILayout.Label (PLAYSCAPE_CONFIGURATION_TITLE, EditorStyles.boldLabel);
 								categories.Add(category, true);
 							}
 

@@ -1,5 +1,5 @@
 	<key>PlayscapePublishingKitVersion</key>
-	<string>dev</string>
+	<string>1.6.117</string>
     
 	<key>PlayscapeRemoteLoggerDumpSizeThresholdBytes</key>
 	<integer>4096</integer>
@@ -14,7 +14,7 @@
 	<string>campaign_id</string>
     
 	<key>PlayscapeDebugMode</key>
-	<true/>
+	<false/>
     
     <key>Pushwoosh_SHOW_ALERT</key>
     <false/>

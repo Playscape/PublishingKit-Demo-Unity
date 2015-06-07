@@ -541,10 +541,6 @@ namespace Playscape.Editor
             injectAdsConfig (gameConfiguration, configDoc);
 			injectABTestingConfig (configDoc);
 
-			configDoc.SelectSingleNode("resources/string[@name='playscape_remote_logger_url']").InnerText =
-				UnityEngine.Debug.isDebugBuild ? Settings.DebugRemoteLoggerUrl
-					: Settings.ReleaseRemoteLoggerUrl;
-
             var writerSettings = new XmlWriterSettings();
             writerSettings.Indent = true;
             using (var writer = XmlWriter.Create(filePathToApplyConfiguration))

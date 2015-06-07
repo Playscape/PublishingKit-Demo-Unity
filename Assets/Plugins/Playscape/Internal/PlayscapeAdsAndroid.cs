@@ -8,14 +8,14 @@ namespace Playscape.Internal
 	/// Wrapper for calls ExternalAdsMethods.java methods
 	/// </summary>
 	public class PlayscapeAdsAndroid : PlayscapeAdsBase {
-		
+
 		#if UNITY_ANDROID
 		const string ADS_METHODS_CLASS_NAME = "com.playscape.ads.ExternalAdsMethods";
-		
+
 		private AndroidJavaClass mJavaMethodsClass = new AndroidJavaClass (ADS_METHODS_CLASS_NAME);
 		#endif
-		
-		
+
+
 		/// <summary>
 		/// Wrapper for calls ExternalAdsMethods.displayInterstitialAd method
 		/// <param name="kind">ad kind</param>
@@ -26,7 +26,7 @@ namespace Playscape.Internal
 			mJavaMethodsClass.CallStatic ("displayInterstitialAd", new object[] {kind, placement});
 			#endif
 		}
-		
+
 		/// <summary>
 		/// Wrapper for calls ExternalAdsMethods.disableAds method
 		/// </summary>
@@ -35,7 +35,7 @@ namespace Playscape.Internal
 			mJavaMethodsClass.CallStatic ("disableAds");
 			#endif
 		}
-		
+
 		/// <summary>
 		/// Wrapper for calls ExternalAdsMethods.enableAds method
 		/// </summary>
@@ -44,7 +44,7 @@ namespace Playscape.Internal
 			mJavaMethodsClass.CallStatic ("enableAds");
 			#endif
 		}
-		
+
 		/// <summary>
 		/// Wrapper for calls ExternalAdsMethods.displayVideoAd method
 		/// <param name="kind">ad kind</param>
@@ -55,7 +55,7 @@ namespace Playscape.Internal
 			mJavaMethodsClass.CallStatic ("displayVideoAd", new object[] {kind, placement});
 			#endif
 		}
-		
+
 		/// <summary>
 		/// Wrapper for calls ExternalAdsMethods.displayBannerAd method
 		/// <param name="alignment">ad alignment</param>
@@ -67,7 +67,7 @@ namespace Playscape.Internal
 			mJavaMethodsClass.CallStatic("displayBannerAd", new object[] {alignment, placement});
 			#endif
 		}
-		
+
 		/// <summary>
 		/// Wrapper for calls ExternalAdsMethods.hideBannerAd method
 		/// </summary>
@@ -77,7 +77,7 @@ namespace Playscape.Internal
 			mJavaMethodsClass.CallStatic("hideBannerAd", new object[] {});
 			#endif
 		}
-		
+
 		/// <summary>
 		/// Wrapper for calls ExternalAdsMethods.isBannerShown method
 		/// </summary>
@@ -89,7 +89,7 @@ namespace Playscape.Internal
 			return false;
 			#endif
 		}
-		
+
 		/// <summary>
 		/// Wrapper for calls ExternalAdsMethods.hasInterstitialInCache method
 		/// <param name="kind">ad kind</param>
@@ -102,7 +102,7 @@ namespace Playscape.Internal
 			return false;
 			#endif
 		}
-		
+
 		/// <summary>
 		/// Wrapper for calls ExternalAdsMethods.onBackPressed method
 		/// </summary>
