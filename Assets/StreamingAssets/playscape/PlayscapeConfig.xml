@@ -13,26 +13,26 @@
     <string name="playscape_remote_logger_file_size_limit_bytes">2097152</string>
     <string name="playscape_remote_logger_entry_size_limit_bytes">2048</string>
     <string name="playscape_remote_logger_force_dump_now">false</string>
-    <string name="playscape_publishing_kit_version">1.6.121</string>
+    <string name="playscape_publishing_kit_version">1.6.141</string>
     <string name="playscape_reporter_id">TestGame</string>
     <string name="playscape_is_alive_service_reschedule_delay_seconds">86400</string>
 
     <!-- Ads -->
     <string name="playscape_ads_api_key">%{API_KEY}</string>
-    <string name="playscape_ads_config_url">%{ADS_CONFIG_URL}</string>
+    <string name="playscape_ads_config_url">http://server.ads.mominis.com/Services/CompressedAdService/json/RollABallMultiplayer_Pubkit_Demo_AdsConfig.json</string>
     <string name="playscape_ads_config_enable_ads_system">true</string>
     <string name="playscape_chartboost_app_id">531c4f442d42da19400a5d75</string>
     <string name="playscape_chartboost_app_signature">3cf6252e06d08e7afa7fbc7532b916a7fd52a01e</string>
-    <string name="playscape_millennial_media_app_id"></string>
-    <string name="playscape_admob_interstitials_ad_unit_id"></string>
-    <string name="playscape_admob_banners_ad_unit_id"></string>
-    <string name="playscape_admob_test_device_id"></string>
-    <string name="playscape_startapp_developer_id"></string>
-    <string name="playscape_startapp_app_id"></string>
-    <string name="playscape_adcolony_app_id"></string>
-    <string name="playscape_adcolony_video_zone_id"></string>
-    <string name="playscape_adcolony_incentivised_video_zone_id"></string>
-    <string name="playscape_vungle_app_id"></string>
+    <string name="playscape_millennial_media_app_id">163708</string>
+    <string name="playscape_admob_interstitials_ad_unit_id">ca-app-pub-6855635722675667/3604954833</string>
+    <string name="playscape_admob_banners_ad_unit_id">ca-app-pub-6855635722675667/8801184031</string>
+    <string name="playscape_admob_test_device_id">false</string>
+    <string name="playscape_startapp_developer_id">105840068</string>
+    <string name="playscape_startapp_app_id">205418137</string>
+    <string name="playscape_adcolony_app_id">app8dbfb639f7564b4399</string>
+    <string name="playscape_adcolony_video_zone_id">vz80e0ea32fdf64b63a2</string>
+    <string name="playscape_adcolony_incentivised_video_zone_id">vzdc652d7a595345b5ab</string>
+    <string name="playscape_vungle_app_id">5369e21389c713e308000211</string>
     <string name="playscape_ads_max_delay_interval_between_failures_ms">60000</string>
     <string name="playscape_ads_delay_interval_between_failures_ms">15000</string>
     <string name="playscape_ads_retry_wait_secs">10</string>
@@ -48,11 +48,11 @@
 
     <!-- Cocos 2D-x specific -->
     <string name="playscape_google_sender_id">95276907422</string>
-	 <string name="playscape_google_sender_id_test">818047653528</string>
+	 <string name="playscape_google_sender_id_test">95276907422</string>
     <string name="playscape_gcm_api_url">https://api.playscape.com</string>
-    <string name="playscape_gcm_api_url_test">https://playscape-gcm-test.appspot.com</string>
+    <string name="playscape_gcm_api_url_test">https://api.playscape.com</string>
     <string name="playscape_tag_api_url">https://api.playscape.com</string>
-    <string name="playscape_tag_api_url_test">https://playscape-gcm-test.appspot.com</string>
+    <string name="playscape_tag_api_url_test">https://api.playscape.com</string>
     <!-- <string name="playscape_gcm_api_url">http://playscape-gcm.appspot.com</string> -->
 
 	<!-- playscape cross promotion -->
