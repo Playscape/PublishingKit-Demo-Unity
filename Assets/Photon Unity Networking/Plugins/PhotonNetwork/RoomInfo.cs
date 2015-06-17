@@ -3,7 +3,7 @@
 //   Loadbalancing Framework for Photon - Copyright (C) 2011 Exit Games GmbH
 // </copyright>
 // <summary>
-//   This class resembles info about available rooms, as sent by the Master 
+//   This class resembles info about available rooms, as sent by the Master
 //   server's lobby. Consider all values as readonly.
 // </summary>
 // <author>developer@exitgames.com</author>
@@ -18,7 +18,7 @@ using ExitGames.Client.Photon;
 /// The properties are not settable (open, maxPlayers, etc).
 /// </summary>
 /// <remarks>
-/// This class resembles info about available rooms, as sent by the Master server's lobby. 
+/// This class resembles info about available rooms, as sent by the Master server's lobby.
 /// Consider all values as readonly. None are synced (only updated by events by server).
 /// </remarks>
 /// \ingroup publicApi
@@ -40,10 +40,15 @@ public class RoomInfo
     protected bool visibleField = true;
 
     /// <summary>Backing field for property. False unless the GameProperty is set to true (else it's not sent).</summary>
-    protected bool autoCleanUpField = false;
+    protected bool autoCleanUpField = PhotonNetwork.autoCleanUpPlayerObjects;
 
     /// <summary>Backing field for property.</summary>
     protected string nameField;
+
+    /// <summary>Backing field for master client id (actorNumber). defined by server in room props and ev leave.</summary>
+    protected internal int masterClientIdField;
+
+    protected internal bool serverSideMasterClient { get; private set; }
 
     /// <summary>Read-only "cache" of custom properties of a room. Set via Room.SetCustomProperties (not available for RoomInfo class!).</summary>
     /// <remarks>All keys are string-typed and the values depend on the game/application.</remarks>
@@ -93,8 +98,8 @@ public class RoomInfo
     /// <summary>
     /// Defines if the room can be joined.
     /// This does not affect listing in a lobby but joining the room will fail if not open.
-    /// If not open, the room is excluded from random matchmaking. 
-    /// Due to racing conditions, found matches might become closed before they are joined. 
+    /// If not open, the room is excluded from random matchmaking.
+    /// Due to racing conditions, found matches might become closed before they are joined.
     /// Simply re-connect to master and find another.
     /// Use property "IsVisible" to not list the room.
     /// </summary>
@@ -158,10 +163,17 @@ public class RoomInfo
     }
 
     /// <summary>Simple printingin method.</summary>
-    /// <returns>String showing the RoomInfo.</returns>
+    /// <returns>Summary of this RoomInfo instance.</returns>
     public override string ToString()
     {
-        return string.Format("Room: '{0}' visible: {1} open: {2} max: {3} count: {4}\ncustomProps: {5}", this.nameField, this.visibleField, this.openField, this.maxPlayersField, this.playerCount, this.customPropertiesField.ToStringFull());
+        return string.Format("Room: '{0}' {1},{2} {4}/{3} players.", this.nameField, this.visibleField ? "visible" : "hidden", this.openField ? "open" : "closed", this.maxPlayersField, this.playerCount);
+    }
+
+    /// <summary>Simple printingin method.</summary>
+    /// <returns>Summary of this RoomInfo instance.</returns>
+    public string ToStringFull()
+    {
+        return string.Format("Room: '{0}' {1},{2} {4}/{3} players.\ncustomProps: {5}", this.nameField, this.visibleField ? "visible" : "hidden", this.openField ? "open" : "closed", this.maxPlayersField, this.playerCount, this.customPropertiesField.ToStringFull());
     }
 
     /// <summary>Copies "well known" properties to fields (isVisible, etc) and caches the custom properties (string-keys only) in a local hashtable.</summary>
@@ -209,6 +221,17 @@ public class RoomInfo
         if (propertiesToCache.ContainsKey(GameProperties.CleanupCacheOnLeave))
         {
             this.autoCleanUpField = (bool)propertiesToCache[GameProperties.CleanupCacheOnLeave];
+        }
+
+        if (propertiesToCache.ContainsKey(GameProperties.MasterClientId))
+        {
+            this.serverSideMasterClient = true;
+            bool isUpdate = this.masterClientIdField != 0;
+            this.masterClientIdField = (int) propertiesToCache[GameProperties.MasterClientId];
+            if (isUpdate)
+            {
+                PhotonNetwork.networkingPeer.UpdateMasterClient();
+            }
         }
 
         //if (propertiesToCache.ContainsKey(GameProperties.PropsListedInLobby))

@@ -40,10 +40,8 @@ namespace Soomla.Store
 				if(_instance == null) {
 					#if UNITY_ANDROID && !UNITY_EDITOR
 					_instance = new StoreInfoAndroid();
-					#if REMOVE_FROM_LINKAGE
 					#elif UNITY_IOS && !UNITY_EDITOR
 					_instance = new StoreInfoIOS();
-					#endif
 					#else
 					_instance = new StoreInfo();
 					#endif

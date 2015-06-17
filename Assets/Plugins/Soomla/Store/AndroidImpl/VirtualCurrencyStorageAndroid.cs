@@ -70,6 +70,7 @@ namespace Soomla.Store
 			AndroidJNI.PopLocalFrame(IntPtr.Zero);
 			return retBalance;
 		}
+	
 #endif
 	}
 }

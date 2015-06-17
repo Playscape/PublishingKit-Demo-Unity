@@ -41,7 +41,7 @@ namespace Soomla {
 		public RandomReward(string id, string name, List<Reward> rewards)
 			: base(id, name)
 		{
-			if ((Rewards == null || Rewards.Count == 0)) {
+			if ((rewards == null || rewards.Count == 0)) {
 				SoomlaUtils.LogError(TAG, "This reward doesn't make sense without items");
 			}
 			Rewards = rewards;

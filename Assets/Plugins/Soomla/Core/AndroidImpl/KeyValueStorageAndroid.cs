@@ -18,6 +18,7 @@ using System;
 namespace Soomla {
 	
 	public class KeyValueStorageAndroid : KeyValueStorage {
+
 #if UNITY_ANDROID && !UNITY_EDITOR
 
 		override protected string _getValue(string key) {

@@ -50,7 +50,11 @@ namespace Playscape.Editor {
 		{
 			if (target == BuildTarget.Android) {
 				return new AndroidPostProcessor(pathToBuiltProject);
+#if UNITY_5
+			} else if (target == BuildTarget.iOS) {
+#else
 			} else if (target == BuildTarget.iPhone) {
+#endif
 				return new IOSPostProcessor(pathToBuiltProject);
 			} else {
 				return new StubPostProcessor();

@@ -27,7 +27,11 @@ public class CMVideoSamplingPatcher : Editor
 	[PostProcessBuild]
 	public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
 	{
+#if UNITY_5
+		if (target != BuildTarget.iOS) {
+#else
 		if (target != BuildTarget.iPhone) {
+#endif
 			return;
 		}
 		

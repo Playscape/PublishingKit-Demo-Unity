@@ -1,5 +1,5 @@
 	<key>PlayscapePublishingKitVersion</key>
-	<string>1.6.141</string>
+	<string>dev</string>
     
 	<key>PlayscapeRemoteLoggerDumpSizeThresholdBytes</key>
 	<integer>4096</integer>
