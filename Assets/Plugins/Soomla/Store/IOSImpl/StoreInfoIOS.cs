@@ -29,7 +29,7 @@ namespace Soomla.Store {
 	/// virtual non-consumable items definitions
 	/// </summary>
 	public class StoreInfoIOS : StoreInfo {
-#if REMOVE_FROM_LINKAGE
+
 #if UNITY_IOS && !UNITY_EDITOR
 
 		/// Functions that call iOS-store functions.
@@ -64,7 +64,6 @@ namespace Soomla.Store {
 			IOS_ErrorCodes.CheckAndThrowException(err);
 		}
 
-#endif
 #endif
 	}
 }

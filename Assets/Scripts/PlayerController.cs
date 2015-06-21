@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour {
 	{
 		if (!PhotonView.Get (this).owner.isMasterClient) {
 			var material = Resources.Load<Material>("PlayerTwoMaterial");
-			gameObject.renderer.material = material;
+			gameObject.GetComponent<Renderer>().material = material;
 
 
 		}
@@ -51,9 +51,9 @@ public class PlayerController : MonoBehaviour {
 				moveVertical = Input.acceleration.y + 0.5f;
 			} 
 
-			if (rigidbody != null) {
+			if (GetComponent<Rigidbody>() != null) {
 				Vector3 movement = new Vector3 (moveHortizontal, 0.0f, moveVertical);
-				rigidbody.AddForce (movement * speed * Time.deltaTime);
+				GetComponent<Rigidbody>().AddForce (movement * speed * Time.deltaTime);
 			}
 		}
 	}

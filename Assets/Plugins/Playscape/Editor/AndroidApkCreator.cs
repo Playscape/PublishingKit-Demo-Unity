@@ -19,10 +19,10 @@ namespace Playscape.Editor
     /// </summary>
 	public class AndroidApkCreator
 	{
-		private const string APK_TOOL_PATH = "Assets/Plugins/Playscape/ThirdParty/apktool.jar" ;
-		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/ThirdParty/zipalign";
-		private const string DEX_2_JAR_TOOL_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/dex2jar";
-		private const string ASPECT_HOME_PATH = "Assets/Plugins/Playscape/ThirdParty/aspectsj/";
+		private const string APK_TOOL_PATH = "Assets/Plugins/Playscape/Editor/ThirdParty/apktool.jar" ;
+		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/Editor/ThirdParty/zipalign";
+		private const string DEX_2_JAR_TOOL_HOME_PATH = "Assets/Plugins/Playscape/Editor/ThirdParty/dex2jar";
+		private const string ASPECT_HOME_PATH = "Assets/Plugins/Playscape/Editor/ThirdParty/aspectsj/";
 		private const string DEFAULT_ANDROID_PLATFORM = "android-19";
 
 		private static string ANDROID_HOME = PlatformUtils.isWindows() ? System.Environment.GetEnvironmentVariable("ANDROID_HOME") : AndroidSDKFolder.Path;
@@ -198,7 +198,7 @@ namespace Playscape.Editor
 			string mainClass = "com.googlecode.dex2jar.tools.Dex2jarCmd";
 			string mainClassParams = "-f -o " + PlatformUtils.qualifyPath(dst) + " " + PlatformUtils.qualifyPath(src);
 
-			string arguments = "-classpath " + classpath + " -Xms512m -Xmx1024m " + mainClass + " " + mainClassParams;
+			string arguments = "-classpath " + classpath + " -Xms1024m -Xmx2048m " + mainClass + " " + mainClassParams;
 
             logger.V("Command " + command);
             logger.V("Argumnets " + arguments);
@@ -229,7 +229,7 @@ namespace Playscape.Editor
             string mainClass = "com.googlecode.dex2jar.tools.Jar2Dex";
             string mainClassParams = "-f -o " + PlatformUtils.qualifyPath(outputPath) + " " + PlatformUtils.qualifyPath(targetPath);
 
-            string arguments = "-classpath " + classpath + " -Xms512m -Xmx1024m " + mainClass + " " + mainClassParams;
+            string arguments = "-classpath " + classpath + " -Xms1024m -Xmx2048m " + mainClass + " " + mainClassParams;
 
             logger.V("Command " + command);
             logger.V("Argumnets " + arguments);
@@ -573,7 +573,7 @@ namespace Playscape.Editor
                 xmlElement.InnerText = string.Format("{0}", value);
             });
 
-            configDoc.SelectSingleNode("resources/string[@name='playscape_ads_api_key']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey);
+            configDoc.SelectSingleNode("resources/string[@name='playscape_ads_api_key']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey).ToLower();
             configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
             configDoc.SelectSingleNode("resources/string[@name='playscape_reporter_id']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.ReporterId);
 			configDoc.SelectSingleNode("resources/string[@name='playscape_is_published_by_playscape']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyGameConfiguration.PublishedByPlayscape);

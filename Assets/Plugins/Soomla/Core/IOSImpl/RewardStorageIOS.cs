@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 namespace Soomla {
 	
 	public class RewardStorageIOS : RewardStorage {
-#if REMOVE_FROM_LINKAGE
+
 #if UNITY_IOS && !UNITY_EDITOR
 		[DllImport ("__Internal")]
 		private static extern long rewardStorage_GetLastGivenTimeMillis(string rewardId);
@@ -67,7 +67,6 @@ namespace Soomla {
 			TimeSpan time = TimeSpan.FromMilliseconds(lastTime);
 			return new DateTime(time.Ticks);
 		}
-#endif
 #endif
 	}
 }

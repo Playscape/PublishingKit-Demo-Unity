@@ -1,77 +1,102 @@
+#pragma warning disable 1587
+/// \file
+/// <summary>ScriptableObject defining a server setup. An instance is created as <b>PhotonServerSettings</b>.</summary>
+#pragma warning restore 1587
 
+
+using System;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using UnityEngine;
 
 
-/// <summary>Currently available cloud regions as enum.</summary>
-/// <remarks>Must match order in CloudServerRegionNames and CloudServerRegionPrefixes.</remarks>
-public enum CloudServerRegion { EU, US, Asia, Japan };
+public class Region
+{
+    public CloudRegionCode Code;
+    public string HostAndPort;
+    public int Ping;
+
+    public static CloudRegionCode Parse(string codeAsString)
+    {
+        codeAsString = codeAsString.ToLower();
+
+        CloudRegionCode code = CloudRegionCode.none;
+        if (Enum.IsDefined(typeof(CloudRegionCode), codeAsString))
+        {
+            code = (CloudRegionCode)Enum.Parse(typeof(CloudRegionCode), codeAsString);
+        }
+
+        return code;
+    }
+    public static CloudRegionFlag ParseFlag(string codeAsString)
+    {
+        codeAsString = codeAsString.ToLower();
+
+        CloudRegionFlag code = 0;
+        if (Enum.IsDefined(typeof(CloudRegionFlag), codeAsString))
+        {
+            code = (CloudRegionFlag)Enum.Parse(typeof(CloudRegionFlag), codeAsString);
+        }
+
+        return code;
+    }
+
+    public override string ToString()
+    {
+        return string.Format("'{0}' \t{1}ms \t{2}", this.Code, this.Ping, this.HostAndPort);
+    }
+}
 
 
 /// <summary>
 /// Collection of connection-relevant settings, used internally by PhotonNetwork.ConnectUsingSettings.
 /// </summary>
-[System.Serializable]
+[Serializable]
 public class ServerSettings : ScriptableObject
 {
-    public const string DefaultCloudServerUrl = "app-eu.exitgamescloud.com";
-    
-    public const string DefaultServerAddress = "127.0.0.1";
-    public const int DefaultMasterPort = 5055;  // default port for master server
-    public const string DefaultAppID = "Master";
-
-    // per region name and server-prefix. must match order in CloudServerRegion enum! (see above)
-    public static readonly string[] CloudServerRegionPrefixes = new string[] {"app-eu", "app-us", "app-asia", "app-jp"};
-
-    public enum HostingOption { NotSet, PhotonCloud, SelfHosted, OfflineMode }
-
+    public enum HostingOption { NotSet = 0, PhotonCloud = 1, SelfHosted = 2, OfflineMode = 3, BestRegion = 4 }
     public HostingOption HostType = HostingOption.NotSet;
+    public ConnectionProtocol Protocol = ConnectionProtocol.Udp;
 
-    public string ServerAddress = DefaultServerAddress;
+    // custom server values (not used for PhotonCloud)
+    public string ServerAddress = "";     // the address to be used (including region-suffix)
     public int ServerPort = 5055;
+
     public string AppID = "";
-    public List<string> RpcList;
-        
+    public CloudRegionCode PreferredRegion;
+    public CloudRegionFlag EnabledRegions = (CloudRegionFlag)(-1);
+    
+
+    public List<string> RpcList = new List<string>();   // set by scripts and or via Inspector
+
     [HideInInspector]
     public bool DisableAutoOpenWizard;
 
-    public static int FindRegionForServerAddress(string server)
-    {
-        int result = 0;
 
-        for (int i = 0; i < CloudServerRegionPrefixes.Length; i++)
-        {
-            if (server.StartsWith(CloudServerRegionPrefixes[i]))
-            {
-                return i;
-            }
-        }
-        
-        return result;
+    public void UseCloudBestRegion(string cloudAppid)
+    {
+        this.HostType = HostingOption.BestRegion;
+        this.AppID = cloudAppid;
     }
 
-    public static string FindServerAddressForRegion(int regionIndex)
-    {
-        return ServerSettings.DefaultCloudServerUrl.Replace("app-eu", ServerSettings.CloudServerRegionPrefixes[regionIndex]);
-    }
-
-    public static string FindServerAddressForRegion(CloudServerRegion regionIndex)
-    {
-        return ServerSettings.DefaultCloudServerUrl.Replace("app-eu", ServerSettings.CloudServerRegionPrefixes[(int)regionIndex]);
-    }
-
-    public void UseCloud(string cloudAppid, int regionIndex)
+    public void UseCloud(string cloudAppid)
     {
         this.HostType = HostingOption.PhotonCloud;
         this.AppID = cloudAppid;
-        this.ServerAddress = FindServerAddressForRegion(regionIndex);
-        this.ServerPort = DefaultMasterPort;
+    }
+
+    public void UseCloud(string cloudAppid, CloudRegionCode code)
+    {
+        this.HostType = HostingOption.PhotonCloud;
+        this.AppID = cloudAppid;
+        this.PreferredRegion = code;
     }
 
     public void UseMyServer(string serverAddress, int serverPort, string application)
     {
         this.HostType = HostingOption.SelfHosted;
-        this.AppID = (application != null) ? application : DefaultAppID;
+        this.AppID = (application != null) ? application : "master";
+
         this.ServerAddress = serverAddress;
         this.ServerPort = serverPort;
     }

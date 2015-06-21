@@ -16,7 +16,7 @@ public class StoreItemController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		mCurrentCamera = GameObject.Find("Camera").camera;
+		mCurrentCamera = GameObject.Find("Camera").GetComponent<Camera>();
 		mPurchaseItem = new PurchaseItem(ItemId);
 
 	}
@@ -28,9 +28,9 @@ public class StoreItemController : MonoBehaviour {
 
 		if (StoreController.Instance.CurrentState == StoreController.State.None) {
 
-			bool isMouseHit =  gameObject.collider.Raycast(mCurrentCamera.ScreenPointToRay(Input.mousePosition), out hit, 10f) && Input.GetMouseButtonUp(0);
+			bool isMouseHit =  gameObject.GetComponent<Collider>().Raycast(mCurrentCamera.ScreenPointToRay(Input.mousePosition), out hit, 10f) && Input.GetMouseButtonUp(0);
 			bool isTouchHit =  Input.touchCount > 0 && 
-							   gameObject.collider.Raycast(mCurrentCamera.ScreenPointToRay(Input.GetTouch(0).position), out hit, 10f) && 
+							   gameObject.GetComponent<Collider>().Raycast(mCurrentCamera.ScreenPointToRay(Input.GetTouch(0).position), out hit, 10f) && 
 							   Input.GetTouch(0).phase == TouchPhase.Ended;
 
 			if (isMouseHit || isTouchHit) {

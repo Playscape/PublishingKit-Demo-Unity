@@ -21,6 +21,7 @@ namespace Soomla.Store {
 	/// This class uses JNI and provides functions that call SOOMLA's android-store.
 	/// </summary>
 	public static class AndroidJNIHandler {
+
 #if UNITY_ANDROID && !UNITY_EDITOR
 
 		/// <summary>

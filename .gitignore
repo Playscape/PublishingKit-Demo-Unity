@@ -19,3 +19,13 @@
 
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
+
+# Files for the Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/

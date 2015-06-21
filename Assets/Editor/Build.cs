@@ -45,7 +45,11 @@ public class Build : MonoBehaviour {
 	public static void BuildIOS() {
 		Configure();
         PlayerSettings.iOS.sdkVersion = iOSSdkVersion.DeviceSDK;
+#if UNITY_5
+		var errorMessage = BuildPipeline.BuildPlayer(GetAllScenes(), buildConfig.OutputPath, BuildTarget.iOS, BuildOptions.Development);
+#else
 		var errorMessage = BuildPipeline.BuildPlayer(GetAllScenes(), buildConfig.OutputPath, BuildTarget.iPhone, BuildOptions.Development);
+#endif
         
         if (!string.IsNullOrEmpty(errorMessage))
 		{

@@ -20,7 +20,6 @@ namespace Soomla {
 	
 	public class KeyValueStorageIOS : KeyValueStorage {
 
-#if REMOVE_FROM_LINKAGE
 #if UNITY_IOS && !UNITY_EDITOR
 		[DllImport ("__Internal")]
 		private static extern void keyValStorage_GetValue(string key, out IntPtr outResult);
@@ -44,7 +43,6 @@ namespace Soomla {
 		override protected void _deleteKeyValue(string key) {
 			keyValStorage_DeleteKeyValue(key);
 		}
-#endif
 #endif
 	}
 }

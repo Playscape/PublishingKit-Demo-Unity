@@ -4,67 +4,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public sealed class InteractiveConsole : MonoBehaviour
+public sealed class InteractiveConsole : ConsoleBase
 {
-    #region FB.Init() example
+    #region FB.ActivateApp() example
 
-    private bool isInit = false;
-
-    private void CallFBInit()
+    private void CallFBActivateApp()
     {
-        FB.Init(OnInitComplete, OnHideUnity);
-    }
-
-    private void OnInitComplete()
-    {
-        Debug.Log("FB.Init completed: Is user logged in? " + FB.IsLoggedIn);
-        isInit = true;
-    }
-
-    private void OnHideUnity(bool isGameShown)
-    {
-        Debug.Log("Is game showing? " + isGameShown);
-    }
-
-    #endregion
-
-    #region FB.Login() example
-
-    private void CallFBLogin()
-    {
-        FB.Login("email,publish_actions", LoginCallback);
-    }
-
-    void LoginCallback(FBResult result)
-    {
-        if (result.Error != null)
-            lastResponse = "Error Response:\n" + result.Error;
-        else if (!FB.IsLoggedIn)
-        {
-            lastResponse = "Login cancelled by Player";
-        }
-        else
-        {
-            lastResponse = "Login was successful!";
-        }
-    }
-
-    private void CallFBLogout()
-    {
-        FB.Logout();
-    }
-    #endregion
-
-    #region FB.PublishInstall() example
-
-    private void CallFBPublishInstall()
-    {
-        FB.PublishInstall(PublishComplete);
-    }
-
-    private void PublishComplete(FBResult result)
-    {
-        Debug.Log("publish response: " + result.Text);
+        FB.ActivateApp();
+        Callback(new FBResult("Check Insights section for your app in the App Dashboard under \"Mobile App Installs\""));
     }
 
     #endregion
@@ -73,7 +20,11 @@ public sealed class InteractiveConsole : MonoBehaviour
 
     public string FriendSelectorTitle = "";
     public string FriendSelectorMessage = "Derp";
-    public string FriendSelectorFilters = "[\"all\",\"app_users\",\"app_non_users\"]";
+    private string[] FriendFilterTypes = new string[] { "None (default)", "app_users", "app_non_users" };
+    private int FriendFilterSelection = 0;
+    private List<string> FriendFilterGroupNames = new List<string>();
+    private List<string> FriendFilterGroupIDs = new List<string>();
+    private int NumFriendFilterGroups = 0;
     public string FriendSelectorData = "{}";
     public string FriendSelectorExcludeIds = "";
     public string FriendSelectorMax = "";
@@ -97,10 +48,29 @@ public sealed class InteractiveConsole : MonoBehaviour
         // include the exclude ids
         string[] excludeIds = (FriendSelectorExcludeIds == "") ? null : FriendSelectorExcludeIds.Split(',');
 
+        // Filter groups
+        List<object> FriendSelectorFilters = new List<object>();
+        if (FriendFilterSelection > 0)
+        {
+            FriendSelectorFilters.Add(FriendFilterTypes[FriendFilterSelection]);
+        }
+        if (NumFriendFilterGroups > 0)
+        {
+            for (int i = 0; i < NumFriendFilterGroups; i++)
+            {
+                FriendSelectorFilters.Add(
+                    new FBAppRequestsFilterGroup(
+                        FriendFilterGroupNames[i],
+                        FriendFilterGroupIDs[i].Split(',').ToList()
+                    )
+                );
+            }
+        }
+
         FB.AppRequest(
             FriendSelectorMessage,
             null,
-            FriendSelectorFilters,
+            (FriendSelectorFilters.Count > 0) ? FriendSelectorFilters : null,
             excludeIds,
             maxRecipients,
             FriendSelectorData,
@@ -125,7 +95,7 @@ public sealed class InteractiveConsole : MonoBehaviour
         FB.AppRequest(
             DirectRequestMessage,
             DirectRequestTo.Split(','),
-            "",
+            null,
             null,
             null,
             "",
@@ -209,14 +179,21 @@ public sealed class InteractiveConsole : MonoBehaviour
 
     #region FB.AppEvent.LogEvent example
 
-    public float PlayerLevel = 1.0f;
-
     public void CallAppEventLogEvent()
     {
-        var parameters = new Dictionary<string, object>();
-        parameters[Facebook.FBAppEventParameterName.Level] = "Player Level";
-        FB.AppEvents.LogEvent(Facebook.FBAppEventName.AchievedLevel, PlayerLevel, parameters);
-        PlayerLevel++;
+        FB.AppEvents.LogEvent(
+            Facebook.FBAppEventName.UnlockedAchievement,
+            null,
+            new Dictionary<string,object>() {
+                { Facebook.FBAppEventParameterName.Description, "Clicked 'Log AppEvent' button" }
+            }
+        );
+        Callback(new FBResult(
+                "You may see results showing up at https://www.facebook.com/insights/" +
+                FB.AppId +
+                "?section=AppEvents"
+            )
+        );
     }
 
     #endregion
@@ -255,11 +232,11 @@ public sealed class InteractiveConsole : MonoBehaviour
         if (CenterHorizontal && CenterVertical)
         {
             FB.Canvas.SetResolution(width, height, false, 0, FBScreen.CenterVertical(), FBScreen.CenterHorizontal());
-        } 
-        else if (CenterHorizontal) 
+        }
+        else if (CenterHorizontal)
         {
             FB.Canvas.SetResolution(width, height, false, 0, FBScreen.Top(top), FBScreen.CenterHorizontal());
-        } 
+        }
         else if (CenterVertical)
         {
             FB.Canvas.SetResolution(width, height, false, 0, FBScreen.CenterVertical(), FBScreen.Left(left));
@@ -274,107 +251,83 @@ public sealed class InteractiveConsole : MonoBehaviour
 
     #region GUI
 
-    private string status = "Ready";
-
-    private string lastResponse = "";
-    public GUIStyle textStyle = new GUIStyle();
-    private Texture2D lastResponseTexture;
-
-    private Vector2 scrollPosition = Vector2.zero;
-#if UNITY_IOS || UNITY_ANDROID || UNITY_WP8
-    int buttonHeight = 60;
-    int mainWindowWidth = Screen.width - 30;
-    int mainWindowFullWidth = Screen.width;
-#else
-    int buttonHeight = 24;
-    int mainWindowWidth = 500;
-    int mainWindowFullWidth = 530;
-#endif
-
-    private int TextWindowHeight
+    override protected void Awake()
     {
-        get
-        {
-#if UNITY_IOS || UNITY_ANDROID || UNITY_WP8
-            return IsHorizontalLayout() ? Screen.height : 85;
-#else
-        return Screen.height;
-#endif
-        }
-    }
-
-    void Awake()
-    {
-        textStyle.alignment = TextAnchor.UpperLeft;
-        textStyle.wordWrap = true;
-        textStyle.padding = new RectOffset(10, 10, 10, 10);
-        textStyle.stretchHeight = true;
-        textStyle.stretchWidth = false;
+        base.Awake();
 
         FeedProperties.Add("key1", new[] { "valueString1" });
         FeedProperties.Add("key2", new[] { "valueString2", "http://www.facebook.com" });
     }
 
-    void OnGUI()
-    {
-        if (IsHorizontalLayout())
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.BeginVertical();
-        }
-        GUILayout.Space(5);
-        GUILayout.Box("Status: " + status, GUILayout.MinWidth(mainWindowWidth));
-
-#if UNITY_IOS || UNITY_ANDROID || UNITY_WP8
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
-        {
-            scrollPosition.y += Input.GetTouch(0).deltaPosition.y;
-        }
-#endif
-
-        scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.MinWidth(mainWindowFullWidth));
-        GUILayout.BeginVertical();
-        GUI.enabled = !isInit;
-        if (Button("FB.Init"))
-        {
-            CallFBInit();
-            status = "FB.Init() called with " + FB.AppId;
-        }
-
+    private void FriendFilterArea() {
+#if UNITY_WEBPLAYER
         GUILayout.BeginHorizontal();
-
-        GUI.enabled = isInit;
-        if (Button("Login"))
-        {
-            CallFBLogin();
-            status = "Login called";
-        }
-
-#if UNITY_IOS || UNITY_ANDROID || UNITY_WP8
-        GUI.enabled = FB.IsLoggedIn;
-        if (Button("Logout"))
-        {
-            CallFBLogout();
-            status = "Logout called";
-        }
-        GUI.enabled = isInit;
 #endif
+        GUILayout.Label("Filters:");
+        FriendFilterSelection =
+            GUILayout.SelectionGrid(FriendFilterSelection,
+                                    FriendFilterTypes,
+                                    3,
+                                    GUILayout.MinHeight(buttonHeight));
+#if UNITY_WEBPLAYER
         GUILayout.EndHorizontal();
 
-#if UNITY_IOS || UNITY_ANDROID
-        if (Button("Publish Install"))
+        // Filter groups are not supported on mobile so no need to display
+        // these buttons if not in web player.
+        if (NumFriendFilterGroups > 0)
         {
-            CallFBPublishInstall();
-            status = "Install Published";
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Filter group name:", GUILayout.MaxWidth(150));
+            GUILayout.Label("IDs (comma separated):");
+            GUILayout.EndHorizontal();
+
+            int deleteGroup = -1;
+            for (int i = 0; i < FriendFilterGroupNames.Count(); i++)
+            {
+                GUILayout.BeginHorizontal();
+                FriendFilterGroupNames[i] = GUILayout.TextField(FriendFilterGroupNames[i], GUILayout.MaxWidth(150));
+                FriendFilterGroupIDs[i] = GUILayout.TextField(FriendFilterGroupIDs[i]);
+                if (GUILayout.Button("del", GUILayout.ExpandWidth(false)))
+                {
+                    deleteGroup = i;
+                }
+                GUILayout.EndHorizontal();
+            }
+            if (deleteGroup >= 0)
+            {
+                NumFriendFilterGroups--;
+                FriendFilterGroupNames.RemoveAt(deleteGroup);
+                FriendFilterGroupIDs.RemoveAt(deleteGroup);
+            }
+            GUILayout.EndVertical();
+        }
+
+        if (Button("Add filter group..."))
+        {
+            FriendFilterGroupNames.Add("");
+            FriendFilterGroupIDs.Add("");
+            NumFriendFilterGroups++;
         }
 #endif
+    }
+
+    void OnGUI()
+    {
+        AddCommonHeader ();
+
+        if (Button("Publish Install"))
+        {
+            CallFBActivateApp();
+            status = "Install Published";
+        }
 
         GUI.enabled = FB.IsLoggedIn;
         GUILayout.Space(10);
         LabelAndTextField("Title (optional): ", ref FriendSelectorTitle);
         LabelAndTextField("Message: ", ref FriendSelectorMessage);
         LabelAndTextField("Exclude Ids (optional): ", ref FriendSelectorExcludeIds);
-        LabelAndTextField("Filters (optional): ", ref FriendSelectorFilters);
+        FriendFilterArea();
         LabelAndTextField("Max Recipients (optional): ", ref FriendSelectorMax);
         LabelAndTextField("Data (optional): ", ref FriendSelectorData);
         if (Button("Open Friend Selector"))
@@ -461,15 +414,16 @@ public sealed class InteractiveConsole : MonoBehaviour
         {
             CallFBGetDeepLink();
         }
-#if UNITY_IOS || UNITY_ANDROID
+
+        GUI.enabled = true;
         if (Button("Log FB App Event"))
         {
             status = "Logged FB.AppEvent";
             CallAppEventLogEvent();
         }
-#endif
 
 #if UNITY_WEBPLAYER
+        GUI.enabled = FB.IsInitialized;
         GUILayout.Space(10);
 
         LabelAndTextField("Game Width: ", ref Width);
@@ -488,6 +442,7 @@ public sealed class InteractiveConsole : MonoBehaviour
             status = "Set to new Resolution";
             CallCanvasSetResolution();
         }
+        GUI.enabled = true;
 #endif
 
         GUILayout.Space(10);
@@ -499,32 +454,8 @@ public sealed class InteractiveConsole : MonoBehaviour
         {
             GUILayout.EndVertical();
         }
-        GUI.enabled = true;
 
-        var textAreaSize = GUILayoutUtility.GetRect(640, TextWindowHeight);
-
-        GUI.TextArea(
-            textAreaSize,
-            string.Format(
-                " AppId: {0} \n Facebook Dll: {1} \n UserId: {2}\n IsLoggedIn: {3}\n AccessToken: {4}\n AccessTokenExpiresAt: {5}\n {6}",
-                FB.AppId,
-                (isInit) ? "Loaded Successfully" : "Not Loaded",
-                FB.UserId,
-                FB.IsLoggedIn,
-                FB.AccessToken,
-                FB.AccessTokenExpiresAt,
-                lastResponse
-            ), textStyle);
-
-        if (lastResponseTexture != null)
-        {
-            var texHeight = textAreaSize.y + 200;
-            if (Screen.height - lastResponseTexture.height < texHeight)
-            {
-                texHeight = Screen.height - lastResponseTexture.height;
-            }
-            GUI.Label(new Rect(textAreaSize.x + 5, texHeight, lastResponseTexture.width, lastResponseTexture.height), lastResponseTexture);
-        }
+        AddCommonFooter();
 
         if (IsHorizontalLayout())
         {
@@ -532,22 +463,8 @@ public sealed class InteractiveConsole : MonoBehaviour
         }
     }
 
-    void Callback(FBResult result)
-    {
-        lastResponseTexture = null;
-        // Some platforms return the empty string instead of null.
-        if (!String.IsNullOrEmpty(result.Error))
-            lastResponse = "Error Response:\n" + result.Error;
-        else if (!ApiQuery.Contains("/picture"))
-            lastResponse = "Success Response:\n" + result.Text;
-        else
-        {
-            lastResponseTexture = result.Texture;
-            lastResponse = "Success Response:\n";
-        }
-    }
 
-    private IEnumerator TakeScreenshot() 
+    private IEnumerator TakeScreenshot()
     {
         yield return new WaitForEndOfFrame();
 
@@ -564,32 +481,6 @@ public sealed class InteractiveConsole : MonoBehaviour
         wwwForm.AddField("message", "herp derp.  I did a thing!  Did I do this right?");
 
         FB.API("me/photos", Facebook.HttpMethod.POST, Callback, wwwForm);
-    }
-
-    private bool Button(string label)
-    {
-        return GUILayout.Button(
-          label, 
-          GUILayout.MinHeight(buttonHeight), 
-          GUILayout.MaxWidth(mainWindowWidth)
-        );
-    }
-
-    private void LabelAndTextField(string label, ref string text)
-    {
-        GUILayout.BeginHorizontal();
-        GUILayout.Label(label, GUILayout.MaxWidth(150));
-        text = GUILayout.TextField(text);
-        GUILayout.EndHorizontal();
-    }
-
-    private bool IsHorizontalLayout()
-    {
-#if UNITY_IOS || UNITY_ANDROID || UNITY_WP8
-        return Screen.orientation == ScreenOrientation.Landscape;
-#else
-        return true;
-#endif
     }
 
     #endregion

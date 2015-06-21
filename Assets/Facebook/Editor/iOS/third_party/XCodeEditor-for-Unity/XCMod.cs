@@ -94,10 +94,7 @@ namespace UnityEditor.XCodeEditor
 			name = System.IO.Path.GetFileNameWithoutExtension( filename );
 			path = projectPath;//System.IO.Path.GetDirectoryName( filename );
 			
-			StreamReader sr = projectFileInfo.OpenText();
-			string contents = sr.ReadToEnd();
-			sr.Close();
-
+			string contents = projectFileInfo.OpenText().ReadToEnd();
 			Dictionary<string, object> dictJson = Json.Deserialize(contents) as Dictionary<string,object>;;
 			_datastore = new Hashtable(dictJson);
 			
