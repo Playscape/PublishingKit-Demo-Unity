@@ -65,9 +65,9 @@ namespace Soomla.Store {
 		/// Constructor.
 		/// </summary>
 		/// <param name="goodItemId">The itemId of the <c>VirtualGood</c> associated with this upgrade.</param>
-		/// <param name="nextItemId">The itemId of the <c>UpgradeVG</c> before, or if this is the first 
+		/// <param name="nextItemId">The itemId of the <c>UpgradeVG</c> after, or if this is the last 
 		/// 						<c>UpgradeVG</c> in the scale then the value is null.</param>
-		/// <param name="prevItemId">The itemId of the <c>UpgradeVG</c> after, or if this is the last
+		/// <param name="prevItemId">The itemId of the <c>UpgradeVG</c> before, or if this is the first
 		///                 		<c>UpgradeVG</c> in the scale then the value is null.</param>
 		/// <param name="name">nName.</param>
 		/// <param name="description">Description.</param>

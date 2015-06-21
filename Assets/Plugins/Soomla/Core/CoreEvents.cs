@@ -24,11 +24,10 @@ namespace Soomla {
 	/// This class provides functions for event handling.
 	/// </summary>
 	public class CoreEvents : MonoBehaviour {
-#if REMOVE_FROM_LINKAGE
+
 #if UNITY_IOS && !UNITY_EDITOR
 		[DllImport ("__Internal")]
 		private static extern void soomlaCore_Init(string secret, [MarshalAs(UnmanagedType.Bool)] bool debug);
-#endif
 #endif
 
 		private const string TAG = "SOOMLA CoreEvents";
@@ -67,10 +66,8 @@ namespace Soomla {
 				jniSoomlaClass.CallStatic("initialize", CoreSettings.SoomlaSecret);
 			}
 			AndroidJNI.PopLocalFrame(IntPtr.Zero);
-#if REMOVE_FROM_LINKAGE
 #elif UNITY_IOS && !UNITY_EDITOR
 			soomlaCore_Init(CoreSettings.SoomlaSecret, CoreSettings.DebugMessages);
-#endif
 #endif
 		}
 

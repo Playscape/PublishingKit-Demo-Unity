@@ -13,7 +13,6 @@
     "AdSupport.framework:weak",
     "Social.framework:weak",
     "Security.framework:weak",
-    "CoreData.framework:weak",
   ],
   "headerpaths": [
     "Facebook/Editor/iOS",
@@ -24,6 +23,6 @@
     "Facebook/Editor/iOS/FbUnityInterface.h",
     "Facebook/Scripts/NativeDialogModes.cs",
   ],
-  "folders": [],
+  "folders": [],	
   "excludes": ["^.*\\.meta$", "^.*\\.mdown^", "^.*\\.pdf$"]
 }

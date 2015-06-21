@@ -62,7 +62,7 @@ public class AccountService
         this.AppId = string.Empty;
         this.Message = string.Empty;
         this.ReturnCode = -1;
-        
+
         string result;
         try
         {
@@ -90,9 +90,9 @@ public class AccountService
     /// <param name="email">Email of the account.</param>
     /// <param name="origin">Marks which channel created the new account (if it's new).</param>
     /// <param name="callback">Called when the result is available.</param>
-    public void RegisterByEmailAsync(string email, Origin origin, Action<AccountService> callback)
+    public void RegisterByEmailAsync(string email, Origin origin, Action<AccountService> callback = null)
     {
-        this.registrationCallback = callback; 
+        this.registrationCallback = callback;
         this.AppId = string.Empty;
         this.Message = string.Empty;
         this.ReturnCode = -1;

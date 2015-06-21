@@ -22,7 +22,7 @@ namespace Playscape.Editor
         /// <summary>
         /// The location of the patch file (aspectj hooks and logic)
         /// </summary>
-        private const string PATCH_FILE = "Assets/Plugins/Playscape/ThirdParty/playscape_lifecycle.jar";
+        private const string PATCH_FILE = "Assets/Plugins/Playscape/Editor/ThirdParty/playscape_lifecycle.jar";
 
         /// <summary>
         /// A delegate used to report the build progress

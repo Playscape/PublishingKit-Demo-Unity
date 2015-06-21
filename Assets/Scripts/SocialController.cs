@@ -382,7 +382,7 @@ public class SocialController : MonoBehaviour {
 		GameState.UniqueRequestId = uniqueRequestId.ToString();
 
 		FB.AppRequest("Hey! Let's play Roll A Ball multiplayer", 
-		              new string[] {facebookFriend.FacebookId}, "", null, null, Json.Serialize(dataJson), "Invite", 
+		              new string[] {facebookFriend.FacebookId}, null, null, null, Json.Serialize(dataJson), "Invite", 
 					  onRequest);
 	}
 
