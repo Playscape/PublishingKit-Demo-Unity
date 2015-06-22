@@ -409,11 +409,9 @@ namespace Playscape.Analytics
         /// <param name="item">
         /// The item.
         /// </param>
+        [Obsolete("This API call is now triggered automatically and should not be called directly", true)]
         public void ReportPurchaseStarted(PurchaseItem item)
         {
-			#if !UNITY_EDITOR
-            NativeReport.playscape_report_ReportPurchaseStarted(item.ToCType());
-#endif
         }
 
         #region Bible Section 5.08
@@ -441,6 +439,7 @@ namespace Playscape.Analytics
         /// <param name="transactionId">
         /// The transaction Id.
         /// </param>
+        [Obsolete("This API call is now triggered automatically and should not be called directly", true)]
         public void ReportPurchaseSuccess(
                 PurchaseItem item,
                 double amount,
@@ -448,14 +447,6 @@ namespace Playscape.Analytics
                 long currencyTimestamp,
                 string transactionId)
         {
-			#if !UNITY_EDITOR
-            NativeReport.playscape_report_ReportPurchaseSuccess(
-                item.ToCType(),
-                amount,
-				currency,
-                currencyTimestamp,
-                transactionId);
-#endif
         }
         /// <summary>
         /// Should be called by purchase plugin
@@ -463,11 +454,9 @@ namespace Playscape.Analytics
         /// <param name="item">
         /// The item.
         /// </param>
+        [Obsolete("This API call is now triggered automatically and should not be called directly", true)]
         public void ReportPurchaseCancelled(PurchaseItem item)
         {
-			#if !UNITY_EDITOR
-            NativeReport.playscape_report_ReportPurchaseCancelled(item.ToCType());
-#endif
         }
         /// <summary>
         /// Should be called by purchase plugin
@@ -478,14 +467,10 @@ namespace Playscape.Analytics
         /// <param name="failureReason">
         /// The failure Reason.
         /// </param>
+        [Obsolete("This API call is now triggered automatically and should not be called directly", true)]
         public void ReportPurchaseFailed(PurchaseItem item,
                 string failureReason)
         {
-			#if !UNITY_EDITOR
-            NativeReport.playscape_report_ReportPurchaseFailed(
-                item.ToCType(),
-                failureReason);
-#endif
         }
         /// <summary>
         /// Should be called by purchase plugin
