@@ -430,6 +430,9 @@ namespace Playscape.Analytics
         /// <param name="amount">
         /// The amount.
         /// </param>
+        /// <param name="amountMicros">
+        /// The amount micros.
+        /// </param>
         /// <param name="currency">
         /// The currency.
         /// </param>
@@ -439,10 +442,11 @@ namespace Playscape.Analytics
         /// <param name="transactionId">
         /// The transaction Id.
         /// </param>
-        [Obsolete("This API call is now triggered automatically and should not be called directly", true)]
+		[Obsolete("This API call is now triggered automatically and should not be called directly", true)]
         public void ReportPurchaseSuccess(
                 PurchaseItem item,
-                double amount,
+                string amount,
+                string amountMicros,
                 string currency,
                 long currencyTimestamp,
                 string transactionId)
@@ -454,7 +458,7 @@ namespace Playscape.Analytics
         /// <param name="item">
         /// The item.
         /// </param>
-        [Obsolete("This API call is now triggered automatically and should not be called directly", true)]
+		[Obsolete("This API call is now triggered automatically and should not be called directly", true)]
         public void ReportPurchaseCancelled(PurchaseItem item)
         {
         }
@@ -467,7 +471,7 @@ namespace Playscape.Analytics
         /// <param name="failureReason">
         /// The failure Reason.
         /// </param>
-        [Obsolete("This API call is now triggered automatically and should not be called directly", true)]
+		[Obsolete("This API call is now triggered automatically and should not be called directly", true)]        
         public void ReportPurchaseFailed(PurchaseItem item,
                 string failureReason)
         {
