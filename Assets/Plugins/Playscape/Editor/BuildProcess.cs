@@ -15,6 +15,14 @@ namespace Playscape.Editor
     /// </summary>
     public class BuildProcess : ITempFileProvider
     {
+		private readonly string[] EXCLUDE_ADS_JARS = new string[] {
+			"com/chartboost/*", 
+			"com/jirbo/adcolony/*", 
+			"com/millennialmedia/*", 
+			"com/startapp/*", 
+			"com/vungle/*"
+		};
+
 		/// <summary>
 		/// The name of the configuration file
 		/// </summary>
@@ -117,6 +125,7 @@ namespace Playscape.Editor
                 string unifiedLibJarFile = GetNewTempFolder("jar");
                 string patchedClassesJarFile = GetNewTempFolder("jar");
                 string alignedFile = GetNewTempFolder();
+				string excludedJarFile = GetNewTempFolder("jar");
 
 				//0. download game configuration and apply game configuration
                 //1. unzip the apk
@@ -169,12 +178,19 @@ namespace Playscape.Editor
 				OnProgress("Extracting jar files", 20);
 				mLogger.V("BuildProcess - Build - executing dex2jar " + sw.ElapsedMilliseconds);
 				apkCreator.Dex2jar(dexFilePath, classesJarFile);
-				
-				OnProgress("Unifying libraries", 20);
+
+				if (!ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem) {
+					OnProgress("Excluding ads classes jar files", 20);
+					apkCreator.Exclude(classesJarFile, excludedJarFile, EXCLUDE_ADS_JARS);
+
+					classesJarFile = excludedJarFile;
+				}
+
+				OnProgress("Unifying libraries", 35);
 				mLogger.V("BuildProcess - Build - unify libs " + sw.ElapsedMilliseconds);
 				apkCreator.unifyLibs(classesJarFile, PATCH_FILE, unifiedLibJarFile);
 				
-				OnProgress("Applying analytics", 30);
+				OnProgress("Applying analytics", 40);
 				mLogger.V("BuildProcess - Build - Apply Patch " + sw.ElapsedMilliseconds);
 				apkCreator.applyPatch(unifiedLibJarFile, unifiedLibJarFile, patchedClassesJarFile);
 				

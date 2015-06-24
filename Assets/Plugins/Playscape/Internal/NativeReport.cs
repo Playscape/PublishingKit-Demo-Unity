@@ -196,7 +196,8 @@ public class NativeReport : MonoBehaviour {
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportPurchaseSuccess(
 		CPurchaseItem item,
-		double amount,
+		string amount,
+		string amountMicros,
 		string currency,
 		long currencyTimestamp,
 		string transactionId);
