@@ -13,30 +13,29 @@ using Ionic.Zip;
 using System.Threading;
 
 namespace Playscape.Editor {
-
+	
 	class AndroidPostProcessor : AbstractPostProcessor {
 		public const string PLAYSCAPE_CONFIG_XML_PATH = "Assets/StreamingAssets/playscape/PlayscapeConfig.xml";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH = "/libs/android-support-v4.jar";
 		private const string LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT  = "/libs/android-support-v4.jar_v19.1";
 		private const string LIBS_UNITY_CLASSES_PATH = "/libs/unity-classes.jar";
 		private const string LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH = "/libs/playscape_lifecycle.jar";
-
+		
 		private const string MANIFEST_FILE_NAME = "AndroidManifest.xml";
-
+		
 		private  string mTargetPath;
-
+		
 		public AndroidPostProcessor(string targetPath) {
 			mTargetPath = targetPath;
 		}
-
+		
 		private Boolean isApkBuild() {
 			return mTargetPath.ToLower ().EndsWith (".apk");
 		}
-
+		
 		public void build(bool async, BuildProcess.BuildCompleted completedCallback, BuildProcess.BuildProgressChanged progressCallback, BuildProcess.BuildFailed failedCallback) {
-            BuildParams bp = ConstructBuildParams();
+			BuildParams bp = ConstructBuildParams();
 			BuildProcess process = new BuildProcess(bp, new UnityDebugLogger(), completedCallback, progressCallback, failedCallback);
-
 
             if (async) {
                 process.BuildAsync(mTargetPath);
@@ -131,21 +130,21 @@ namespace Playscape.Editor {
 		public static string CamelToSnake(string camelCase)
 		{
 			var builder = new StringBuilder();
-
+			
 			for (int i = 0; i < camelCase.Length; ++i)
 			{
 				if (char.IsUpper(camelCase[i]) && i > 0)
 				{
 					builder.Append("_");
 				}
-
-
+				
+				
 				builder.Append(char.ToLower(camelCase[i]));
 			}
-
+			
 			return builder.ToString();
 		}
-
+		
 		/// <summary>
 		/// Replaces common placeholders according to unity configuration in an android manifest
 		/// </summary>
@@ -155,7 +154,7 @@ namespace Playscape.Editor {
 		{
 			return manifestContents.Replace("PACKAGE_NAME", PlayerSettings.bundleIdentifier);
 		}
-
+		
 		private static void CopyDepedencyJarsToLibs (string targetPath,
 		                                             string pathToPublishingKitLibSources,
 		                                             string projectSources)
@@ -170,8 +169,8 @@ namespace Playscape.Editor {
 					break;
 				}
 			}
-
-
+			
+			
 			// If no v4 support lib, use the one that comes with the pubkit
 			if (string.IsNullOrEmpty (v4supportLibPath))
 			{
@@ -180,29 +179,29 @@ namespace Playscape.Editor {
 			} else {
 				File.Delete(pathToPublishingKitLibSources + LIBS_ANDROID_SUPPORT_V4_PATH_THAT_COMES_WITH_PUBKIT);
 			}
-
+			
 			foreach (var dirPath in Directory.GetDirectories(targetPath)) {
 				if (new DirectoryInfo(dirPath).Name != PlayerSettings.productName) {
 					if (!Directory.Exists(dirPath + "/libs")) {
 						Directory.CreateDirectory(dirPath + "/libs");
 					}
-
+					
 					if (new DirectoryInfo(v4supportLibPath).FullName != new DirectoryInfo(dirPath + LIBS_ANDROID_SUPPORT_V4_PATH).FullName) {
 						File.Copy(v4supportLibPath, dirPath + LIBS_ANDROID_SUPPORT_V4_PATH, true);
 					}
-
+					
 					if (File.Exists(projectSources + LIBS_UNITY_CLASSES_PATH )) {
 						File.Copy(projectSources + LIBS_UNITY_CLASSES_PATH, dirPath + LIBS_UNITY_CLASSES_PATH, true);
 					}
 				}
 			}
-
+			
 			if(File.Exists(pathToPublishingKitLibSources + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH)) {
 				File.Delete(pathToPublishingKitLibSources + LIBS_PLAYSCAPE_PUBLISHING_KIT_PATH);
 			}
 		}
-
+		
 	}
-
+	
 }
 #endif
