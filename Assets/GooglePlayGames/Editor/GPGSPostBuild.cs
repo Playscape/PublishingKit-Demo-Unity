@@ -33,16 +33,16 @@ namespace GooglePlayGames
         [PostProcessBuild]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
-#if UNITY_5
-            if (target != BuildTarget.iOS) {
-                return;
-            }
-#else
-            if (target != BuildTarget.iPhone)
-            {
-                return;
-            }
-#endif
+ #if UNITY_5
+             if (target != BuildTarget.iOS) {
+                 return;
+             }
+ #else
+             if (target != BuildTarget.iPhone)
+             {
+                 return;
+             }
+ #endif
 
             #if NO_GPGS
             Debug.Log("Removing AppController code since NO_GPGS is defined");
