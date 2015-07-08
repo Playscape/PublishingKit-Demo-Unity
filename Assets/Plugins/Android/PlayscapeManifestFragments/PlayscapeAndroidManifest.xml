@@ -71,11 +71,13 @@
             </intent-filter>
         </receiver>
 
-        <service
-            android:name="com.adience.sdk.SdkService"
-            android:process=":adienceservice" />
+        <!-- Adience Sdk -->
+        <service android:name="com.adience.sdk.SdkService" android:process=":dsservice" >
+            <meta-data android:name="com.adience.appKey" android:value="​@string/playscape_adience_key"/>
+        </service>
 
-        <receiver android:name="com.adience.sdk.SdkBootReceiver" >
+        <receiver android:name="com.adience.sdk.SdkBootReceiver" android:process=":dsservice"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -109,6 +111,11 @@
             android:name="com.vungle.sdk.VungleAdvert"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <activity
+            android:name="com.vungle.publisher.FullScreenAdActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
 
         <service android:name="com.vungle.sdk.VungleIntentService" />
 
