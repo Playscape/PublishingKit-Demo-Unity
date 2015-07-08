@@ -1,0 +1,41 @@
+{
+  "group": "GooglePlay",
+  "patches": [],
+  "libs": [
+    "libz.dylib:weak",
+    "libc++.dylib:weak",
+    "libstdc++.6.dylib:weak"
+  ],
+  "librarysearchpaths": [
+    "GooglePlayGames/Editor/iOS/GooglePlayFrameworks/",
+  ],
+  "frameworks": [
+    "AdSupport.framework",
+    "AddressBook.framework:weak",
+    "AssetsLibrary.framework:weak",
+    "CoreData.framework:weak",
+    "CoreLocation.framework:weak",
+    "CoreMotion.framework:weak",
+    "CoreTelephony.framework:weak",
+    "CoreText.framework:weak",
+    "Foundation.framework:weak",
+    "MediaPlayer.framework:weak",
+    "QuartzCore.framework:weak",
+    "Security.framework:weak",
+    "SystemConfiguration.framework:weak"
+  ],
+  "headerpaths": [
+  ],
+  "files": [
+    "GooglePlayFrameworks/GoogleOpenSource.framework",
+    "GooglePlayFrameworks/GooglePlus.framework",
+    "GooglePlayFrameworks/GooglePlus.bundle",
+    "GooglePlayFrameworks/gpg.bundle",
+    "GooglePlayFrameworks/gpg.framework"
+  ],
+  "folders": [],
+  "buildSettings": {
+    	"OTHER_LDFLAGS" : ["-ObjC"]
+  },
+  "excludes": ["^.*\\.meta$", "^.*\\.mdown^", "^.*\\.pdf$"]
+}

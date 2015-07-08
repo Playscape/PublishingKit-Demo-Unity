@@ -35,8 +35,7 @@ namespace Playscape.Editor {
 
 		public override void Run()
 		{
-			var plistFragment = 
-				pathToProjectSources + "/Libraries/playscape_config.plist_fragment";
+			var plistFragment = "Assets/Plugins/iOS/playscape_config.plist_fragment";
 
 			var infoAppender = new PlistAppender(pathToProjectSources + "/Info.plist");
 
@@ -56,7 +55,7 @@ namespace Playscape.Editor {
 			infoAppender.AppendFragment(plistFragment);
 			infoAppender.Save();
 
-			File.Delete(plistFragment);
+//			File.Delete(plistFragment);
 
 //			AddRequiredFrameworks(pathToProjectSources);
 
