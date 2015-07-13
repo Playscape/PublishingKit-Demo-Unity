@@ -6,7 +6,7 @@ namespace Playscape.Internal
 	public class PlayscapeCatalogAndroid : PlayscapeCatalogBase {
 
 		#if UNITY_ANDROID
-        const string PLAYSCAPE_EXCHANGE_MNG_CLASS_NAME = "com.playscape.exchange.ExchangeManager";
+        const string PLAYSCAPE_EXCHANGE_MNG_CLASS_NAME = "com.playscape.api.exchange.ExchangeManager";
 
         private AndroidJavaClass mJavaMethodsClass = new AndroidJavaClass(PLAYSCAPE_EXCHANGE_MNG_CLASS_NAME);
         #endif
