@@ -68,10 +68,12 @@ namespace GooglePlayGames
             UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
             UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
 
-            EditorWindow.GetWindow<GPGSInstructionWindow>(
-                utility: true,
-                title: "Building for IOS",
-                focus: true);
+#if UNITY_EDITOR
+            // EditorWindow.GetWindow<GPGSInstructionWindow>(
+            //     utility: true,
+            //     title: "Building for IOS",
+            //     focus: true);
+#endif
             #endif
         }
 
