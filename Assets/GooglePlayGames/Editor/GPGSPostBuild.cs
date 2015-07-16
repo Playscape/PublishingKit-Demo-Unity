@@ -19,6 +19,7 @@ namespace GooglePlayGames
     using System;
     using UnityEditor.Callbacks;
     using UnityEditor;
+    using UnityEditor.XCodeEditor;
     using UnityEngine;
     using GooglePlayGames;
     using GooglePlayGames.Editor.Util;
