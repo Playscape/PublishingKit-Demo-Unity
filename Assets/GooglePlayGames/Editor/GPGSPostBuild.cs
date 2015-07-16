@@ -76,8 +76,7 @@ namespace GooglePlayGames
             var files = System.IO.Directory.GetFiles(projModPath, "*.projmods", System.IO.SearchOption.AllDirectories);
             
             foreach (var file in files)
-            {
-              L.E("PROJ: {0}", file.ToString());
+            {              
               project.ApplyMod(projModPath, file);
             }
             project.Save();
