@@ -67,6 +67,19 @@ namespace GooglePlayGames
 
             UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
             UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
+            
+            UnityEditor.XCodeEditor.XCProject project = new UnityEditor.XCodeEditor.XCProject(pathToBuiltProject);
+            // Find and run through all projmods files to patch the project
+            
+            string projModPath = System.IO.Path.Combine(Application.dataPath, "GooglePlayGames/Editor/iOS");
+            var files = System.IO.Directory.GetFiles(projModPath, "*.projmods", System.IO.SearchOption.AllDirectories);
+            
+            foreach (var file in files)
+            {
+              L.E("PROJ: {0}", file.ToString());
+              project.ApplyMod(projModPath, file);
+            }
+            project.Save();
 
 #if UNITY_EDITOR
             // EditorWindow.GetWindow<GPGSInstructionWindow>(

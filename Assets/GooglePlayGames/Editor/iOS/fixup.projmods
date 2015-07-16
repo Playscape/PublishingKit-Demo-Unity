@@ -6,9 +6,6 @@
     "libc++.dylib:weak",
     "libstdc++.6.dylib:weak"
   ],
-  "librarysearchpaths": [
-    "GooglePlayGames/Editor/iOS/GooglePlayFrameworks/",
-  ],
   "frameworks": [
     "AdSupport.framework",
     "AddressBook.framework:weak",
