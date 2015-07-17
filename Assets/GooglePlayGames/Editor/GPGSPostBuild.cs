@@ -52,6 +52,7 @@ namespace GooglePlayGames
             if (System.IO.Directory.Exists(pluginDir))
             {
                 GPGSUtil.WriteFile(pluginDir + "/GPGSAppController.mm", "// Empty since NO_GPGS is defined\n");
+                System.Console.WriteLine("KDG. NO GPG");
                 return;
             }
             #else
@@ -61,6 +62,7 @@ namespace GooglePlayGames
                 UnityEngine.Debug.LogError("The iOS bundle ID has not been set up through the " +
                     "'iOS Setup' submenu of 'Google Play Games' - the generated xcode project will " +
                     "not work properly.");
+				System.Console.WriteLine("KDG. EMPTY BUNDLE");
                 return;
             }
 
@@ -68,18 +70,23 @@ namespace GooglePlayGames
 
             UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
             UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
-            
-            UnityEditor.XCodeEditor.XCProject project = new UnityEditor.XCodeEditor.XCProject(pathToBuiltProject);
-            // Find and run through all projmods files to patch the project
-            
-            string projModPath = System.IO.Path.Combine(Application.dataPath, "GooglePlayGames/Editor/iOS");
-            var files = System.IO.Directory.GetFiles(projModPath, "*.projmods", System.IO.SearchOption.AllDirectories);
-            
-            foreach (var file in files)
-            {              
-              project.ApplyMod(projModPath, file);
-            }
-            project.Save();
+
+			UnityEditor.XCodeEditor.XCProject project = new UnityEditor.XCodeEditor.XCProject(pathToBuiltProject);
+
+			System.Console.WriteLine("KDG. GPG INIT XCODE PROJECT");
+			
+			// Find and run through all projmods files to patch the project
+			
+			string projModPath = System.IO.Path.Combine(Application.dataPath, "GooglePlayGames/Editor/iOS");
+			var files = System.IO.Directory.GetFiles(projModPath, "*.projmods", System.IO.SearchOption.AllDirectories);
+			System.Console.WriteLine("KDG. GPG FETCH FILES: {0}", files.Length.ToString());
+			foreach (var file in files)
+			{
+				System.Console.WriteLine("KDG. GPG APPLY FILE: {0}", file.ToString());
+				project.ApplyMod(projModPath, file);
+			}
+			project.Save();
+			System.Console.WriteLine("KDG. GPG SAVE XCODE PROJECT");
 
 #if UNITY_EDITOR
             // EditorWindow.GetWindow<GPGSInstructionWindow>(
