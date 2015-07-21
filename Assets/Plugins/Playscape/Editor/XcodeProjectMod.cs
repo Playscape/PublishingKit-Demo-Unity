@@ -6,12 +6,12 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
  
-namespace Playscape.Internal {
+namespace Playscape.Editor {
 
 	/// <summary>
 	/// Xcode project mod. Edits xcode project files
 	/// </summary>
-	public class XcodeProjectMod 
+	public class XcodeProjectMod
 	{
 		private string path;
 		private List<string> frameworks;
@@ -140,7 +140,7 @@ namespace Playscape.Internal {
 			}
 
 			//save project
-			File.WriteAllText(projPath, proj.WriteToString());	        
+			File.WriteAllText(projPath, proj.WriteToString());
 	    }
 	}
 }
