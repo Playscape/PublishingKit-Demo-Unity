@@ -176,7 +176,7 @@ namespace Playscape.Editor
 			string mainClass = "com.googlecode.dex2jar.tools.Dex2jarCmd";
 			string mainClassParams = "-f -o " + PlatformUtils.qualifyPath(dst) + " " + PlatformUtils.qualifyPath(src);
 			
-			string arguments = "-classpath " + classpath + " -Xms512m -Xmx1024m " + mainClass + " " + mainClassParams;
+			string arguments = "-classpath " + classpath + " -Xms1024m -Xmx2048m " + mainClass + " " + mainClassParams;
 			
 			logger.V("Command " + command);
 			logger.V("Argumnets " + arguments);
@@ -207,7 +207,7 @@ namespace Playscape.Editor
 			string mainClass = "com.googlecode.dex2jar.tools.Jar2Dex";
 			string mainClassParams = "-f -o " + PlatformUtils.qualifyPath(outputPath) + " " + PlatformUtils.qualifyPath(targetPath);
 			
-			string arguments = "-classpath " + classpath + " -Xms512m -Xmx1024m " + mainClass + " " + mainClassParams;
+			string arguments = "-classpath " + classpath + " -Xms1024m -Xmx2048m " + mainClass + " " + mainClassParams;
 			
 			logger.V("Command " + command);
 			logger.V("Argumnets " + arguments);

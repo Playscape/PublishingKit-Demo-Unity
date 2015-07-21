@@ -71,23 +71,6 @@ namespace GooglePlayGames
             UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
             UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
 
-			UnityEditor.XCodeEditor.XCProject project = new UnityEditor.XCodeEditor.XCProject(pathToBuiltProject);
-
-			System.Console.WriteLine("KDG. GPG INIT XCODE PROJECT");
-			
-			// Find and run through all projmods files to patch the project
-			
-			string projModPath = System.IO.Path.Combine(Application.dataPath, "GooglePlayGames/Editor/iOS");
-			var files = System.IO.Directory.GetFiles(projModPath, "*.projmods", System.IO.SearchOption.AllDirectories);
-			System.Console.WriteLine("KDG. GPG FETCH FILES: {0}", files.Length.ToString());
-			foreach (var file in files)
-			{
-				System.Console.WriteLine("KDG. GPG APPLY FILE: {0}", file.ToString());
-				project.ApplyMod(projModPath, file);
-			}
-			project.Save();
-			System.Console.WriteLine("KDG. GPG SAVE XCODE PROJECT");
-
 #if UNITY_EDITOR
             // EditorWindow.GetWindow<GPGSInstructionWindow>(
             //     utility: true,
