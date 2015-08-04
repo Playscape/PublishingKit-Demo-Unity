@@ -16,14 +16,11 @@ namespace Playscape.Editor
     public class BuildProcess : ITempFileProvider
     {
 		private readonly string[] EXCLUDE_ADS_JARS = new string[] {
-			"com/chartboost/*",
-			"com/jirbo/adcolony/*",
-			"com/millennialmedia/*",
-			"com/startapp/*",
-			"com/vungle/*",
-            "javax.inject/*",
-            "com.nineoldandroids/*",
-            "dagger/*"
+			"com/chartboost/*", 
+			"com/jirbo/adcolony/*", 
+			"com/millennialmedia/*", 
+			"com/startapp/*", 
+			"com/vungle/*"
 		};
 
 		/// <summary>
