@@ -22,6 +22,7 @@ namespace Playscape.Editor {
 		private const string CLOSE = "Apply Changes";
         private const string TEST_BUILD = "Test";
         private const string PLAYSCAPE_CONFIGURATION_TITLE = "Playscape Configuration";
+		private const string INCLUDE_ARCHITECTURE_TITLE = "Include Architectures";
 		private Vector2  scrollPos;
 
 		private const string AB_TESTING_TITLE = "AB Testing Configuration";
@@ -121,6 +122,10 @@ namespace Playscape.Editor {
 			targetManifest = "Assets/Plugins/Android/AndroidManifest.xml";
 			AndroidManifestMerger.Merge (targetManifest, false);
 
+			string targetArmeabi = "Assets/Plugins/Android/PlayscapePublishingKit/libs/armeabi";
+			string tempArmeabi = "Assets/Temp/armeabi";
+			AndroidApkCreator.IncludeArchotecture (Configuration.Instance.includeArchitectures, targetArmeabi, tempArmeabi);
+
 			EditorUtility.DisplayDialog(
 				"Configuration Ended",
 				"The configuration process has ended successfully",
@@ -193,6 +198,8 @@ namespace Playscape.Editor {
                             }
 						});
 
+			bool includeArchitectures = EditorGUILayout.ToggleLeft (INCLUDE_ARCHITECTURE_TITLE, Configuration.Instance.includeArchitectures);
+			Configuration.Instance.includeArchitectures = includeArchitectures;
 		}
 	}
 }

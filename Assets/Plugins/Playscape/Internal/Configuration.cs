@@ -53,6 +53,8 @@ namespace Playscape.Internal {
 		//        GUI and saving/loading of the config will be done automagically for you.
 		public Ads MyAds = new Ads();
 
+		public bool includeArchitectures = true;
+
 		[SerializeField]
 		private GameConfiguration _gameConfiguration = new GameConfiguration();
 
