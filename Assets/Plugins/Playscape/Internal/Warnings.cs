@@ -36,6 +36,31 @@ namespace Playscape.Internal {
 			"Release build should has internet connection.",
 			"WARN-G003");
 
+		public static readonly string JAVA_HOME_ENV_VAR_NOT_SET = MakeWarning (
+			"JAVA_HOME environment variable is missed.",
+			"WARN-G004");
+
+		public static readonly string JAVA_HOME_ENV_VAR_NOT_EXIST = MakeWarning (
+			"JAVA_HOME path does not exist.",
+			"WARN-G005");
+
+		public static readonly string JAVA_NOT_SATISFYING_PLAYSCAPE_SDK = MakeWarning (
+			"Please make sure you have a suitable JDK installation. Playscape SDK requires at least JDK 7 (1.7) 64-Bit, having JRE only is not enough.  The latest JDK can be obtained from the Oracle website http://www.oracle.com/technetwork/java/javase/downloads/index.html",
+			"WARN-G006");
+
+		public static readonly string ANDROID_HOME_ENV_VAR_NOT_SET = MakeWarning (
+			"ANDROID_HOME environment variable is missed.",
+			"WARN-G007");
+
+		public static readonly string ANDROID_HOME_ENV_VAR_NOT_EXIST = MakeWarning (
+			"ANDROID_HOME path does not exist.",
+			"WARN-G008");
+
+		public static readonly string ANDROID_NOT_HAS_GOOGLE_PLAY_SERVICES = MakeWarning (
+			"Looks like you don't have \"Google Play Services\" library in your Android SDK folder. Please download it.",
+			"WARN-G009");
+
+
 		#endregion
 
 		#region Android Warnings

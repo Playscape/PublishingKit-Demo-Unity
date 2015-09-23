@@ -22,12 +22,10 @@ namespace Playscape.Editor
 		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/Editor/ThirdParty/zipalign";
 		private const string DEX_2_JAR_TOOL_HOME_PATH = "Assets/Plugins/Playscape/Editor/ThirdParty/dex2jar";
 		private const string ASPECT_HOME_PATH = "Assets/Plugins/Playscape/Editor/ThirdParty/aspectsj/";
-		private const string DEFAULT_ANDROID_PLATFORM = "android-19";
+		private const string DEFAULT_ANDROID_PLATFORM = "19";			
 		
-		private static string ANDROID_HOME = PlatformUtils.isWindows() ? System.Environment.GetEnvironmentVariable("ANDROID_HOME") : AndroidSDKFolder.Path;
-		
-		private static string sJavaCommand = (PlatformUtils.isWindows()) ? string.Format("\"{0}\"", System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/java.exe") : "/usr/bin/java";
-		private static string sDelimeter = (PlatformUtils.isWindows()) ? ";" : ":";
+		private static string sJavaCommand = JDKFolder.JavaPath;
+		private static string sDelimeter = PlatformUtils.PathDelimeter;
 		private static string sClasspath = Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/asm-all-3.3.1.jar") + sDelimeter
 			+ Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/commons-lite-1.15.jar") + sDelimeter
 				+ Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/dex-ir-1.12.jar") + sDelimeter
@@ -54,6 +52,13 @@ namespace Playscape.Editor
 		/// </summary>
 		private ILogger logger { get; set; }
 		
+		
+		/// <summary>
+		/// Gets or sets the command line executor.
+		/// </summary>
+		/// <value>The m command line executor.</value>
+		private CommandLineExecutor mCommandLineExecutor { get; set; }
+		
 		/// <summary>
 		/// Constructs a new AndroidAPK creator instnace
 		/// </summary>
@@ -65,7 +70,8 @@ namespace Playscape.Editor
 			this.buildParams = bp;
 			this.logger = logger;
 			this.mTempFileProvider = tempFileProvider;
-		}		       
+			this.mCommandLineExecutor = new CommandLineExecutor (logger);
+		}
 		
 		/// <summary>
 		/// Extract an ZIP file to a folder
@@ -176,18 +182,18 @@ namespace Playscape.Editor
 			string mainClass = "com.googlecode.dex2jar.tools.Dex2jarCmd";
 			string mainClassParams = "-f -o " + PlatformUtils.qualifyPath(dst) + " " + PlatformUtils.qualifyPath(src);
 			
-			string arguments = "-classpath " + classpath + " -Xms512m -Xmx1024m " + mainClass + " " + mainClassParams;
+			string arguments = "-classpath " + classpath + " -Xms1024m -Xmx2048m " + mainClass + " " + mainClassParams;
 			
 			logger.V("Command " + command);
 			logger.V("Argumnets " + arguments);
 			
-			int exitCode = runProcessWithCommand (command, arguments);
-			string message = "executeDex2jar was" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode;
+			Output output = mCommandLineExecutor.Execute (command, arguments);
+			string message = "executeDex2jar was" + (output.ExitCode == 0 ? "" : " not") + " successfully with code " + output.ExitCode;
 			logger.V(message);
 			
-			if (exitCode != 0)
+			if (output.ExitCode != 0)
 			{
-				throw new Exception("failed to execture dex2jar");
+				throw new Exception(string.Format("Failed to execture dex2jar. Error description: {0}", output.ErrorDescription));
 			}
 		}
 		
@@ -207,18 +213,18 @@ namespace Playscape.Editor
 			string mainClass = "com.googlecode.dex2jar.tools.Jar2Dex";
 			string mainClassParams = "-f -o " + PlatformUtils.qualifyPath(outputPath) + " " + PlatformUtils.qualifyPath(targetPath);
 			
-			string arguments = "-classpath " + classpath + " -Xms512m -Xmx1024m " + mainClass + " " + mainClassParams;
+			string arguments = "-classpath " + classpath + " -Xms1024m -Xmx2048m " + mainClass + " " + mainClassParams;
 			
 			logger.V("Command " + command);
 			logger.V("Argumnets " + arguments);
 			
-			int exitCode = runProcessWithCommand(command, arguments);
-			string message = "executeLib2dex was" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode;
+			Output output = mCommandLineExecutor.Execute (command, arguments);
+			string message = "executeLib2dex was" + (output.ExitCode == 0 ? "" : " not") + " successfully with code " + output.ExitCode;
 			logger.V(message);
 			
-			if (exitCode != 0)
+			if (output.ExitCode != 0)
 			{
-				throw new Exception("failed to execture lib2dex");
+				throw new Exception(string.Format("Failed to execture lib2dex. Error description: {0}", output.ErrorDescription));
 			}
 		}
 		
@@ -356,39 +362,46 @@ namespace Playscape.Editor
 			string GOOGLE_PLAY_SERVICES_JAR;
 			
 			//Getting android platform jar for minSDK setted in PlayerSettings
-			string platform = string.Format("{0}-{1}", "android", Regex.Match(buildParams.sdkVersion, @"\d+").Value);
-			ANDROID_JAR = Path.Combine(ANDROID_HOME, string.Format("platforms/{0}/android.jar", platform));
+			string platform = Regex.Match(buildParams.sdkVersion, @"\d+").Value;
+			ANDROID_JAR = AndroidSDKFolder.GetAndroidAPIJarPath (UInt16.Parse(platform));
 			
 			//if android platform jar getted from PlayerSettings doesn't exist will use default
 			if (!File.Exists(ANDROID_JAR))
 			{
-				ANDROID_JAR = Path.Combine(ANDROID_HOME, string.Format("platforms/{0}/android.jar", DEFAULT_ANDROID_PLATFORM));
+				ANDROID_JAR = AndroidSDKFolder.GetAndroidAPIJarPath (UInt16.Parse(DEFAULT_ANDROID_PLATFORM)); 
+				
+				if (!File.Exists(ANDROID_JAR)) {
+					throw new Exception(string.Format("Looks like you don't have required version of android API. Required version is {0} version. Please, download it.", DEFAULT_ANDROID_PLATFORM));
+				}
 			}
 			
-			GOOGLE_PLAY_SERVICES_JAR = Path.Combine(ANDROID_HOME,
-			                                        "extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar");
+			GOOGLE_PLAY_SERVICES_JAR = AndroidSDKFolder.GooglePlayServicesJarPath;
+																							
+			if (!File.Exists (GOOGLE_PLAY_SERVICES_JAR)) {
+				throw new Exception("Looks like you don't have \"Google Play Services\" library in your Android SDK folder. Please download it.");
+			}
 			
-			string delimeter = (PlatformUtils.isWindows()) ? ";" : ":";
+			string delimeter = sDelimeter;
 			string classpath = Path.Combine(ASPECT_HOME_PATH, "aspectjtools.jar") + delimeter
 				+ Path.Combine(ASPECT_HOME_PATH, "aspectjrt.jar") + delimeter
 					+ ANDROID_JAR + delimeter
 					+ GOOGLE_PLAY_SERVICES_JAR;
 
-			string arguments = "-classpath " + PlatformUtils.qualifyPath(classpath) + " -Xmx8g org.aspectj.tools.ajc.Main -source 1.5 -Xlint:ignore -inpath "
-				+ PlatformUtils.qualifyPath(inpath) + " -aspectpath " + PlatformUtils.qualifyPath(aspectpath) + " -outjar " + PlatformUtils.qualifyPath(outjar);
-			
+			string arguments = "-classpath \"" + classpath + "\" -Xmx8g org.aspectj.tools.ajc.Main -source 1.5 -Xlint:ignore -inpath \""
+				+ inpath + "\" -aspectpath \"" + aspectpath + "\" -outjar \"" + outjar + "\"";
+
 			logger.V("Command " + command);
 			logger.V("Argumnets " + arguments);
 			
-			int exitCode = runProcessWithCommand(command, arguments);
-			string message = "aspects was applyed" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode;
-			if (exitCode == 0)
+			Output output = mCommandLineExecutor.Execute (command, arguments);
+			string message = "aspects was applyed" + (output.ExitCode == 0 ? "" : " not") + " successfully with code " + output.ExitCode;
+			if (output.ExitCode == 0)
 			{
 				logger.V(message);
 			}
 			else
 			{
-				throw new Exception("failed to apply patch to the .jar file");
+				throw new Exception(string.Format("Failed to apply patch to the .jar file. Error description: {0}", output.ErrorDescription));
 			}
 		}
 		
@@ -400,56 +413,53 @@ namespace Playscape.Editor
 		public void signApk(string unsignedAPKPath)
 		{
 			logger.V("entering signApk");
-			string keysotre_path = buildParams.keysotre_path;
-			string alias = buildParams.alias;
-			string storepass = buildParams.storepass;
-			string keypass = buildParams.keypass;
-			
-			
-			logger.V("Removing current APK signatures");
-			// first remove the current sign
-			using (ZipFile zipFile = new ZipFile(unsignedAPKPath))
-			{
+			Stopwatch sw = new Stopwatch ();
+			try {
+				sw.Start();
+
+				string keysotre_path = buildParams.keysotre_path;
+				string alias = buildParams.alias;
+				string storepass = buildParams.storepass;
+				string keypass = buildParams.keypass;
 				
-				for (int i = 0; i < zipFile.Count; ++i)
+				
+				logger.V("Removing current APK signatures");
+				// first remove the current sign
+				using (ZipFile zipFile = new ZipFile(unsignedAPKPath))
 				{
-					ZipEntry e = zipFile[i];
-					if (e.FileName.StartsWith("META-INF/"))
-						zipFile.RemoveEntry(e.FileName);
+					
+					for (int i = 0; i < zipFile.Count; ++i)
+					{
+						ZipEntry e = zipFile[i];
+						if (e.FileName.StartsWith("META-INF/"))
+							zipFile.RemoveEntry(e.FileName);
+					}
+					
+					zipFile.Save();
 				}
 				
-				zipFile.Save();
+
+				string command = JDKFolder.JarSignerPath;
+				string arguments = "-sigalg SHA1withRSA -digestalg SHA1 -keystore \"" + keysotre_path + "\" -storepass " + storepass + " -keypass " + keypass + " \"" + unsignedAPKPath + "\"  \"" + alias + "\"";
+
+				logger.V("command: {0}", command);
+				logger.V("arguments: {0}", arguments);
+				
+				logger.V("Runing sign process");
+				Output output = mCommandLineExecutor.Execute (command, arguments);
+				string message = "apk was " + (output.ExitCode == 0 ? "" : "not") + " signed successfully" + (output.ExitCode == 0 ? "" : " with code " + output.ExitCode);
+				logger.V(message);
+
+				if (output.ExitCode != 0)
+				{
+					throw new Exception(string.Format("Failed to sign apk. Error description: {0}", output.ErrorDescription));
+				}
+				
+				
+				logger.V("Leaving signApk");
+			} finally {
+				sw.Stop();
 			}
-			
-			
-			string command;
-			if (PlatformUtils.isWindows())
-			{
-				command = System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/jarSigner.exe";
-			}
-			else
-			{
-				command = "/usr/bin/jarsigner";
-			}
-			
-			string arguments = "-keystore " + PlatformUtils.qualifyPath(keysotre_path) + " -storepass " + storepass + " -keypass " + keypass + " " + PlatformUtils.qualifyPath(unsignedAPKPath) + " " + alias;
-			logger.V("command: {0}", command);
-			logger.V("arguments: {0}", arguments);
-			
-			logger.V("Runing sign process");
-			int exitCode = runProcessWithCommand(command, arguments);
-			string message = "apk was " + (exitCode == 0 ? "" : "not") + " signed successfully" + (exitCode == 0 ? "" : " with code " + exitCode);
-			logger.V(message);
-			
-			if (exitCode != 0)
-			{
-				throw new Exception("failed to sign apk");
-			}
-			
-			
-			logger.V("Leaving signApk");
-			
-			
 		}
 		
 		/// <summary>
@@ -459,7 +469,6 @@ namespace Playscape.Editor
 		/// <param name="dst">The destination path of the aligned zip file</param>
 		public void applyZipalign(string src, string dst)
 		{
-			
 			logger.V("entering ZipAlign");
 			string command = Directory.GetCurrentDirectory() + ZIPALIGN_TOOL_PATH;
 			if (PlatformUtils.isWindows())
@@ -467,52 +476,21 @@ namespace Playscape.Editor
 				command += ".exe";
 			}
 			
-			string arguments = " 4 " + PlatformUtils.qualifyPath(src) + " " + PlatformUtils.qualifyPath(dst);
+			string arguments = " 4 \"" + src + "\" \"" + dst + "\"";
 			logger.V("command: {0}", command);
 			logger.V("arguments: {0}", arguments);
 			
-			int exitCode = runProcessWithCommand(command, arguments);
-			string message = "apk was " + (exitCode == 0 ? "" : "not") + " zipaligned successfully" + (exitCode == 0 ? "" : " with code " + exitCode);
+			Output output = mCommandLineExecutor.Execute (command, arguments);
+			string message = "apk was " + (output.ExitCode == 0 ? "" : "not") + " zipaligned successfully" + (output.ExitCode == 0 ? "" : " with code " + output.ExitCode);
 			logger.V(message);
 			
 			
-			if (exitCode != 0)
+			if (output.ExitCode != 0)
 			{
-				throw new Exception("failed run zipalign");
+				throw new Exception(string.Format("Failed run zipalign. Error description: {0}", output.ErrorDescription));
 			}
 			
 			logger.V("leaving ZipAlign");
-		}
-		
-		
-		private int runProcessWithCommand(string command, string args)
-		{
-			logger.V(string.Format("running {0} with arguments {1}", command, args));
-			
-			var processInfo = new ProcessStartInfo (command, args)
-			{
-				CreateNoWindow = true,
-				UseShellExecute = false,
-				RedirectStandardOutput = true
-			};
-			Process proc;
-			
-			if ((proc = Process.Start(processInfo)) == null)
-			{
-				throw new InvalidOperationException("Can not start new process with command: " + command + " in AndroidApkCreator.");
-			}
-			
-			proc.WaitForExit();
-			int exitCode = proc.ExitCode;
-			
-			if (exitCode != 0)
-			{
-				string output = proc.StandardOutput.ReadToEnd();
-				logger.W("process failed with error {0}", output);
-			}
-			proc.Close();
-			
-			return exitCode;
 		}
 		
 		
@@ -613,6 +591,61 @@ namespace Playscape.Editor
 					rootResources.InsertAfter(playscapeExperimentElement, lastExperimentsElement);
 				}
 				lastExperimentsElement = playscapeExperimentElement;
+			}
+		}
+
+
+		public static void IncludeArchitecture(bool include, string targetPath, string tempPath)
+		{
+			if (include) {
+				DirectoryCopy(tempPath, targetPath, true);
+			} else {
+				if(Directory.Exists(targetPath)) {
+					Directory.Delete(targetPath, true);
+					string metaFile = targetPath + ".meta";
+					if(File.Exists(metaFile))
+					{
+						File.Delete(metaFile);
+					}
+				}
+			}
+		}
+
+		private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+		{
+			// Get the subdirectories for the specified directory.
+			DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+			DirectoryInfo[] dirs = dir.GetDirectories();
+
+			if (!dir.Exists)
+			{
+				throw new DirectoryNotFoundException(
+					"Source directory does not exist or could not be found: "
+					+ sourceDirName);
+			}
+
+			// If the destination directory doesn't exist, create it.
+			if (!Directory.Exists(destDirName))
+			{
+				Directory.CreateDirectory(destDirName);
+			}
+
+			// Get the files in the directory and copy them to the new location.
+			FileInfo[] files = dir.GetFiles();
+			foreach (FileInfo file in files)
+			{
+				string temppath = Path.Combine(destDirName, file.Name);
+				file.CopyTo(temppath, false);
+			}
+
+			// If copying subdirectories, copy them and their contents to new location.
+			if (copySubDirs)
+			{
+				foreach (DirectoryInfo subdir in dirs)
+				{
+					string temppath = Path.Combine(destDirName, subdir.Name);
+					DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+				}
 			}
 		}
 	}
