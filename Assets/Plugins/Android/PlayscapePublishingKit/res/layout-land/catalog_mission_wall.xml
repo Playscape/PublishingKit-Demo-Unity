@@ -1,9 +1,0 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/mission_wall"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:background="@android:color/black"
-    android:orientation="vertical" >
-
-	<include layout="@layout/mission_wall" />
-</LinearLayout>
