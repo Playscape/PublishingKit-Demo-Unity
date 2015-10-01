@@ -1,0 +1,13 @@
+{
+    "group":       "",
+    "libs":        [
+    "libz.dylib:weak"
+    ],
+    "frameworks":  [
+    "StoreKit.framework",
+	],
+    "headerpaths": [],
+    "files":       [],
+    "folders":     [],
+    "excludes":    ["^.*.meta$", "^.*.mdown^", "^.*.pdf$"]
+}

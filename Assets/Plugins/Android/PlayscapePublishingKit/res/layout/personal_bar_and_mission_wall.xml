@@ -1,0 +1,30 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:tag="personal_bar_and_mission_wall"
+    android:id="@+id/personal_bar_and_mission_wall"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+	android:gravity="bottom"
+	>
+ 
+     <SlidingDrawer
+        android:id="@+id/mission_wall_drawer"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/PersonalBarContainer"
+        android:content="@+id/mission_wall"
+        android:handle="@+id/mission_wall_drawer_handle" >
+
+        <ImageView
+            android:id="@+id/mission_wall_drawer_handle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:src="@drawable/handle_up_closed" />
+        
+        <include layout="@layout/catalog_mission_wall" />
+    </SlidingDrawer> 
+
+  
+	<include layout="@layout/personal_bar" />
+
+</RelativeLayout>

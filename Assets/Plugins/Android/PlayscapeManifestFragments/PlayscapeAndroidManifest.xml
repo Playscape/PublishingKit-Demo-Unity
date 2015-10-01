@@ -1,0 +1,282 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.playscape.publishingkit"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="PACKAGE_NAME.permission.C2D_MESSAGE" />
+
+    <permission
+        android:name="PACKAGE_NAME.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <application
+        android:icon="@drawable/app_icon"
+        android:label="@string/app_name">
+        
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <receiver
+            android:name="com.playscape.utils.gcm.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
+                <category android:name="PACKAGE_NAME" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.playscape.utils.gcm.handlers.NotificationActionListener" >
+            <intent-filter>
+                <action android:name="com.playscape.utils.intent.NOTIFICATIONACTION" />
+
+                <category android:name="PACKAGE_NAME" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.playscape.utils.gcm.handlers.AutomaticRetryExponentialBackOff" >
+            <intent-filter>
+                <action android:name="com.playscape.utils.intent.RETRY_BACKOFF" />
+
+                <category android:name="PACKAGE_NAME" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="com.playscape.utils.gcm.GcmIntentService" />
+        <service android:name="mominis.common.logger.LoggingService" >
+            <intent-filter>
+                <action android:name="com.mominis.gameconsole.logger.START_LOGGER_SERVICE" />
+            </intent-filter>
+        </service>
+        <service android:name="com.mominis.logger.IsAliveService" >
+        </service>
+
+        <receiver android:name="mominis.common.logger.OnLogAlarmReceiver" >
+            <intent-filter>
+                <action android:name="com.mominis.gameconsole.alarm.START_LOG_SHIPPING_FROM_REPEATING" />
+                <action android:name="com.mominis.gameconsole.alarm.START_LOG_SHIPPING_FROM_DEFERRED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.mominis.logger.ConnectivityChangedReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Adience Sdk -->
+        <service android:name="com.adience.sdk.SdkService" android:process=":dsservice" >
+            <meta-data android:name="com.adience.appKey" android:value="​@string/playscape_adience_key"/>
+        </service>
+
+        <receiver android:name="com.adience.sdk.SdkBootReceiver" android:process=":dsservice"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- StartApp Ads -->
+        <activity
+            android:name="com.startapp.android.publish.list3d.List3DActivity"
+            android:theme="@android:style/Theme" />
+        <activity
+            android:name="com.startapp.android.publish.AppWallActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:theme="@android:style/Theme.Translucent" />
+
+        <!-- MoPub Ads -->
+        <activity
+            android:name="com.mopub.mobileads.MoPubActivity"
+            android:configChanges="keyboardHidden|orientation" />
+        <activity
+            android:name="com.mopub.mobileads.MraidActivity"
+            android:configChanges="keyboardHidden|orientation" />
+        <activity
+            android:name="com.mopub.mobileads.MraidBrowser"
+            android:configChanges="keyboardHidden|orientation" />
+        <activity
+            android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
+            android:configChanges="keyboardHidden|orientation" />
+
+        <!-- Vungle Video Ads -->
+        <activity
+            android:name="com.vungle.sdk.VungleAdvert"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <activity
+            android:name="com.vungle.publisher.FullScreenAdActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+
+        <service android:name="com.vungle.sdk.VungleIntentService" />
+
+        <!-- AdColony Video Ads -->
+        <activity
+            android:name="com.jirbo.adcolony.AdColonyOverlay"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.jirbo.adcolony.AdColonyFullscreen"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.jirbo.adcolony.AdColonyBrowser"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
+
+        <!-- AdMob Ads -->
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+
+        <!-- Millenial Media Ads -->
+        <activity
+            android:name="com.millennialmedia.android.VideoPlayer"
+            android:configChanges="keyboardHidden|orientation|keyboard" >
+        </activity>
+        <activity
+            android:name="com.millennialmedia.android.MMActivity"
+            android:configChanges="keyboardHidden|orientation|keyboard"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+
+        <!-- Used for install referrer tracking -->
+        <receiver
+            android:name="com.playscape.analytics.MarketReferrerReceiver"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
+		<!-- playscape SDK -->
+
+		<!-- Activities -->
+
+
+        <activity
+            android:name="mominis.gameconsole.activities.GamePageActivity"
+            android:configChanges="keyboard|keyboardHidden"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter>
+                <action android:name="mominis.common.PlayscapeSdk.SHOW_GAME_PAGE_ACTION" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="mominis.gameconsole.activities.RedirectToMarketActivity"
+            android:configChanges="keyboard|keyboardHidden"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+
+        <activity
+            android:name="mominis.gameconsole.views.impl.Catalog"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+
+        <activity android:name="mominis.gameconsole.activities.GameDialogActivity"
+
+			android:theme="@android:style/Theme.Translucent.NoTitleBar">
+        </activity>
+
+		<!-- Notification with promotionUrl trigger this activity -->
+        <activity android:name="mominis.common.services.notifications.PromotionActivity"
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:label="Mominis Promotion"
+			>
+        </activity>
+
+        <!-- Notification with market trigger this activity, it is used merely for analytics and launching the market afterwards -->
+        <activity android:name="mominis.common.services.notifications.NotificationProxyActivity"
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:label="Notification"
+			>
+        </activity>
+
+        <!-- Our Services -->
+
+        <service android:name="mominis.common.services.sync.impl.SyncIntentService">
+			<intent-filter>
+				<action android:name="android.content.Intent.ACTION_SYNC"></action>
+				<action android:name="mominis.common.services.sync.impl.SyncIntentService.SCHEDULE_PERIODIC_SYNC_ACTION"></action>
+			</intent-filter>
+		</service>
+
+		<service android:name="mominis.common.components.mailslot.impl.MailslotIntentService">
+			<intent-filter>
+				<action android:name="mominis.common.components.mailslot.impl.MailslotIntentService.MAILSLOT_ACTION" />
+			</intent-filter>
+		</service>
+
+		<service android:name="mominis.gameconsole.services.impl.SocialService" android:enabled="true" android:exported="true"></service>
+
+
+        <!-- 3rd Party Services -->
+        <service android:name="mobpartner.ad.sdk.MobPartnerSDK$ProcessCode" />
+
+
+
+		<!-- Used to trigger GameApplication.onCreate() to update the master in case of app removal. -->
+		<receiver
+            android:name="mominis.common.services.notifications.PackageStateChangeReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+				<action android:name="android.intent.action.PACKAGE_REMOVED"/>
+				<data android:path="*mominis*"/>
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+
+	  	<!-- Initializes the notifications subsystem -->
+		<receiver
+            android:name="mominis.common.services.notifications.GameNotificationInitReceiver"
+            android:enabled="true"
+            android:exported="true" >
+			<intent-filter>
+				<action android:name="com.mominis.GameNotificationInitReceiver.ACTION" />
+			</intent-filter>
+	  	</receiver>
+
+        <!-- Responds to notifications related alarms -->
+        <receiver
+            android:name="mominis.common.services.notifications.OnGameNotificationAlarmReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.mominis.game.notifications.OnGameNotificationAlarmReceiver.ACTION" />
+            </intent-filter>
+        </receiver>
+
+		<!--  Package changes receiver -->
+	    <receiver android:name="mominis.gameconsole.common.PackageStateReceiverObservable">
+			<intent-filter>
+                 <action android:name="android.intent.action.PACKAGE_REMOVED"/>
+                 <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+                 <action android:name="android.intent.action.PACKAGE_ADDED"/>
+                 <data android:path="*mominis*"/>
+                 <data android:scheme="package"/>
+			</intent-filter>
+		</receiver>
+
+    </application>
+
+</manifest>

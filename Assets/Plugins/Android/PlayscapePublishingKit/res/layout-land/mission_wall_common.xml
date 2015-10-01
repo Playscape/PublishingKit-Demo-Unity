@@ -1,0 +1,84 @@
+<!--  This is the mission wall sort bar and loading message -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    
+    <RelativeLayout
+        android:id="@+id/mission_wall_sort_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mw_sort_area"
+        android:clickable="true"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+
+
+
+        <ImageView
+            android:id="@+id/SortButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/mw_btn_sort" />
+
+
+
+        <RelativeLayout
+            android:id="@+id/StaticHeaderTextContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/SortButton"
+            android:orientation="vertical" >
+
+
+            <TextView
+                android:id="@+id/CurrenltySortedByLabelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:text="@string/currently_sorted_by"
+                android:textSize="12sp" >
+
+            </TextView>
+
+
+
+            <TextView
+                android:id="@+id/SortOptionTextView"
+                style="@style/mission_wall_sort_option_text_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/CurrenltySortedByLabelTextView"
+                android:layout_toRightOf="@+id/CurrenltySortedByLabelTextView"
+                android:text="@string/featured"
+                android:textStyle="normal|bold" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/loadingMissionsText"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="@dimen/loading_missions_text_margin"
+        android:layout_marginTop="@dimen/loading_missions_text_margin"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="top|center_horizontal"
+        android:text="@string/mw_loading_missions"
+        android:textSize="@dimen/game_page_game_discription_font_size"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/white">
+
+    </TextView>
+	   
+</LinearLayout>

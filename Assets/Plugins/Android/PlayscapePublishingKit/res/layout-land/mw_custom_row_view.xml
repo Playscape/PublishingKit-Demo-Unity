@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mission_wall_wrapper"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+
+
+
+
+
+
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/mission_wall_entry"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mw_item_background"
+        android:paddingBottom="10dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="10dp" >
+
+
+        <TextView
+            android:id="@+id/MissionTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:text="Title"
+            android:textColor="@drawable/mw_item_text_color"
+            android:textSize="14dp"
+            android:textStyle="bold" >
+
+        </TextView>
+
+
+
+
+
+        <TextView
+            android:id="@+id/MissionDescriptionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/MissionTitleTextView"
+            android:layout_below="@+id/MissionTitleTextView"
+            android:layout_marginRight="3dp"
+            android:layout_toLeftOf="@id/MissionWallImageView"
+            android:minLines="2"
+            android:scrollHorizontally="false"
+            android:text="and reach level 10 in less than 5 min and added some words to see 2nd row"
+            android:textColor="@drawable/mw_item_description_text_color"
+            android:textSize="@dimen/mission_wall_entry_desc_text_size"/>
+
+
+
+
+
+
+
+
+
+        <ImageView
+            android:id="@+id/MissionWallImageView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignRight="@+id/coins_and_xp"
+            android:layout_below="@+id/coins_and_xp"
+            android:layout_centerVertical="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/mw_sample_icon" >
+
+        </ImageView>
+
+
+        <LinearLayout
+            android:id="@id/coins_and_xp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal" >
+
+
+            <LinearLayout
+                android:id="@+id/xpContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp" >
+
+                <ImageView
+                    android:id="@+id/mission_entity_xp_icon"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/xp_icon" />
+
+                <TextView
+                    android:id="@+id/MissionWallXpValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="2dp"
+                    android:text="2,000"
+                    android:textColor="@drawable/mw_item_xp_text_color"
+                    android:textSize="11dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/coinsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <ImageView
+                    android:id="@+id/mission_entity_coin_icon"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp"
+                    android:src="@drawable/coin_icon" />
+
+                <TextView
+                    android:id="@+id/MissionWallCoinValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:text="120,000"
+                    android:textColor="@drawable/mw_item_coin_text_color"
+                    android:textSize="11dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/mw_completed_imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/mission_completed" />
+
+</RelativeLayout>

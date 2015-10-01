@@ -1,0 +1,177 @@
+[
+	{
+		"rank" : "1",
+		"name" : "Newborn",
+		"xp" : "0",
+		"icon": "level_up_icons/lvl1.png",
+		"bonus": 0
+	},
+	{
+		"rank" : "2",
+		"name" : "Novice",
+		"xp" : "200",
+		"icon": "level_up_icons/lvl2.png",
+		"bonus": 5
+	},
+	{
+		"rank" : "3",
+		"name" : "Member",
+		"xp" : "800",
+		"icon": "level_up_icons/lvl3.png",
+		"bonus": 10
+	},
+	{
+		"rank" : "4",
+		"name" : "Swift Scout",
+		"xp" : "1500",
+		"icon": "level_up_icons/lvl4.png",
+		"bonus": 20
+	},
+	{
+		"rank" : "5",
+		"name" : "Blue Flame",
+		"xp" : "2500",
+		"icon": "level_up_icons/lvl5.png",
+		"bonus": 25
+	},
+	{
+		"rank" : "6",
+		"name" : "Bright Light",
+		"xp" : "3700",
+		"icon": "level_up_icons/lvl6.png",
+		"bonus": 30
+	},
+	{
+		"rank" : "7",
+		"name" : "Wild Wind",
+		"xp" : "5000",
+		"icon": "level_up_icons/lvl7.png",
+		"bonus": 35
+	},
+	{
+		"rank" : "8",
+		"name" : "Ghost Hunter",
+		"xp" : "6500",
+		"icon": "level_up_icons/lvl8.png",
+		"bonus": 40
+	},
+	{
+		"rank" : "9",
+		"name" : "Tiger Warrior",
+		"xp" : "8200",
+		"icon": "level_up_icons/lvl9.png",
+		"bonus": 45
+	},
+	{
+		"rank" : "10",
+		"name" : "Sergeant Awesome",
+		"xp" : "10100",
+		"icon": "level_up_icons/lvl10.png",
+		"bonus": 50
+	},
+	{
+		"rank" : "11",
+		"name" : "Shadow Ninja",
+		"xp" : "12200",
+		"icon": "level_up_icons/lvl11.png",
+		"bonus": 55
+	},
+	{
+		"rank" : "12",
+		"name" : "Silver Valor",
+		"xp" : "14500",
+		"icon": "level_up_icons/lvl12.png",
+		"bonus": 60
+	},
+	{
+		"rank" : "13",
+		"name" : "Golden Knight",
+		"xp" : "17000",
+		"icon": "level_up_icons/lvl13.png",
+		"bonus": 65
+	},
+	{
+		"rank" : "14",
+		"name" : "Tactics Master",
+		"xp" : "19700",
+		"icon": "level_up_icons/lvl14.png",
+		"bonus": 70
+	},
+	{
+		"rank" : "15",
+		"name" : "Fire Fox",
+		"xp" : "22600",
+		"icon": "level_up_icons/lvl15.png",
+		"bonus": 75
+	},
+	{
+		"rank" : "16",
+		"name" : "Mighty Guardian",
+		"xp" : "25700",
+		"icon": "level_up_icons/lvl16.png",
+		"bonus": 80
+	},
+	{
+		"rank" : "17",
+		"name" : "Earth Champion",
+		"xp" : "29000",
+		"icon": "level_up_icons/lvl17.png",
+		"bonus": 85
+	},
+	{
+		"rank" : "18",
+		"name" : "Heroic Lion",
+		"xp" : "32500",
+		"icon": "level_up_icons/lvl18.png",
+		"bonus": 90
+	},
+	{
+		"rank" : "19",
+		"name" : "General Courage",
+		"xp" : "42000",
+		"icon": "level_up_icons/lvl19.png",
+		"bonus": 95
+	},
+	{
+		"rank" : "20",
+		"name" : "Majestic Panda",
+		"xp" : "60000",
+		"icon": "level_up_icons/lvl20.png",
+		"bonus": 100
+	},
+	{
+		"rank" : "21",
+		"name" : "Angelic Justice",
+		"xp" : "80000",
+		"icon": "level_up_icons/lvl21.png",
+		"bonus": 105
+	},
+	{
+		"rank" : "22",
+		"name" : "Legendary",
+		"xp" : "100000",
+		"icon": "level_up_icons/lvl22.png",
+		"bonus": 110
+	},
+	{
+		"rank" : "23",
+		"name" : "The One",
+		"xp" : "150000",
+		"icon": "level_up_icons/lvl23.png",
+		"bonus": 115
+	},
+	{
+		"rank" : "24",
+		"name" : "Immortal",
+		"xp" : "200000",
+		"icon": "level_up_icons/lvl24.png",
+		"bonus": 120
+	},
+	{
+		"rank" : "25",
+		"name" : "Master",
+		"xp" : "300000",
+		"icon": "level_up_icons/lvl25.png",
+		"bonus": 125
+	}
+]

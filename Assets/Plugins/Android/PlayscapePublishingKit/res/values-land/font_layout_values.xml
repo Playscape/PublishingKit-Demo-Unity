@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="award_dialog_body_text_width">190dp</dimen>
+    <dimen name="award_dialog_body_text_height">70dp</dimen>
+    <dimen name="award_dialog_margin_sides">20dp</dimen>
+    <dimen name="award_dialog_text_to_award_margin">25dp</dimen>
+    <dimen name="award_dialog_award_to_icon_margin">30dp</dimen>
+    
+    <dimen name="award_dialog_margin_top">40dp</dimen>
+    <dimen name="award_dialog_margin_bottom">80dp</dimen>
+    <dimen name="award_dialog_earned_margin_top">20dp</dimen>
+    
+    <dimen name="tour_more_pointer_more_margin_left">150dp</dimen>
+    <dimen name="tour_more_pointer_more_margin_bottom">-10dp</dimen>
+    <dimen name="award_ad_body_text_width">55dp</dimen>
+    <dimen name="award_earned_goods_margin_top">20dp</dimen>
+    <dimen name="award_dialog_close_ok_btn_margin_top">50dp</dimen>
+    <dimen name="guided_tour_text_bubble_width">0dp</dimen>
+    <dimen name="guided_tour_text_margin">0dp</dimen>
+    <dimen name="guided_tour_launch_window_height">160px</dimen>
+    <dimen name="guided_tour_upper_catalog_title_cover_height">92px</dimen>
+    <dimen name="guided_tour_award_dialog_msg_margin_bottom">85dp</dimen>
+    <dimen name="guided_tour_award_bouncy_bill_margin_bottom">50dp</dimen>
+    <dimen name="guided_tour_launch_screen_arrow_margin_left">30dp</dimen>
+    
+    <!-- guided_tour_welcome_screen -->
+    <dimen name="gt_welcome_dialog_box_width">296dp</dimen>
+    <dimen name="gt_welcome_dialog_box_height">268dp</dimen>
+    <dimen name="gt_welcome_dialog_box_margin_bottom">5dp</dimen>
+    
+    <dimen name="gt_welcome_web_view_container_width">286dp</dimen>
+    <dimen name="gt_welcome_web_view_container_height">198dp</dimen>
+    <dimen name="gt_welcome_web_view_container_margin_bottom">0dp</dimen>
+    
+    <dimen name="gt_close_ok_btn_width">115dp</dimen>
+    <dimen name="gt_close_ok_btn_height">25dp</dimen>
+    <!-- guided_tour_welcome_screen end -->
+    
+	<dimen name="guided_tour_award_dialog_arrow_margin_bottom">40dp</dimen>
+	<dimen name="guided_tour_award_dialog_arrow_margin_right">50dp</dimen>
+	<dimen name="guided_tour_award_dialog_arrow_margin_left">50dp</dimen> <!-- crap. -->
+	
+	<dimen name="gt_xp_web_view_container_width">247dp</dimen>
+	<dimen name="gt_xp_web_view_container_height">98dp</dimen>	
+	<dimen name="gt_coins_web_view_container_width">247dp</dimen>
+	<dimen name="gt_coins_web_view_container_height">130dp</dimen>
+	
+	<dimen name="gt_open_mission_wall_web_view_width">290dp</dimen>
+	<dimen name="gt_open_mission_wall_web_view_height">170dp</dimen>
+	<dimen name="gt_open_mission_wall_web_view_margin_bottom">0dp</dimen>
+	
+	<dimen name="gt_open_mission_wall_web_view_container_width">270dp</dimen>
+	<dimen name="gt_open_mission_wall_web_view_container_height">100dp</dimen>
+	<dimen name="gt_open_mission_wall_web_view_container_margin_bottom">00dp</dimen>
+	<dimen name="gt_open_mission_wall_web_view_container_margin_left">00dp</dimen>
+	
+	<dimen name="gt_open_mission_wall_btn_width">115dp</dimen>
+    <dimen name="gt_open_mission_wall_btn_height">25dp</dimen>
+
+    <dimen name="personal_bar_height">40dp</dimen>
+    
+    <dimen name="categories_toolbar_height">40dp</dimen>
+    
+    <dimen name="loading_missions_text_margin">50dp</dimen>
+    
+    <dimen name="catalog_game_max_height">200dp</dimen>
+	
+	<dimen name="catalog_tabs_width">210dp</dimen>
+	<dimen name="catalog_tabs_height">40dp</dimen>
+	<dimen name="catalog_tabs_text_size">13dp</dimen>
+	
+	<dimen name="catalog_playbox_width">100dp</dimen>
+	<dimen name="catalog_playbox_height">40dp</dimen>
+	<dimen name="catalog_categories_width">65dp</dimen>
+	<dimen name="catalog_categories_height">40dp</dimen>
+	<dimen name="catalog_mygames_width">85dp</dimen>
+	<dimen name="catalog_mygames_height">40dp</dimen>
+	
+	<dimen name="game_page_play_button_width">105dp</dimen>
+	<dimen name="game_page_play_button_height">42dp</dimen>
+	<dimen name="game_page_all_games_width">120dp</dimen>
+	
+	<dimen name="missionwall_drawer_handle_height">25dp</dimen>
+	<dimen name="game_page_game_discription_font_size">14dp</dimen>
+
+	<dimen name="drawer_top_offset">-25dp</dimen>
+	
+	<dimen name="ol_title_text_size">25dp</dimen>
+	<dimen name="ol_desc_text_size">17dp</dimen>
+	<dimen name="ol_desc_container_size">230dp</dimen>
+	<dimen name="ol_desc_container_size_level_up">230dp</dimen>
+	<dimen name="ol_desc_container_margin_top_7dp">7dp</dimen>
+	
+	<dimen name="ol_level_lup_ok_width">135dp</dimen>
+	<dimen name="ol_level_lup_ok_height">25dp</dimen>
+	
+	<dimen name="ol_main_rel_buttom_margin">48dp</dimen>
+	<dimen name="ol_level_up_portrait_image_height_container">145dp</dimen>
+	
+	<dimen name="ol_level_notification_icon_margin_right">80dp</dimen>
+	
+	<dimen name="ol_level_notification_icon_counter_margin_right">95dp</dimen>
+	<dimen name="ol_level_notification_icon_counter_margin_left">5dp</dimen>
+	<dimen name="ol_level_notification_icon_counter_margin_top">20dp</dimen>
+	<dimen name="ol_level_level_icon_counter_margin_right">13dp</dimen>
+	<dimen name="ol_level_notification_icon_width">14dp</dimen>
+	<dimen name="ol_level_notification_icon_height">11dp</dimen>
+	
+	<dimen name="mission_wall_entry_desc_text_size">14dp</dimen>
+</resources>

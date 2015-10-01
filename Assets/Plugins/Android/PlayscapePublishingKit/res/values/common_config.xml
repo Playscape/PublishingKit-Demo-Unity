@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--  this is the playscape default app id -->
+    <string name="SocialNetworkAppId" formatted="false">394312077314737</string>
+    <string name="GenericBadgeIconUrl" formatted="false">http://mominis.production.s3.amazonaws.com/facebook_images/playscape_badge_icon.png</string>
+    <string name="LevelUpIconUrl" formatted="false">http://mominis.production.s3.amazonaws.com/facebook_images/level_up_icons/lvl%1$d.png</string>
+</resources>

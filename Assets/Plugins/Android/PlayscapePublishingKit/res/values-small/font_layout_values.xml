@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>	
+	<dimen name="award_dialog_margin_top">10dp</dimen>
+    <dimen name="award_dialog_margin_bottom">15dp</dimen>
+    <dimen name="award_dialog_earned_margin_top">20dp</dimen>
+    <dimen name="game_page_game_discription_font_size">14dp</dimen>
+
+    <dimen name="gt_xp_web_view_container_width">257dp</dimen>
+	<dimen name="gt_xp_web_view_container_height">135dp</dimen>	
+	<dimen name="gt_coins_web_view_container_width">257dp</dimen>
+	<dimen name="gt_coins_web_view_container_height">150dp</dimen>
+	
+	<dimen name="gt_open_mission_wall_btn_width">150dp</dimen>
+    <dimen name="gt_open_mission_wall_btn_height">35dp</dimen>
+    
+    <dimen name="gt_close_ok_btn_width">150dp</dimen>
+    <dimen name="gt_close_ok_btn_height">35dp</dimen>
+    
+    <dimen name="gt_welcome_web_view_container_width">234dp</dimen>
+    <dimen name="gt_welcome_web_view_container_height">200dp</dimen>
+    <dimen name="ol_level_lup_ok_width">115.2dp</dimen>
+	<dimen name="ol_level_lup_ok_height">24.5dp</dimen>
+	<dimen name="ol_level_up_portrait_image_height_container">170dp</dimen>
+	<dimen name="ol_btn_text_size">15dp</dimen>
+	
+	
+	<dimen name="goto_menu_main_layout_width">300dp</dimen>
+	<dimen name="goto_menu_main_layout_height">330dp</dimen>
+	<dimen name="goto_title_container_marginLeft_20dp">5dp</dimen>
+	<dimen name="goto_title_container_marginRight_20dp">5dp</dimen>
+	<dimen name="goto_title_container_margintop_3dp">3dp</dimen>
+	<dimen name="goto_ad_title_marginBottom_15dp">7dp</dimen>
+	<dimen name="goto_ad_title_marginTop_30dp">10dp</dimen>
+	<dimen name="goto_ad_title_textSize_27dp">14dp</dimen>
+	
+	 <dimen name="goto_content_container_marginLeft_20dp">10dp</dimen>
+     <dimen name="goto_content_container_marginRight_20dp">10dp</dimen>
+     <dimen name="goto_content_container_marginTop_45dp">10dp</dimen>
+     <dimen name="goto_menu_button_more_missions_marginRight_50dp">30dp</dimen>
+     <dimen name="goto_menu_button_more_missions_layout_width_wrap_content">80dp</dimen>
+     <dimen name="goto_menu_button_more_missions_layout_height_wrap_content">80dp</dimen>
+     <dimen name="goto_menu_land_button_more_missions_layout_width_wrap_content">75dp</dimen>
+     <dimen name="goto_menu_land_button_more_missions_layout_height_wrap_content">75dp</dimen>
+     <dimen name="goto_txt_1_marginRight_50dp">30dp</dimen>
+     <dimen name="goto_txt_1_marginBottom_15dp">15dp</dimen>
+     <dimen name="goto_txt_1_marginTop_5dp">5dp</dimen>
+     <dimen name="goto_txt_1_marginLeft_0dp">0dp</dimen>
+     <dimen name="goto_txt_1_textSize_20dp">12dp</dimen>
+     <dimen name="goto_txt_2_layout_width_130dp">85dp</dimen>
+     <dimen name="goto_txt_2_layout_marginBottom_15dp">15dp</dimen>
+     <dimen name="goto_txt_2_layout_marginTop_5dp">5dp</dimen>
+     <dimen name="goto_menu_buttons_container2_marginTop_25dp">5dp</dimen>
+     <dimen name="goto_menu_buttons_container2_marginTop_25dp_land">5dp</dimen>
+     <dimen name="goto_txt_3_marginBottom_15dp">15dp</dimen>
+     <dimen name="goto_txt_3_marginLeft_10dp">2.5dp</dimen>
+     <dimen name="goto_txt_3_marginRight_63dp">35dp</dimen>
+     <dimen name="goto_txt_3_marginTop_5dp">5dp</dimen>
+     <dimen name="goto_txt_4_layout_width_130dp">130dp</dimen>
+     
+     <dimen name="goto_txt_4_marginBottom_15dp">15dp</dimen>
+     <dimen name="goto_txt_4_marginTop_5dp">5dp</dimen>
+     
+     
+     <dimen name="ol_main_rel_buttom_margin">80dp</dimen>
+     
+     
+     <dimen name="award_dialog_btn_img_width">120dp</dimen> 
+     <dimen name="award_dialog_btn_img_height">36dp</dimen>
+     
+     <dimen name="award_dialog_land_btn_img_width">58.6dp</dimen> 
+     <dimen name="award_dialog_land_btn_img_height">16.6dp</dimen>
+     
+     <dimen name="m_level_up_portrait_image_layout_marginBelow">2dp</dimen>
+     
+     <dimen name="mission_wall_entry_desc_text_size">12dp</dimen>
+     
+    
+	<dimen name="goto_land_menu_main_layout_width">380dp</dimen>
+	<dimen name="goto_land_menu_main_layout_height">230dp</dimen>
+	
+    
+</resources>
