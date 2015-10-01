@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-  
-    <item android:id="@+id/mission_sort_menu_featured" android:title="@string/featured" android:checked="true"></item>
-    <item android:id="@+id/mission_sort_menu_newest" android:title="@string/newest"></item>
-    <item android:id="@+id/mission_sort_menu_most_rewarding" android:title="@string/most_rewarding"></item>
-    <item android:id="@+id/mission_sort_menu_completed" android:title="@string/completed"></item>
-   
-</menu>
