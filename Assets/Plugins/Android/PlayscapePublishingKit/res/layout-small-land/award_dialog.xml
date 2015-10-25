@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center_horizontal" 
+    >
+
+    <RelativeLayout
+        android:id="@+id/award_dialog_background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_shape_outlined_90" >
+        <!-- Title -->
+
+        <RelativeLayout
+            android:id="@+id/title_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="3dp" >
+
+            <TextView
+                android:id="@+id/ad_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="Mission completed"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <ImageView
+                android:id="@+id/title_underline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ad_title"
+                android:background="@drawable/separator" />
+        </RelativeLayout>
+
+        <!-- Content -->
+
+        <RelativeLayout
+            android:id="@+id/content_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/title_container"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="15dp" >
+
+            <TextView
+                android:id="@+id/ad_sub_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Massive Destruction"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/ad_bodyText"
+                android:layout_width="175dp"
+                android:layout_height="70dp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/ad_sub_title"
+                android:layout_marginTop="5dp"
+                android:maxLength="60"
+                android:text="finish the first 4 levels under a total of 3 minutes"
+                android:textAppearance="?android:attr/textAppearanceMedium" >
+
+            </TextView>
+
+            <ImageView
+                android:id="@+id/ad_img"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/title_container"
+                android:layout_toLeftOf="@+id/ad_bodyText"
+                android:scaleType="fitXY"
+                android:src="@drawable/award_dialog_img" />
+
+            <!-- Earned goods -->
+
+            <RelativeLayout
+                android:id="@+id/earned_goods"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/ad_img"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp" >
+
+                <TextView
+                    android:id="@+id/ad_xp_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginTop="@dimen/award_dialog_earned_margin_top"
+                    android:text="@string/you_earned"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:visibility="visible" />
+
+                <!-- Earned xp -->
+
+                <ImageView
+                    android:id="@+id/ad_xp_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/ad_xp_text"
+                    android:layout_marginLeft="15dp"
+                    android:layout_toRightOf="@+id/ad_xp_text"
+                    android:src="@drawable/xp_icon"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/ad_xp_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/ad_xp_img"
+                    android:layout_marginLeft="5dp"
+                    android:layout_toRightOf="@+id/ad_xp_img"
+                    android:text="1000"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#2DADFF"
+                    android:textStyle="bold"
+                    android:visibility="visible" />
+
+                <!-- Earn mission coins -->
+
+                <ImageView
+                    android:id="@+id/ad_coin_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/ad_xp_img"
+                    android:layout_below="@+id/ad_xp_img"
+                    android:src="@drawable/coin_icon"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/ad_coin_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_toRightOf="@+id/ad_coin_img"
+                    android:layout_alignBottom="@+id/ad_coin_img"
+                    android:text="1000"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#FEE14C"
+                    android:visibility="visible" />
+
+                <!-- Coins bonus when level up -->
+
+                <ImageView
+                    android:id="@+id/levelup_coins_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/coins_bonus_icon"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/levelup_coins_bonus_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/levelup_coins_icon"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@+id/levelup_coins_icon"
+                    android:text="@string/levelup_coins_bonus_title"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#FEE14C"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/levelup_coins_bonus_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/levelup_coins_bonus_title"
+                    android:layout_below="@+id/levelup_coins_bonus_title"
+                    android:text="@string/levelup_coins_bonus_text"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#FEE14C"
+                    android:visibility="gone" />
+            </RelativeLayout>
+            
+            
+           
+            <ImageView
+                android:id="@+id/gt_arrow_pointer_more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/levelup_buttons_container"
+                android:layout_below="@id/levelup_buttons_container"
+                android:layout_marginLeft="30dp"
+                android:src="@drawable/gt_arrow_up"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/ad_facebook_Btn"
+                android:layout_width="@dimen/award_dialog_btn_img_width"
+                android:layout_height="@dimen/award_dialog_btn_img_height"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/facebook_btn"
+                android:scaleType="fitXY"
+                android:src="@drawable/facebook_btn_content"
+                android:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/ad_close_ok_Btn"
+                android:layout_width="@dimen/award_dialog_btn_img_width"
+                android:layout_height="@dimen/award_dialog_btn_img_height"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:scaleType="fitXY"
+                android:background="@drawable/ad_next_btn"
+                android:src="@drawable/next_btn_content"
+                android:visibility="visible" />
+
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

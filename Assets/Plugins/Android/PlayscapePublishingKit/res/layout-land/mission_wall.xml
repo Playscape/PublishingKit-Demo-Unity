@@ -1,0 +1,21 @@
+<!--  This is a basic mission wall with sort bar, list view and loading mission text viwe -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/black"
+    android:orientation="vertical" >
+    
+    <include layout="@layout/mission_wall_common" />
+	
+
+  	<GridView
+        android:visibility="gone"
+        android:id="@+id/MissionWallListView"
+        android:columnWidth="240dp"
+        android:numColumns="2"
+        android:stretchMode="columnWidth"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" 
+        android:gravity="center"
+        android:listSelector="@android:color/transparent"/>
+</LinearLayout>
