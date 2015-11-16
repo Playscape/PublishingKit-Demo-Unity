@@ -54,6 +54,13 @@ namespace Playscape.Editor
 		/// </summary>
 		private ILogger logger { get; set; }
 		
+		
+		/// <summary>
+		/// Gets or sets the command line executor.
+		/// </summary>
+		/// <value>The m command line executor.</value>
+		private CommandLineExecutor mCommandLineExecutor { get; set; }
+		
 		/// <summary>
 		/// Constructs a new AndroidAPK creator instnace
 		/// </summary>
@@ -65,7 +72,8 @@ namespace Playscape.Editor
 			this.buildParams = bp;
 			this.logger = logger;
 			this.mTempFileProvider = tempFileProvider;
-		}		       
+			this.mCommandLineExecutor = new CommandLineExecutor (logger);
+		}
 		
 		/// <summary>
 		/// Extract an ZIP file to a folder
@@ -181,13 +189,13 @@ namespace Playscape.Editor
 			logger.V("Command " + command);
 			logger.V("Argumnets " + arguments);
 			
-			int exitCode = runProcessWithCommand (command, arguments);
-			string message = "executeDex2jar was" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode;
+			Output output = mCommandLineExecutor.Execute (command, arguments);
+			string message = "executeDex2jar was" + (output.ExitCode == 0 ? "" : " not") + " successfully with code " + output.ExitCode;
 			logger.V(message);
 			
-			if (exitCode != 0)
+			if (output.ExitCode != 0)
 			{
-				throw new Exception("failed to execture dex2jar");
+				throw new Exception(string.Format("Failed to execture dex2jar. Error description: {0}", output.ErrorDescription));
 			}
 		}
 		
@@ -212,13 +220,13 @@ namespace Playscape.Editor
 			logger.V("Command " + command);
 			logger.V("Argumnets " + arguments);
 			
-			int exitCode = runProcessWithCommand(command, arguments);
-			string message = "executeLib2dex was" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode;
+			Output output = mCommandLineExecutor.Execute (command, arguments);
+			string message = "executeLib2dex was" + (output.ExitCode == 0 ? "" : " not") + " successfully with code " + output.ExitCode;
 			logger.V(message);
 			
-			if (exitCode != 0)
+			if (output.ExitCode != 0)
 			{
-				throw new Exception("failed to execture lib2dex");
+				throw new Exception(string.Format("Failed to execture lib2dex. Error description: {0}", output.ErrorDescription));
 			}
 		}
 		
@@ -363,10 +371,18 @@ namespace Playscape.Editor
 			if (!File.Exists(ANDROID_JAR))
 			{
 				ANDROID_JAR = Path.Combine(ANDROID_HOME, string.Format("platforms/{0}/android.jar", DEFAULT_ANDROID_PLATFORM));
+				
+				if (!File.Exists(ANDROID_JAR)) {
+					throw new Exception(string.Format("Looks like you don't have required version of android API. Required version is {0} version. Please, download it.", DEFAULT_ANDROID_PLATFORM));
+				}
 			}
 			
 			GOOGLE_PLAY_SERVICES_JAR = Path.Combine(ANDROID_HOME,
 			                                        "extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar");
+																							
+			if (!File.Exists (GOOGLE_PLAY_SERVICES_JAR)) {
+				throw new Exception("Looks like you don't have \"Google Play Services\" library in your Android SDK folder. Please download it.");
+			}
 			
 			string delimeter = (PlatformUtils.isWindows()) ? ";" : ":";
 			string classpath = Path.Combine(ASPECT_HOME_PATH, "aspectjtools.jar") + delimeter
@@ -374,21 +390,21 @@ namespace Playscape.Editor
 					+ ANDROID_JAR + delimeter
 					+ GOOGLE_PLAY_SERVICES_JAR;
 
-			string arguments = "-classpath " + PlatformUtils.qualifyPath(classpath) + " -Xmx8g org.aspectj.tools.ajc.Main -source 1.5 -Xlint:ignore -inpath "
-				+ PlatformUtils.qualifyPath(inpath) + " -aspectpath " + PlatformUtils.qualifyPath(aspectpath) + " -outjar " + PlatformUtils.qualifyPath(outjar);
-			
+			string arguments = "-classpath \"" + classpath + "\" -Xmx8g org.aspectj.tools.ajc.Main -source 1.5 -Xlint:ignore -inpath \""
+				+ inpath + "\" -aspectpath \"" + aspectpath + "\" -outjar \"" + outjar + "\"";
+
 			logger.V("Command " + command);
 			logger.V("Argumnets " + arguments);
 			
-			int exitCode = runProcessWithCommand(command, arguments);
-			string message = "aspects was applyed" + (exitCode == 0 ? "" : " not") + " successfully with code " + exitCode;
-			if (exitCode == 0)
+			Output output = mCommandLineExecutor.Execute (command, arguments);
+			string message = "aspects was applyed" + (output.ExitCode == 0 ? "" : " not") + " successfully with code " + output.ExitCode;
+			if (output.ExitCode == 0)
 			{
 				logger.V(message);
 			}
 			else
 			{
-				throw new Exception("failed to apply patch to the .jar file");
+				throw new Exception(string.Format("Failed to apply patch to the .jar file. Error description: {0}", output.ErrorDescription));
 			}
 		}
 		
@@ -432,24 +448,22 @@ namespace Playscape.Editor
 				command = "/usr/bin/jarsigner";
 			}
 			
-			string arguments = "-sigalg SHA1withRSA -digestalg SHA1 -keystore " + PlatformUtils.qualifyPath(keysotre_path) + " -storepass " + storepass + " -keypass " + keypass + " " + PlatformUtils.qualifyPath(unsignedAPKPath) + " " + alias;
+			string arguments = "-sigalg SHA1withRSA -digestalg SHA1 -keystore \"" + keysotre_path + "\" -storepass " + storepass + " -keypass " + keypass + " \"" + unsignedAPKPath + "\"  \"" + alias + "\"";
 			logger.V("command: {0}", command);
 			logger.V("arguments: {0}", arguments);
 			
 			logger.V("Runing sign process");
-			int exitCode = runProcessWithCommand(command, arguments);
-			string message = "apk was " + (exitCode == 0 ? "" : "not") + " signed successfully" + (exitCode == 0 ? "" : " with code " + exitCode);
+			Output output = mCommandLineExecutor.Execute (command, arguments);
+			string message = "apk was " + (output.ExitCode == 0 ? "" : "not") + " signed successfully" + (output.ExitCode == 0 ? "" : " with code " + output.ExitCode);
 			logger.V(message);
 			
-			if (exitCode != 0)
+			if (output.ExitCode != 0)
 			{
-				throw new Exception("failed to sign apk");
+				throw new Exception(string.Format("Failed to sign apk. Error description: {0}", output.ErrorDescription));
 			}
 			
 			
 			logger.V("Leaving signApk");
-			
-			
 		}
 		
 		/// <summary>
@@ -459,7 +473,6 @@ namespace Playscape.Editor
 		/// <param name="dst">The destination path of the aligned zip file</param>
 		public void applyZipalign(string src, string dst)
 		{
-			
 			logger.V("entering ZipAlign");
 			string command = Directory.GetCurrentDirectory() + ZIPALIGN_TOOL_PATH;
 			if (PlatformUtils.isWindows())
@@ -467,52 +480,21 @@ namespace Playscape.Editor
 				command += ".exe";
 			}
 			
-			string arguments = " 4 " + PlatformUtils.qualifyPath(src) + " " + PlatformUtils.qualifyPath(dst);
+			string arguments = " 4 \"" + src + "\" \"" + dst + "\"";
 			logger.V("command: {0}", command);
 			logger.V("arguments: {0}", arguments);
 			
-			int exitCode = runProcessWithCommand(command, arguments);
-			string message = "apk was " + (exitCode == 0 ? "" : "not") + " zipaligned successfully" + (exitCode == 0 ? "" : " with code " + exitCode);
+			Output output = mCommandLineExecutor.Execute (command, arguments);
+			string message = "apk was " + (output.ExitCode == 0 ? "" : "not") + " zipaligned successfully" + (output.ExitCode == 0 ? "" : " with code " + output.ExitCode);
 			logger.V(message);
 			
 			
-			if (exitCode != 0)
+			if (output.ExitCode != 0)
 			{
-				throw new Exception("failed run zipalign");
+				throw new Exception(string.Format("Failed run zipalign. Error description: {0}", output.ErrorDescription));
 			}
 			
 			logger.V("leaving ZipAlign");
-		}
-		
-		
-		private int runProcessWithCommand(string command, string args)
-		{
-			logger.V(string.Format("running {0} with arguments {1}", command, args));
-			
-			var processInfo = new ProcessStartInfo (command, args)
-			{
-				CreateNoWindow = true,
-				UseShellExecute = false,
-				RedirectStandardOutput = true
-			};
-			Process proc;
-			
-			if ((proc = Process.Start(processInfo)) == null)
-			{
-				throw new InvalidOperationException("Can not start new process with command: " + command + " in AndroidApkCreator.");
-			}
-			
-			proc.WaitForExit();
-			int exitCode = proc.ExitCode;
-			
-			if (exitCode != 0)
-			{
-				string output = proc.StandardOutput.ReadToEnd();
-				logger.W("process failed with error {0}", output);
-			}
-			proc.Close();
-			
-			return exitCode;
 		}
 		
 		

@@ -1,0 +1,20 @@
+	<key>PlayscapePublishingKitVersion</key>
+	<string>dev</string>
+    
+	<key>PlayscapeRemoteLoggerDumpSizeThresholdBytes</key>
+	<integer>4096</integer>
+    
+	<key>PlayscapeRemoteLoggerFileSizeLimitBytes</key>
+	<integer>2097152</integer>
+    
+	<key>PlayscapeRemoteLoggerEntrySizeLimitBytes</key>
+	<integer>2048</integer>
+    
+    <key>PlayscapeRemoteLoggerCampaignId</key>
+	<string>campaign_id</string>
+    
+	<key>PlayscapeDebugMode</key>
+	<true/>
+    
+    <key>Pushwoosh_SHOW_ALERT</key>
+    <false/>
