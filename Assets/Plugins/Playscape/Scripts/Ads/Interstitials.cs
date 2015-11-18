@@ -98,13 +98,22 @@ namespace Playscape.Ads {
 		/// </summary>
 		/// <param name="type">Type.</param>
 		/// <param name="placement">Extra text added with the analytic report of each event related to this ad, can be null.</param>
+		[Obsolete]
 		public void Display(Kind kind, string placement) {
+			throw new Exception ("You call deprecated method: 'Interstitials.Instance.Display(Kind kind, string placement)'. Please, use this method: 'Interstitials.Instance.Display(string placement)'");
+		}
+
+		/// <summary>
+		/// Displays the interstitial.
+		/// </summary>
+		/// <param name="placement">Extra text added with the analytic report of each event related to this ad, can be null.</param>
+		public void Display(string placement) {
 			if (placement == null) {
 				placement = string.Empty;
 			}
 
 			if (mPlayscapeAds != null) {
-				mPlayscapeAds.displayInterstitialAd((int)kind, placement);
+				mPlayscapeAds.displayInterstitialAd((int)Kind.Both, placement);
 			}
 		}
 
