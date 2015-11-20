@@ -56,6 +56,10 @@ namespace Playscape.Editor {
 				string vungleJar = "Assets/Plugins/Android/PlayscapePublishingKit/libs/com.vungle.vungle-1.3.11-RELEASE.jar";
 				DeleteFileForUpgrade(vungleJar);
 				DeleteFileForUpgrade(vungleJar + ".meta");
+
+				string adienceJar = "Assets/Plugins/Android/PlayscapePublishingKit/libs/adience.jar";
+				DeleteFileForUpgrade(adienceJar);
+				DeleteFileForUpgrade(adienceJar + ".meta");
             }
 
             File.WriteAllText(CommonConsts.PLUGINS_PLAYSCAPE_VERSION_PATH + "/" + myVersion, "upgraded");

@@ -62,11 +62,13 @@ public class Build : MonoBehaviour {
 
 		BuildConfig config = new BuildConfig();
 
+		char[] trimWhitespaceChars = {' '};
+		char[] trimQuotesChars = {'"'};
 		foreach (var arg in args) {
 			var argParts = arg.Split('=');
 			if (argParts.Length == 2) {
-				var argName = argParts[0];
-				var argValue = argParts[1];
+				var argName = argParts[0].Trim(trimWhitespaceChars);
+				var argValue = argParts[1].Trim(trimQuotesChars);
 				
 				switch(argName) {
 				case "-outputPath":
@@ -74,7 +76,6 @@ public class Build : MonoBehaviour {
 					break;
 				}
 			}
-			
 		}
 
 		return config;
