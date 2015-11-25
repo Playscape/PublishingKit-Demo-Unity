@@ -22,12 +22,10 @@ namespace Playscape.Editor
 		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/Editor/ThirdParty/zipalign";
 		private const string DEX_2_JAR_TOOL_HOME_PATH = "Assets/Plugins/Playscape/Editor/ThirdParty/dex2jar";
 		private const string ASPECT_HOME_PATH = "Assets/Plugins/Playscape/Editor/ThirdParty/aspectsj/";
-		private const string DEFAULT_ANDROID_PLATFORM = "android-19";
+		private const string DEFAULT_ANDROID_PLATFORM = "19";			
 		
-		private static string ANDROID_HOME = PlatformUtils.isWindows() ? System.Environment.GetEnvironmentVariable("ANDROID_HOME") : AndroidSDKFolder.Path;
-		
-		private static string sJavaCommand = (PlatformUtils.isWindows()) ? string.Format("\"{0}\"", System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/java.exe") : "/usr/bin/java";
-		private static string sDelimeter = (PlatformUtils.isWindows()) ? ";" : ":";
+		private static string sJavaCommand = JDKFolder.JavaPath;
+		private static string sDelimeter = PlatformUtils.PathDelimeter;
 		private static string sClasspath = Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/asm-all-3.3.1.jar") + sDelimeter
 			+ Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/commons-lite-1.15.jar") + sDelimeter
 				+ Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/dex-ir-1.12.jar") + sDelimeter
@@ -364,27 +362,26 @@ namespace Playscape.Editor
 			string GOOGLE_PLAY_SERVICES_JAR;
 			
 			//Getting android platform jar for minSDK setted in PlayerSettings
-			string platform = string.Format("{0}-{1}", "android", Regex.Match(buildParams.sdkVersion, @"\d+").Value);
-			ANDROID_JAR = Path.Combine(ANDROID_HOME, string.Format("platforms/{0}/android.jar", platform));
+			string platform = Regex.Match(buildParams.sdkVersion, @"\d+").Value;
+			ANDROID_JAR = AndroidSDKFolder.GetAndroidAPIJarPath (UInt16.Parse(platform));
 			
 			//if android platform jar getted from PlayerSettings doesn't exist will use default
 			if (!File.Exists(ANDROID_JAR))
 			{
-				ANDROID_JAR = Path.Combine(ANDROID_HOME, string.Format("platforms/{0}/android.jar", DEFAULT_ANDROID_PLATFORM));
+				ANDROID_JAR = AndroidSDKFolder.GetAndroidAPIJarPath (UInt16.Parse(DEFAULT_ANDROID_PLATFORM)); 
 				
 				if (!File.Exists(ANDROID_JAR)) {
 					throw new Exception(string.Format("Looks like you don't have required version of android API. Required version is {0} version. Please, download it.", DEFAULT_ANDROID_PLATFORM));
 				}
 			}
 			
-			GOOGLE_PLAY_SERVICES_JAR = Path.Combine(ANDROID_HOME,
-			                                        "extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar");
+			GOOGLE_PLAY_SERVICES_JAR = AndroidSDKFolder.GooglePlayServicesJarPath;
 																							
 			if (!File.Exists (GOOGLE_PLAY_SERVICES_JAR)) {
 				throw new Exception("Looks like you don't have \"Google Play Services\" library in your Android SDK folder. Please download it.");
 			}
 			
-			string delimeter = (PlatformUtils.isWindows()) ? ";" : ":";
+			string delimeter = sDelimeter;
 			string classpath = Path.Combine(ASPECT_HOME_PATH, "aspectjtools.jar") + delimeter
 				+ Path.Combine(ASPECT_HOME_PATH, "aspectjrt.jar") + delimeter
 					+ ANDROID_JAR + delimeter
@@ -437,18 +434,10 @@ namespace Playscape.Editor
 				zipFile.Save();
 			}
 			
-			
-			string command;
-			if (PlatformUtils.isWindows())
-			{
-				command = System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/jarSigner.exe";
-			}
-			else
-			{
-				command = "/usr/bin/jarsigner";
-			}
-			
+
+			string command = JDKFolder.JarSignerPath;
 			string arguments = "-sigalg SHA1withRSA -digestalg SHA1 -keystore \"" + keysotre_path + "\" -storepass " + storepass + " -keypass " + keypass + " \"" + unsignedAPKPath + "\"  \"" + alias + "\"";
+
 			logger.V("command: {0}", command);
 			logger.V("arguments: {0}", arguments);
 			

@@ -4,14 +4,14 @@
 		android:id="@+id/top_level_layout"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent" >
-
+		
 	<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:orientation="vertical"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
 		android:background="@drawable/screen_bg"
 		>
-
+		
 					<!-- <ImageView
 					android:layout_width="fill_parent"
 					android:layout_height="fill_parent"
@@ -19,9 +19,9 @@
 					android:adjustViewBounds="false"
 					android:scaleType="matrix"
 				/>-->
-
+	
 		<!--  Top Toolbar -->
-
+	
 		<RelativeLayout
 			android:id="@+id/top_layout"
 			android:layout_height="wrap_content"
@@ -30,8 +30,8 @@
 			android:paddingBottom="0dp"
 			android:layout_alignParentTop="true"
 		>
-
-
+		
+	
 			<LinearLayout
 				android:orientation="vertical"
 				android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
 						    android:adjustViewBounds="true"
 						    android:src="@drawable/logo_selected"
 						    android:tag="top_toolbar_playbox" />
-
+		
 						<com.playscape.utils.AspectRatioImageView
 						    android:id="@+id/top_toolbar_categories"
 						    android:layout_width="@dimen/catalog_categories_width"
@@ -71,7 +71,7 @@
 						    android:adjustViewBounds="true"
 						    android:src="@drawable/link_cats"
 						    android:tag="top_toolbar_categories" />
-
+				
 				        <com.playscape.utils.AspectRatioImageView
 				            android:id="@+id/top_toolbar_my_games"
 				            android:layout_width="@dimen/catalog_mygames_width"
@@ -84,19 +84,8 @@
 				            android:src="@drawable/link_my_games"
 				            android:tag="top_toolbar_my_games" />
 
-                        <ImageView
-                           android:id="@+id/top_toolbar_settings"
-                           android:layout_width="wrap_content"
-                           android:layout_height="fill_parent"
-                           android:layout_alignParentRight="true"
-                           android:layout_centerVertical="true"
-                           android:layout_gravity="center"
-                           android:adjustViewBounds="false"
-                           android:src="@drawable/ic_action_navigation_more_vert"
-                           android:tag="top_toolbar_settings" />
-                           
 					</RelativeLayout>
-
+				
 				<!-- Categories Toolbar -->
 
 					<LinearLayout
@@ -335,11 +324,11 @@
 					</LinearLayout>
 
 			</LinearLayout>
-
+			
 		</RelativeLayout>
-
+		
 		<!--  Catalog View -->
-
+		
 		<RelativeLayout
             android:tag="gridViewContainer"
 		    android:id="@+id/gridViewContainer"
@@ -350,11 +339,11 @@
 		    android:layout_marginTop="0dp"
 		    android:background="@android:color/transparent"
 		    android:paddingTop="0dp" >
-
+					
 		  	<mominis.gameconsole.views.impl.ConsoleGridView
                 android:tag="gridview"
 			    android:id="@+id/gridview"
-			    android:layout_width="fill_parent"
+			    android:layout_width="fill_parent" 
 			    android:layout_height="fill_parent"
 			    android:layout_marginTop="0dp"
 			    android:paddingTop="0dp"
@@ -362,12 +351,12 @@
 			    android:horizontalSpacing="0dp"
 	            android:background="@android:color/transparent"
 			    android:gravity="center"/>
-
-
+		
+			
 			<!--  NOTE: These images must be placed after the ConsoleGrid view, so they'll be on top of it	-->
-
-
-			<!--
+			
+			 
+			<!-- 
 			<ImageView android:id="@+id/logo_header"
 					android:layout_width="150dp"
 					android:layout_height="wrap_content"
@@ -381,7 +370,7 @@
 					android:scaleType="fitXY"
 					/>
 			-->
-
+					
 		</RelativeLayout>
 
         <include

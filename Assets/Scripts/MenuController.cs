@@ -20,7 +20,6 @@ public class MenuController : MonoBehaviour {
 	const string SET_PW_CUSTOM_TAG = "Set PW custom tags";
 	const string SHOW_CATALOG = "Show Catalog";
 	const string GET_A_TESTING_VALUES = "Get AB Testing Values";
-	const string FACEBOOK_TESTS = "Open Facebook Tests";
 	const string QUIT = "QUIT";
 
 
@@ -81,34 +80,34 @@ public class MenuController : MonoBehaviour {
 			GameState.CurrentGameType = GameState.GameType.SinglePlayer;
 			Application.LoadLevel ("level1");
 		}
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight + marginTop, buttonWidth, buttonHeight), PLAY_A_RANDOM_GAME)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight + marginTop * 1.4f, buttonWidth, buttonHeight), PLAY_A_RANDOM_GAME)) {
 			GameState.IsHost = true;
 			GameState.CurrentGameType = GameState.GameType.MultiplayerPublicGame;
 			Application.LoadLevel ("lobby");
 		}
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 2 + marginTop, buttonWidth, buttonHeight), PLAY_WITH_FRIENDS)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 2 + marginTop * 1.4f, buttonWidth, buttonHeight), PLAY_WITH_FRIENDS)) {
 			GameState.IsHost = false;
 			GameState.CurrentGameType = GameState.GameType.MultiplayerPrivateGame;
 			Application.LoadLevel ("invite_screen");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop, buttonWidth, buttonHeight), STORE)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop * 1.4f, buttonWidth, buttonHeight), STORE)) {
 			Application.LoadLevel ("store");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop, buttonWidth, buttonHeight), SHOW_INTESITIAL)) {
-			Playscape.Ads.Interstitials.Instance.Display(Interstitials.Kind.Both, "main-menu");
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop * 1.4f, buttonWidth, buttonHeight), SHOW_INTESITIAL)) {
+			Playscape.Ads.Interstitials.Instance.Display("main-menu");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop, buttonWidth, buttonHeight), DISABLE_ADS)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 1.4f, buttonWidth, buttonHeight), DISABLE_ADS)) {
 			AdManager.Instance.DisableAds();
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 6 + marginTop, buttonWidth, buttonHeight), ENABLE_ADS)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 6 + marginTop * 1.4f, buttonWidth, buttonHeight), ENABLE_ADS)) {
 			AdManager.Instance.EnableAds();
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop, buttonWidth, buttonHeight), SET_PW_CUSTOM_TAG)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 1.4f, buttonWidth, buttonHeight), SET_PW_CUSTOM_TAG)) {
 			int randomValue = (int) Random.Range(0, 20000);
 
 			PushWoosh.Instance.SetTag("customTag1", randomValue.ToString());
@@ -117,20 +116,16 @@ public class MenuController : MonoBehaviour {
 			PushWoosh.Instance.SetTag("customTag4Numeric", randomValue + 4);
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 8 + marginTop, buttonWidth, buttonHeight), GET_A_TESTING_VALUES)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 8 + marginTop * 1.4f, buttonWidth, buttonHeight), GET_A_TESTING_VALUES)) {
 			Application.LoadLevel("ab_testing");
 		}
 
-        if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth / 2, buttonHeight * 9 + marginTop, buttonWidth, buttonHeight), SHOW_CATALOG))
+        if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth / 2, buttonHeight * 9 + marginTop * 2.4f, buttonWidth, buttonHeight), SHOW_CATALOG))
         {
             Playscape.Catalog.Catalog.Instance.showCatalog();
         }
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 10 + marginTop, buttonWidth, buttonHeight), FACEBOOK_TESTS)) {
-			Application.LoadLevel ("facebook_tests");
-		}
-
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 11 + marginTop, buttonWidth, buttonHeight), QUIT)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 10 + marginTop * 2.6f, buttonWidth, buttonHeight), QUIT)) {
 			Application.Quit ();
 		}
 	}

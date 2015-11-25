@@ -69,6 +69,10 @@ namespace Playscape.Internal
 			
 			string standardOutput = proc.StandardOutput.ReadToEnd();
 			
+			if (string.IsNullOrEmpty(standardOutput)) {
+				standardOutput = proc.StandardError.ReadToEnd();
+			}
+			
 			proc.WaitForExit();
 			
 			int exitCode = proc.ExitCode;
