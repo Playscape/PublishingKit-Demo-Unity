@@ -40,17 +40,5 @@ namespace Playscape.Editor
             }
             return str;
         }
-
-		public static string PathDelimeter {
-			get {
-				string delimeter = ":";
-
-				if (isWindows()) {
-					delimeter = ";";
-				}
-
-				return delimeter;
-			}
-		}
     }
 }

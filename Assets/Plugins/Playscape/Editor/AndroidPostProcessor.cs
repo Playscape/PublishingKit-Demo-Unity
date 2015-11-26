@@ -33,29 +33,6 @@ namespace Playscape.Editor {
 			return mTargetPath.ToLower ().EndsWith (".apk");
 		}
 		
-		public override void CheckForWarnings(WarningAccumulator warnings)
-		{
-			base.CheckForWarnings (warnings);
-
-			//check JAVA_HOME variable
-			bool javaHomeNotSet = string.IsNullOrEmpty(JDKFolder.Path);
-			bool javaHomeNotExist = !System.IO.Directory.Exists(JDKFolder.Path);
-			bool javaHomeNotSatisfy = !JDKFolder.IsSatisfyingJDKVersion;
-			
-			warnings.WarnIf (javaHomeNotSet, Playscape.Internal.Warnings.JAVA_HOME_ENV_VAR_NOT_SET);
-			warnings.WarnIf (javaHomeNotExist, Playscape.Internal.Warnings.JAVA_HOME_ENV_VAR_NOT_EXIST);
-			warnings.WarnIf (javaHomeNotSatisfy, Playscape.Internal.Warnings.JAVA_NOT_SATISFYING_PLAYSCAPE_SDK);
-			
-			//check ANDROID_HOME variable
-			bool androidHomeNotSet = string.IsNullOrEmpty(AndroidSDKFolder.Path);
-			bool androidHomeNotExist = !System.IO.Directory.Exists(AndroidSDKFolder.Path);
-			bool androidHomeNotHasGooglePlayServices = !System.IO.File.Exists(AndroidSDKFolder.GooglePlayServicesJarPath);
-			
-			warnings.WarnIf (androidHomeNotSet, Playscape.Internal.Warnings.ANDROID_HOME_ENV_VAR_NOT_SET);
-			warnings.WarnIf (androidHomeNotExist, Playscape.Internal.Warnings.ANDROID_HOME_ENV_VAR_NOT_EXIST);
-			warnings.WarnIf (androidHomeNotHasGooglePlayServices, Playscape.Internal.Warnings.ANDROID_NOT_HAS_GOOGLE_PLAY_SERVICES);
-		}
-		
 		public void build(bool async, BuildProcess.BuildCompleted completedCallback, BuildProcess.BuildProgressChanged progressCallback, BuildProcess.BuildFailed failedCallback) {
 			BuildParams bp = ConstructBuildParams();
 			BuildProcess process = new BuildProcess(bp, new UnityDebugLogger(), completedCallback, progressCallback, failedCallback);
