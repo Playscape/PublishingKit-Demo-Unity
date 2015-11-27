@@ -96,7 +96,7 @@ public class MenuController : MonoBehaviour {
 		}
 
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop * 1.4f, buttonWidth, buttonHeight), SHOW_INTESITIAL)) {
-			Playscape.Ads.Interstitials.Instance.Display("main-menu");
+			Playscape.Ads.Interstitials.Instance.Display(Interstitials.Kind.Both, "main-menu");
 		}
 
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 1.4f, buttonWidth, buttonHeight), DISABLE_ADS)) {
