@@ -1,9 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Text;
-
 using Playscape.Ads;
-using Playscape.Notifications;
 using Soomla.Store;
 using Playscape.Internal;
 

@@ -19,6 +19,7 @@ namespace GooglePlayGames
     using System;
     using UnityEditor.Callbacks;
     using UnityEditor;
+    using UnityEditor.XCodeEditor;
     using UnityEngine;
     using GooglePlayGames;
     using GooglePlayGames.Editor.Util;
@@ -51,6 +52,7 @@ namespace GooglePlayGames
             if (System.IO.Directory.Exists(pluginDir))
             {
                 GPGSUtil.WriteFile(pluginDir + "/GPGSAppController.mm", "// Empty since NO_GPGS is defined\n");
+                System.Console.WriteLine("KDG. NO GPG");
                 return;
             }
             #else
@@ -60,6 +62,7 @@ namespace GooglePlayGames
                 UnityEngine.Debug.LogError("The iOS bundle ID has not been set up through the " +
                     "'iOS Setup' submenu of 'Google Play Games' - the generated xcode project will " +
                     "not work properly.");
+				System.Console.WriteLine("KDG. EMPTY BUNDLE");
                 return;
             }
 
@@ -68,10 +71,12 @@ namespace GooglePlayGames
             UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
             UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
 
-            EditorWindow.GetWindow<GPGSInstructionWindow>(
-                utility: true,
-                title: "Building for IOS",
-                focus: true);
+#if UNITY_EDITOR
+            // EditorWindow.GetWindow<GPGSInstructionWindow>(
+            //     utility: true,
+            //     title: "Building for IOS",
+            //     focus: true);
+#endif
             #endif
         }
 
