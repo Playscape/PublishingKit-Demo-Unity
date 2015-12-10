@@ -23,6 +23,7 @@ namespace Playscape.Editor {
         private const string TEST_BUILD = "Test";
         private const string PLAYSCAPE_CONFIGURATION_TITLE = "Playscape Configuration";
         private const string INCLUDE_ARCHITECTURE_TITLE = "Include Architectures";
+		private const string INCLUDE_PL_EXCHANGE_TITLE = "Include Playscape Exchange";
 		private Vector2  scrollPos;
 
 		private const string AB_TESTING_TITLE = "AB Testing Configuration";
@@ -36,7 +37,7 @@ namespace Playscape.Editor {
             GUI.changed = false;
 
 			EditorGUILayout.BeginHorizontal();
-			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width (650), GUILayout.Height (80));
+			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width (650), GUILayout.Height (120));
 				OnAdsGUI ();
 			EditorGUILayout.EndScrollView ();
 			EditorGUILayout.EndHorizontal ();
@@ -116,16 +117,26 @@ namespace Playscape.Editor {
 		}
 
 		private void ApplyChanges() {
-			string targetManifest = "Assets/Plugins/Android/PlayscapePublishingKit/AndroidManifest.xml";
+      string templateManifestPath = CommonConsts.PLAYSCAPE_MANIFEST_PATH;
 
-			string manifestContents = File.ReadAllText(CommonConsts.PLAYSCAPE_MANIFEST_PATH);
+      if (!ConfigurationInEditor.Instance.IncludePlayscapeExchange) {
+          templateManifestPath = CommonConsts.PLAYSCAPE_WITHOUT_EXCHANGE_MANIFEST_PATH;
+      }
+
+      string targetManifest = "Assets/Plugins/Android/PlayscapePublishingKit/AndroidManifest.xml";
+
+			string manifestContents = File.ReadAllText(templateManifestPath);
 			manifestContents = AndroidPostProcessor.ApplyCommonAndroidManifestParams(manifestContents);
 			File.WriteAllText(targetManifest, manifestContents);
+      
+      string minSdkVersion = Regex.Match (PlayerSettings.Android.minSdkVersion.ToString (), @"\d+").Value;
+			AndroidManifestMerger.InsertUsesSDK ("Assets/Plugins/Android/AndroidManifest.xml", minSdkVersion, "22");
 
 			targetManifest = "Assets/Plugins/Android/AndroidManifest.xml";
 			AndroidManifestMerger.Merge (targetManifest, false);
 
 			AndroidApkCreator.IncludeArchitecture (Configuration.Instance.IncludeArchitectures, TARGET_ARMEABI, TEMP_ARMEABI);
+			AndroidApkCreator.IncludePlayscapeExchange (ConfigurationInEditor.Instance.IncludePlayscapeExchange);
 
 			EditorUtility.DisplayDialog(
 				"Configuration Ended",
@@ -201,6 +212,9 @@ namespace Playscape.Editor {
 
             bool includeArchitectures = EditorGUILayout.ToggleLeft (INCLUDE_ARCHITECTURE_TITLE, Configuration.Instance.IncludeArchitectures);
 			Configuration.Instance.IncludeArchitectures = includeArchitectures;
+
+			bool includePlayscapeExchange = EditorGUILayout.ToggleLeft (INCLUDE_PL_EXCHANGE_TITLE, ConfigurationInEditor.Instance.IncludePlayscapeExchange);
+			ConfigurationInEditor.Instance.IncludePlayscapeExchange = includePlayscapeExchange;
 		}
 	}
 }

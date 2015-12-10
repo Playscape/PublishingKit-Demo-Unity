@@ -36,16 +36,19 @@ namespace Playscape.Internal {
 			}
 		}
 
-		public static void Log(LogLevel logLevel, string tag, string message) {
-
+		public static void Log(LogLevel logLevel, string tag, string message, string attrs) {
+			
 			L.D("[{0}] {1}: {2}", logLevel, tag, message);
-	
-
-	#if UNITY_ANDROID && !UNITY_EDITOR
-	        initializeAndroidRemoteLogger();
+						
+#if UNITY_ANDROID && !UNITY_EDITOR
+			initializeAndroidRemoteLogger();
 			remoteLoggerClass.CallStatic("log", (int) logLevel, tag, message);
-	#endif
-	    }
+#endif
+		}
+
+		public static void Log(LogLevel logLevel, string tag, string message) {
+			Log (logLevel, tag, message, null);
+		}
 
 		/// <summary>
 		/// Dumps log to server.

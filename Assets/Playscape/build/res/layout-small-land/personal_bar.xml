@@ -1,0 +1,239 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/PersonalBarContainer"
+    android:layout_width="fill_parent"
+    android:layout_height="@dimen/personal_bar_height"
+    android:layout_alignParentBottom="true"
+    android:background="@drawable/pb_bottomarea_tile"
+    android:focusable="true"
+    android:clickable="true"
+    android:focusableInTouchMode="true" >
+
+    <!-- Top separator -->
+    
+    <ImageView
+        android:id="@+id/pb_separator_open"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+    	android:layout_alignParentTop="true"
+        android:background="@drawable/pb_border_open">
+    </ImageView>
+    
+	<!--  Coins container -->
+    
+    <RelativeLayout
+        android:id="@+id/personal_bar_coins_layout"
+        android:layout_width="150dp"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/pb_separator_open"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp">
+        
+        <!-- Coins amount container -->
+        
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerVertical="true"
+           	android:layout_toRightOf="@+id/coins_bubble_layout"
+           	android:layout_marginLeft="-15dp">
+            	
+            <!-- Coins amount background -->
+            
+            <ImageView
+				android:layout_width="fill_parent"
+       			android:layout_height="27dp"
+        		android:paddingLeft="20dp"
+        		android:background="@drawable/pb_coins_area"
+	           	android:layout_alignParentRight="true"
+	           	android:layout_marginRight="5dp"
+	           	android:layout_centerVertical="true"/>
+            
+            <!-- Coins amount -->
+	       	
+			<TextView
+                android:id="@+id/pb_coinsValueTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="15dp"
+                android:text="24,000"
+                android:textColor="@drawable/mw_item_coin_text_color"
+                android:textSize="15dp" />
+	       	
+		</RelativeLayout>
+        
+        <!-- Bubble + coins icon -->
+        
+        <RelativeLayout
+            android:id="@+id/coins_bubble_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_alignParentLeft="true"
+        	android:layout_centerVertical="true"
+        	android:padding="0dp"
+        	android:layout_margin="0dp">
+        
+            <!-- Bubble -->	
+            <ImageView
+                android:layout_centerVertical="true"
+                android:layout_width="35dp"
+				android:layout_height="35dp"
+            	android:background="@drawable/pb_level_bubble" />
+            
+            <!-- Icon -->
+            <ImageView
+                android:gravity="center"
+                android:background="@drawable/coin_icon"
+                android:layout_centerVertical="true"
+                android:layout_centerInParent="true"
+                android:layout_width="20dp"
+				android:layout_height="20dp" />
+        </RelativeLayout>
+    </RelativeLayout>
+    
+    <!-- XP, level container -->
+    
+    <RelativeLayout
+        android:id="@+id/personal_bar_xp_layout"
+        android:layout_width="150dp"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/pb_separator_open"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="5dp" >
+        
+        <!-- Progress bar container -->
+        
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerVertical="true"
+           	android:layout_toLeftOf="@+id/xp_bubble_layout"
+           	android:layout_marginRight="-15dp">
+
+           <!-- NOTE: for some reason, using a ProgressBar applies
+              - a stencil mask on our bitmaps which I couldn't get rid of
+              - no matter what. I (duv) decided to go along with two
+              - overlapping images, where to top one is clipped according
+              - to the current progress. Please tell me if you
+              - manager to remove that stencil.
+            -->	
+            
+           <!-- Progress background -->
+           <ImageView
+               android:layout_alignParentRight="true"
+	           android:layout_marginLeft="5dp"
+	           android:layout_centerVertical="true"
+	           android:layout_width="fill_parent"
+	           android:layout_height="27dp"
+               android:background="@drawable/pb_progress_empty"/>
+           
+           <!-- Clipped progress -->
+           <ImageView
+               android:id="@+id/pb_ProgressBar"
+               android:layout_alignParentRight="true"
+	           android:layout_marginLeft="5dp"
+	           android:layout_centerVertical="true"
+	           android:layout_width="fill_parent"
+	           android:layout_height="27dp"
+               android:background="@drawable/pb_progress_bar_style"/>
+           
+           <!-- Current XP container -->
+           <RelativeLayout
+	               	android:layout_width="wrap_content"
+	            	android:layout_height="fill_parent"
+	            	android:layout_centerVertical="true"
+	            	android:layout_centerInParent="true">
+	            	
+               <!-- XP icon -->
+               
+               <ImageView
+                   	android:id="@+id/pb_xp_icon"
+                   	android:layout_width="20dp"
+	                android:layout_height="20dp"
+	                android:layout_marginRight="2dp"
+	                android:layout_centerVertical="true"
+	                android:background="@drawable/pb_xp_icon" />
+               
+               <!-- Current XP amount -->
+               
+               <TextView
+                   android:layout_toRightOf="@id/pb_xp_icon"
+	                android:id="@+id/pb_xpValueTextView"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_centerVertical="true"
+	                android:text="1,000"
+	                android:textColor="@android:color/white"
+	                android:textSize="15dp" />
+           </RelativeLayout>
+		</RelativeLayout>
+        
+        <!-- Current level container -->
+        <RelativeLayout
+            android:id="@+id/xp_bubble_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_alignParentRight="true"
+        	android:layout_centerVertical="true">
+        	
+            <ImageView
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:layout_width="35dp"
+				android:layout_height="35dp"
+            	android:background="@drawable/pb_level_bubble" />
+            
+            <TextView
+                style="@style/personal_bar_level_bubble_text_style"
+                android:id="@+id/pb_rankTextView"
+                android:layout_centerVertical="true"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+				android:text="88"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/player_stats_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/personal_bar_xp_layout"
+        android:layout_toRightOf="@id/personal_bar_coins_layout"
+        android:gravity="center_vertical"
+        android:visibility="invisible"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginLeft="13dp"
+            android:paddingTop="-1dp"
+            android:src="@drawable/xp_icon" />
+
+        <TextView
+            android:id="@+id/mw_remaingXpTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:text="100"
+            android:textColor="#4792C6" />
+
+        <TextView
+            android:id="@+id/mw_nextXpLevelRankTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:text="@string/mw_needed_to_reach_level"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+</RelativeLayout>

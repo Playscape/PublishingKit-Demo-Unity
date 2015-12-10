@@ -123,6 +123,46 @@ namespace Playscape.Editor {
 				toAppNode.AppendChild(newNode);
 			}
 			
+
+		}
+
+		/// <summary>
+		/// Updates uses-sdk node in AndroidManifest.xml file
+		/// </summary>
+		/// <param name="manifestPath">manifestPath.</param>
+		/// <param name="minSdkVersion">minSdkVersion.</param>
+		/// <param name="targetSdkVersion">targetSdkVersion.</param>
+		public static void InsertUsesSDK(string manifestPath, string minSdkVersion, string targetSdkVersion) {
+			var configDoc = new XmlDocument();
+			configDoc.LoadXml(File.ReadAllText(manifestPath));
+
+			XmlNode manifestNode = configDoc.SelectSingleNode ("manifest");
+
+			XmlAttribute targetSdkVersionAttr = configDoc.CreateAttribute ("android", "targetSdkVersion", "http://schemas.android.com/apk/res/android");
+			targetSdkVersionAttr.Value = targetSdkVersion;
+
+			XmlAttribute minSdkVersionAttr = configDoc.CreateAttribute ("android", "minSdkVersion", "http://schemas.android.com/apk/res/android");
+			minSdkVersionAttr.Value = minSdkVersion;
+
+			XmlNode usesSDKElement = configDoc.SelectSingleNode ("manifest/uses-sdk");
+
+			if (usesSDKElement != null) {
+				foreach (XmlAttribute attr in usesSDKElement.Attributes) {
+					if (attr.Name.Equals("android:minSdkVersion")) {
+						attr.Value = minSdkVersion;
+					} else if (attr.Name.Equals("android:targetSdkVersion")) {
+						attr.Value = targetSdkVersion;
+					}
+				}
+			} else {
+				usesSDKElement = configDoc.CreateElement ("uses-sdk");
+				usesSDKElement.Attributes.Append(targetSdkVersionAttr);
+				usesSDKElement.Attributes.Append(minSdkVersionAttr);
+
+				manifestNode.AppendChild (usesSDKElement);
+			}
+
+			configDoc.Save (manifestPath);
 		}
 		
 		/// <summary>

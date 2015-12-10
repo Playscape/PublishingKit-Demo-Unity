@@ -1,0 +1,43 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mission_wall"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/black"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/player_stats_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/black"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginLeft="13dp"
+            android:paddingTop="-1dp"
+            android:src="@drawable/xp_icon" />
+
+        <TextView
+            android:id="@+id/mw_remaingXpTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:text="100"
+            android:textColor="#4792C6" />
+
+        <TextView
+            android:id="@+id/mw_nextXpLevelRankTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:text="@string/mw_needed_to_reach_level"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+	<include layout="@layout/mission_wall" />
+</LinearLayout>

@@ -21,6 +21,7 @@
     <string name="playscape_ads_api_key">%{API_KEY}</string>
     <string name="playscape_ads_config_url">http://server.ads.mominis.com/Services/CompressedAdService/json/RollABallMultiplayer_Pubkit_Demo_AdsConfig.json</string>
     <string name="playscape_ads_config_enable_ads_system">true</string>
+    <string name="playscape_config_exchange_enabled">true</string>
     <string name="playscape_chartboost_app_id">531c4f442d42da19400a5d75</string>
     <string name="playscape_chartboost_app_signature">3cf6252e06d08e7afa7fbc7532b916a7fd52a01e</string>
     <string name="playscape_millennial_media_app_id">163708</string>
