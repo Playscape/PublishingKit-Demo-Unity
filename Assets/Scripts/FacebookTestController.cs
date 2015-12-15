@@ -8,6 +8,7 @@ public class FacebookTestController : MonoBehaviour {
 	const string LOGIN = "LOGIN";
 	const string LOGOUT = "LOGOUT";
 	const string SHARE = "SHARE";
+	const string APP_REQUEST = "APP REQUEST";
 
 	// Use this for initialization
 	void Start () {
@@ -48,6 +49,9 @@ public class FacebookTestController : MonoBehaviour {
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 2 + marginTop, buttonWidth, buttonHeight), SHARE)) {
 			Share();
 		}
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop, buttonWidth, buttonHeight), APP_REQUEST)) {
+			AppRequest();
+		}
 	}
 
 	void Share () {
@@ -57,6 +61,10 @@ public class FacebookTestController : MonoBehaviour {
 		        linkName: "Checkout my Friend Smash greatness!",                                                                 
 		        link: "http://apps.facebook.com/" + FB.AppId + "/?challenge_brag=" + (FB.IsLoggedIn ? FB.UserId : "guest")       
 		        ); 
+	}
+
+	void AppRequest() {
+		FB.AppRequest ("I'd like to invite you in this awesome app!", new string[] {"449443455241537", "971381496268038"}, null, null, 50, "", "Just title for test invite", null);
 	}
 
 	void LoginCallback(FBResult result)                                                        
