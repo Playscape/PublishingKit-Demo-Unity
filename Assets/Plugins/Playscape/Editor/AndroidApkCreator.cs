@@ -540,7 +540,8 @@ namespace Playscape.Editor
             configDoc.SelectSingleNode("resources/string[@name='playscape_ads_api_key']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey);
             configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
             configDoc.SelectSingleNode("resources/string[@name='playscape_reporter_id']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.ReporterId);
-			configDoc.SelectSingleNode("resources/string[@name='playscape_is_published_by_playscape']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyGameConfiguration.PublishedByPlayscape);
+						configDoc.SelectSingleNode("resources/string[@name='playscape_is_published_by_playscape']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyGameConfiguration.PublishedByPlayscape);
+						configDoc.SelectSingleNode("resources/string[@name='playscape_config_exchange_enabled']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.IncludePlayscapeExchange).ToLower();
 		}
 		
 		private static void injectABTestingConfig(XmlDocument configDoc)
@@ -606,6 +607,10 @@ namespace Playscape.Editor
 
 		private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
 		{
+			if (Directory.Exists (destDirName)) {
+				DeleteDirectory(destDirName);
+			}
+
 			// Get the subdirectories for the specified directory.
 			DirectoryInfo dir = new DirectoryInfo(sourceDirName);
 			DirectoryInfo[] dirs = dir.GetDirectories();
@@ -639,6 +644,66 @@ namespace Playscape.Editor
 					string temppath = Path.Combine(destDirName, subdir.Name);
 					DirectoryCopy(subdir.FullName, temppath, copySubDirs);
 				}
+			}
+		}
+
+		public static void DeleteDirectory(string target_dir)
+		{
+			string[] files = Directory.GetFiles(target_dir);
+			string[] dirs = Directory.GetDirectories(target_dir);
+			
+			foreach (string file in files)
+			{
+				File.SetAttributes(file, FileAttributes.Normal);
+				File.Delete(file);
+			}
+			
+			foreach (string dir in dirs)
+			{
+				DeleteDirectory(dir);
+			}
+			
+			Directory.Delete(target_dir, false);
+		}
+
+		public static void FileCopy(string sourceFilename, string destFilename, bool overwrite) {
+			if (overwrite) {
+				if (File.Exists (destFilename)) {
+					File.Delete(destFilename);
+				}
+			} 
+
+			string dirs = Path.GetDirectoryName (destFilename);
+			if (!Directory.Exists (dirs)) {
+				Directory.CreateDirectory(dirs);
+			}
+
+			File.Copy (sourceFilename, destFilename);
+		}
+
+		public static void IncludePlayscapeExchange(bool include) {
+			string playscapeBackupPath = "/Assets/Playscape/";
+
+			if (include) {
+				DeleteDirectory("Assets/Plugins/Android/PlayscapePublishingKit/res");
+				DirectoryCopy("Assets/Playscape/build/res", "Assets/Plugins/Android/PlayscapePublishingKit/res", true);
+				DirectoryCopy("Assets/Playscape/build/assets/fonts", "Assets/StreamingAssets/fonts", true);
+				DirectoryCopy("Assets/Playscape/build/assets/level_up_icons", "Assets/StreamingAssets/level_up_icons", true);
+				DirectoryCopy("Assets/Playscape/build/assets/playscape_bootstrap", "Assets/StreamingAssets/playscape_bootstrap", true);
+				FileCopy("Assets/Playscape/build/assets/predefined_badges.json", "Assets/StreamingAssets/predefined_badges.json", true);
+				FileCopy("Assets/Playscape/build/assets/ranks.json", "Assets/StreamingAssets/ranks.json", true);
+				FileCopy("Assets/Playscape/build/assets/WelcomeMessage", "Assets/StreamingAssets/WelcomeMessage", true);
+				FileCopy("Assets/Playscape/build/libs/PlayscapeCPSDK", "Assets/Plugins/Android/PlayscapePublishingKit/libs/PlayscapeCPSDK.jar", true);
+			} else {
+				DeleteDirectory("Assets/Plugins/Android/PlayscapePublishingKit/res");
+				DeleteDirectory("Assets/StreamingAssets/fonts");
+				DeleteDirectory("Assets/StreamingAssets/level_up_icons");
+				DeleteDirectory("Assets/StreamingAssets/playscape_bootstrap");
+				File.Delete("Assets/StreamingAssets/predefined_badges.json");
+				File.Delete("Assets/StreamingAssets/ranks.json");
+				File.Delete("Assets/StreamingAssets/WelcomeMessage");
+				File.Delete("Assets/Plugins/Android/PlayscapePublishingKit/libs/PlayscapeCPSDK.jar");
+				FileCopy("Assets/Playscape/build/res/values/config_strings.xml", "Assets/Plugins/Android/PlayscapePublishingKit/res/values/config_strings.xml", true);
 			}
 		}
 	}

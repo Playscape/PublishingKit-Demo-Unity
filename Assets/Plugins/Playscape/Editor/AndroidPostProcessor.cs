@@ -81,7 +81,7 @@ namespace Playscape.Editor {
                 keypass = PlayerSettings.Android.keyaliasPass
             };
 
-            if (bp.isDebug || string.IsNullOrEmpty(bp.keysotre_path))
+            if (string.IsNullOrEmpty(bp.keysotre_path))
             {
                 bp.keysotre_path = (PlatformUtils.isWindows() ? System.Environment.GetEnvironmentVariable("USERPROFILE") :
                                  Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).FullName)

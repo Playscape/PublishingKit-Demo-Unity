@@ -62,6 +62,8 @@ namespace Playscape.Internal {
 			}
 		}
 
+		public bool IncludePlayscapeExchange = true;
+
 		[SerializeField]
 		private GameConfiguration _gameConfiguration = new GameConfiguration();
 

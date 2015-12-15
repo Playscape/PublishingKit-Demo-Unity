@@ -49,7 +49,6 @@ namespace Playscape.Internal
 			RemoteLogger.Init();
 			NativeReport.Init();
 			AddABTesingScripts();
-			AddPushWooshScripts();
 			AddAdScripts();
             AddCatalogcripts();
 
@@ -73,17 +72,6 @@ namespace Playscape.Internal
 		public void OnApplicationQuit()
 		{
 			RemoteLogger.DumpNow();
-		}
-
-	    /// <summary>
-	    /// </summary>
-	    private void AddPushWooshScripts()
-		{
-			#if UNITY_IPHONE
-			gameObject.AddComponent(typeof(PushNotificationsIOS ));
-			PushWooshCommon pushWoosh = (PushWooshCommon) gameObject.GetComponent(typeof(PushNotificationsIOS));
-			pushWoosh.ReportAllTags();
-			#endif
 		}
 
 		/// <summary>
