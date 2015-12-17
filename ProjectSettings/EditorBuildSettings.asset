@@ -21,3 +21,5 @@ EditorBuildSettings:
     path: Assets/_Scenes/ab_testing.unity
   - enabled: 1
     path: Assets/_Scenes/report_screen.unity
+  - enabled: 1
+    path: Assets/_Scenes/facebook_tests.unity
