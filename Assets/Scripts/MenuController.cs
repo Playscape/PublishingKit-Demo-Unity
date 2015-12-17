@@ -1,9 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Text;
-
 using Playscape.Ads;
-using Playscape.Notifications;
 using Soomla.Store;
 using Playscape.Internal;
 
@@ -17,7 +15,7 @@ public class MenuController : MonoBehaviour {
 	const string SHOW_INTESITIAL = "Show Interstitial";
 	const string DISABLE_ADS = "Disable ads";
 	const string ENABLE_ADS = "Enable ads";
-	const string SET_PW_CUSTOM_TAG = "Set PW custom tags";
+	const string OPEN_REPORT_EVENT = "Open Report Scene";
 	const string SHOW_CATALOG = "Show Catalog";
 	const string GET_A_TESTING_VALUES = "Get AB Testing Values";
 	const string QUIT = "QUIT";
@@ -107,13 +105,8 @@ public class MenuController : MonoBehaviour {
 			AdManager.Instance.EnableAds();
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 1.4f, buttonWidth, buttonHeight), SET_PW_CUSTOM_TAG)) {
-			int randomValue = (int) Random.Range(0, 20000);
-
-			PushWoosh.Instance.SetTag("customTag1", randomValue.ToString());
-			PushWoosh.Instance.SetTag("customTag2", (randomValue + 1).ToString());
-			PushWoosh.Instance.SetTag("customTag3Numeric", randomValue + 2);
-			PushWoosh.Instance.SetTag("customTag4Numeric", randomValue + 4);
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 1.4f, buttonWidth, buttonHeight), OPEN_REPORT_EVENT)) {
+			Application.LoadLevel("report_screen");
 		}
 
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 8 + marginTop * 1.4f, buttonWidth, buttonHeight), GET_A_TESTING_VALUES)) {

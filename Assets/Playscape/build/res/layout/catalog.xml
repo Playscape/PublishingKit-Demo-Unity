@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:tag="top_level_layout"
+		android:id="@+id/top_level_layout"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent" >
+		
+	<RelativeLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:background="@drawable/screen_bg"
+		>
+		
+					<!-- <ImageView
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"
+					android:src="@drawable/screen_bg"
+					android:adjustViewBounds="false"
+					android:scaleType="matrix"
+				/>-->
+	
+		<!--  Top Toolbar -->
+	
+		<RelativeLayout
+			android:id="@+id/top_layout"
+			android:layout_height="wrap_content"
+			android:layout_width="fill_parent"
+			android:layout_marginBottom="0dp"
+			android:paddingBottom="0dp"
+			android:layout_alignParentTop="true"
+		>
+		
+	
+			<LinearLayout
+				android:orientation="vertical"
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:layout_marginBottom="0dp"
+				android:paddingBottom="0dp"
+			>
+		
+				<RelativeLayout
+					android:layout_height="@dimen/catalog_playbox_height"
+					android:layout_width="fill_parent"
+					android:background="@android:color/black">
+
+					<com.playscape.utils.AspectRatioImageView
+					    android:id="@+id/top_toolbar_playbox"
+					    android:layout_width="@dimen/catalog_playbox_width"
+					    android:layout_height="fill_parent"
+					    android:layout_alignParentLeft="true"
+					    android:layout_centerVertical="true"
+					    android:layout_gravity="center"
+					    android:adjustViewBounds="true"
+					    android:src="@drawable/logo_selected"
+					    android:tag="top_toolbar_playbox" />
+	
+					<com.playscape.utils.AspectRatioImageView
+					    android:id="@+id/top_toolbar_categories"
+					    android:layout_width="@dimen/catalog_categories_width"
+					    android:layout_height="fill_parent"
+					    android:layout_centerVertical="true"
+					    android:layout_gravity="center"
+					    android:layout_toLeftOf="@+id/top_toolbar_my_games"
+					    android:adjustViewBounds="true"
+					    android:src="@drawable/link_cats"
+					    android:tag="top_toolbar_categories" />
+			
+			        <com.playscape.utils.AspectRatioImageView
+			            android:id="@+id/top_toolbar_my_games"
+			            android:layout_width="@dimen/catalog_mygames_width"
+			            android:layout_height="fill_parent"
+			            android:layout_toLeftOf="@+id/top_toolbar_settings"
+			            android:layout_centerVertical="true"
+			            android:layout_gravity="center"
+			            android:adjustViewBounds="true"
+			            android:src="@drawable/link_my_games"
+			            android:tag="top_toolbar_my_games"/>
+
+                    <ImageView
+                            android:id="@+id/top_toolbar_settings"
+                            android:layout_width="wrap_content"
+                            android:layout_height="fill_parent"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_gravity="center"
+                            android:adjustViewBounds="false"
+                            android:src="@drawable/ic_action_navigation_more_vert"
+                            android:tag="top_toolbar_settings" />
+
+				
+				</RelativeLayout>
+				
+				<!-- Categories Toolbar -->
+				<LinearLayout
+                    android:tag="categories_toolbar"
+					android:id="@+id/categories_toolbar"
+					android:orientation="vertical"
+					android:layout_height="0dp"
+					android:layout_width="fill_parent"
+					android:layout_marginBottom="0dp"
+					android:paddingBottom="0dp"
+					android:paddingLeft="0dp"
+					android:paddingRight="0dp">
+					
+					<RelativeLayout
+						android:orientation="horizontal"
+						android:layout_height="50dp"
+						android:layout_width="fill_parent"
+						android:layout_marginBottom="0dp"
+						android:paddingBottom="0dp"
+						>
+		
+					
+						<!-- Category Tabs -->
+
+						<RelativeLayout
+						    android:id="@+id/categories_tabs"
+						    android:layout_width="fill_parent"
+						    android:layout_height="fill_parent"
+						    android:layout_centerHorizontal="true"
+						    android:orientation="horizontal"
+						    android:tag="categories_tabs" >
+							
+							<RelativeLayout
+							    android:id="@+id/category_tab1"
+							    android:layout_width="wrap_content"
+							    android:layout_height="fill_parent"
+							    android:layout_alignParentBottom="true"
+							    android:layout_centerInParent="true"
+							    android:tag="category_tab1" >
+								
+								<ImageView
+                                    android:tag="category_tab1_image"
+									android:id="@+id/category_tab1_image"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:adjustViewBounds="true"
+									android:src="@drawable/tab_normal"
+								/>
+								
+								<ImageView
+                                    android:tag="category_tab1_image_selected"
+									android:id="@+id/category_tab1_image_selected"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:adjustViewBounds="true"
+									android:visibility="invisible"
+									android:src="@drawable/tab_selected"
+								/>
+								
+								<TextView
+                                    android:tag="category_tab1_text"
+									android:id="@+id/category_tab1_text"
+									android:text=""
+									android:textColor="#FFFFFF"
+									android:layout_alignParentBottom="true"
+									android:layout_centerHorizontal="true"
+									android:textSize="15dp"
+									android:layout_height="wrap_content"
+									android:layout_width="wrap_content"
+									android:paddingBottom="8dp"
+								/>
+							</RelativeLayout>
+							
+							<RelativeLayout
+							    android:id="@+id/category_tab2"
+							    android:layout_width="wrap_content"
+							    android:layout_height="fill_parent"
+							    android:layout_alignParentBottom="true"
+							    android:layout_centerInParent="true"
+							    android:tag="category_tab2" >
+								
+								<ImageView
+                                    android:tag="category_tab2_image"
+									android:id="@+id/category_tab2_image"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:adjustViewBounds="true"
+									android:src="@drawable/tab_normal"
+								/>
+								
+								<ImageView
+                                    android:tag="category_tab2_image_selected"
+									android:id="@+id/category_tab2_image_selected"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:adjustViewBounds="true"
+									android:visibility="invisible"
+									android:src="@drawable/tab_selected"
+								/>
+								
+								<TextView
+                                    android:tag="category_tab2_text"
+									android:id="@+id/category_tab2_text"
+									android:text=""
+									android:textColor="#FFFFFF"
+									android:layout_alignParentBottom="true"
+									android:layout_centerHorizontal="true"
+									android:textSize="15dp"
+									android:layout_height="wrap_content"
+									android:layout_width="wrap_content"
+									android:paddingBottom="8dp"
+								/>
+							</RelativeLayout>
+							
+							<RelativeLayout
+							    android:id="@+id/category_tab3"
+							    android:layout_width="wrap_content"
+							    android:layout_height="fill_parent"
+							    android:layout_alignParentBottom="true"
+							    android:layout_centerInParent="true"
+							    android:tag="category_tab3" >
+								
+								<ImageView
+                                    android:tag="category_tab3_image"
+									android:id="@+id/category_tab3_image"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:adjustViewBounds="true"
+									android:src="@drawable/tab_normal"
+								/>
+								
+								<ImageView
+                                    android:tag="category_tab3_image_selected"
+									android:id="@+id/category_tab3_image_selected"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:adjustViewBounds="true"
+									android:visibility="invisible"
+									android:src="@drawable/tab_selected"
+								/>
+								
+								<TextView
+                                    android:tag="category_tab3_text"
+									android:id="@+id/category_tab3_text"
+									android:text=""
+									android:textColor="#FFFFFF"
+									android:layout_alignParentBottom="true"
+									android:layout_centerHorizontal="true"
+									android:textSize="15dp"
+									android:layout_height="wrap_content"
+									android:layout_width="wrap_content"
+									android:paddingBottom="8dp"
+								/>
+							</RelativeLayout>
+							
+							<RelativeLayout
+							    android:id="@+id/category_tab4"
+							    android:layout_width="wrap_content"
+							    android:layout_height="fill_parent"
+							    android:layout_alignParentBottom="true"
+							    android:layout_centerInParent="true"
+							    android:tag="category_tab4" >
+								
+								<ImageView
+                                    android:tag="category_tab4_image"
+									android:id="@+id/category_tab4_image"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:adjustViewBounds="true"
+									android:src="@drawable/tab_normal"
+								/>
+								
+								<ImageView
+                                    android:tag="category_tab4_image_selected"
+									android:id="@+id/category_tab4_image_selected"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:adjustViewBounds="true"
+									android:visibility="invisible"
+									android:src="@drawable/tab_selected"
+								/>
+								
+								<TextView
+                                    android:tag="category_tab4_text"
+									android:id="@+id/category_tab4_text"
+									android:text=""
+									android:textColor="#FFFFFF"
+									android:layout_alignParentBottom="true"
+									android:layout_centerHorizontal="true"
+									android:textSize="15dp"
+									android:layout_height="wrap_content"
+									android:layout_width="wrap_content"
+									android:paddingBottom="8dp"
+								/>
+							</RelativeLayout>
+							
+							<RelativeLayout
+							    android:id="@+id/category_tab5"
+							    android:layout_width="wrap_content"
+							    android:layout_height="wrap_content"
+							    android:layout_alignParentBottom="true"
+							    android:layout_centerInParent="true"
+							    android:tag="category_tab5" >
+								
+								<ImageView
+                                    android:tag="category_tab5_image"
+									android:id="@+id/category_tab5_image"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:adjustViewBounds="true"
+									android:src="@drawable/tab_normal"
+								/>
+								
+								<ImageView
+                                    android:tag="category_tab5_image_selected"
+									android:id="@+id/category_tab5_image_selected"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:adjustViewBounds="true"
+									android:visibility="invisible"
+									android:src="@drawable/tab_selected"
+								/>
+								
+								<TextView
+                                    android:tag="category_tab5_text"
+									android:id="@+id/category_tab5_text"
+									android:text=""
+									android:textColor="#FFFFFF"
+									android:textSize="15dp"
+									android:layout_height="wrap_content"
+									android:layout_alignParentBottom="true"
+									android:layout_centerHorizontal="true"
+									android:layout_width="wrap_content"
+									android:paddingBottom="8dp"
+								/>
+							</RelativeLayout>
+						
+						
+						</RelativeLayout>
+					
+					</RelativeLayout>
+					
+					<ImageView
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:adjustViewBounds="true"
+						android:layout_gravity="center_vertical"
+						android:src="@drawable/tabline"
+						android:scaleType="fitXY"
+						android:layout_marginTop="-5dp"
+					/>
+				</LinearLayout>
+			</LinearLayout>
+			
+		</RelativeLayout>
+		
+		<!--  Catalog View -->
+		
+		<RelativeLayout
+            android:tag="gridViewContainer"
+		    android:id="@+id/gridViewContainer"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+		    android:layout_below="@id/top_layout"
+		    android:layout_marginBottom="48dp"
+		    android:layout_marginTop="0dp"
+		    android:background="@android:color/transparent"
+		    android:paddingTop="0dp" >
+					
+		  	<mominis.gameconsole.views.impl.ConsoleGridView
+                android:tag="gridview"
+			    android:id="@+id/gridview"
+			    android:layout_width="fill_parent" 
+			    android:layout_height="fill_parent"
+			    android:layout_marginTop="0dp"
+			    android:paddingTop="0dp"
+			    android:verticalSpacing="0dp"
+			    android:horizontalSpacing="0dp"
+	            android:background="@android:color/transparent"
+	            android:listSelector="@android:color/transparent"
+			    android:gravity="center"/>
+		
+			
+			<!--  NOTE: These images must be placed after the ConsoleGrid view, so they'll be on top of it	-->
+			
+			 
+			<!-- 
+			<ImageView android:id="@+id/logo_header"
+					android:layout_width="150dp"
+					android:layout_height="wrap_content"
+					android:adjustViewBounds="true"
+					android:layout_alignParentTop="true"
+					android:layout_alignLeft="@id/gridview"
+					android:layout_marginLeft="0dp"
+					android:paddingLeft="0dp"
+					android:layout_gravity="top"
+					android:src="@drawable/logo_tri"
+					android:scaleType="fitXY"
+					/>
+			-->
+					
+		</RelativeLayout>
+		
+        <include
+            android:tag="personal_bar_and_mission_wall"
+            layout="@layout/personal_bar_and_mission_wall" />
+	</RelativeLayout>
+</FrameLayout>

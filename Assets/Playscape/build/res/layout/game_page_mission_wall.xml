@@ -1,0 +1,96 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mission_wall"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/black"
+    android:orientation="vertical" >
+
+      <RelativeLayout
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:id="@+id/game_page_player_stats_bar"
+          android:layout_width="fill_parent"
+          android:layout_height="@dimen/game_page_player_stats_bar_height"
+          android:layout_alignParentBottom="true"
+          android:background="@drawable/pb_background"
+          android:clickable="true"
+          android:focusable="true"
+          android:focusableInTouchMode="true" >
+
+          <ImageView
+              android:id="@+id/pb_separator_open"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:layout_alignParentTop="true"
+              android:background="@drawable/pb_border_open" >
+          </ImageView>
+
+          <RelativeLayout
+              android:id="@+id/titles_container"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentLeft="true"
+              android:layout_centerVertical="true"
+              android:layout_marginLeft="10dp"
+              android:paddingLeft="5dp" >
+
+              <TextView
+                  android:id="@+id/game_page_game_title"
+                  style="@style/game_page_game_title_style"
+                  android:textSize="@dimen/game_page_game_title_text_size"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_alignLeft="@+id/latest_missions"
+                  android:text="Hungry Fish" />
+
+              <TextView
+                  android:id="@+id/latest_missions"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_below="@+id/game_page_game_title"
+                  android:text="@string/latest_missions"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:textSize="@dimen/game_page_latest_missions_text_size" />
+          </RelativeLayout>
+
+          <LinearLayout
+              android:id="@+id/player_stats_bar"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentRight="true"
+              android:layout_centerVertical="true"
+              android:gravity="center_vertical"
+              android:orientation="horizontal"
+              android:paddingRight="5dp" >
+
+              <ImageView
+                  android:id="@+id/imageView1"
+                  android:layout_width="@dimen/personal_bar_needed_XP_icon_size"
+                  android:layout_height="@dimen/personal_bar_needed_XP_icon_size"
+                  android:layout_marginLeft="13dp"
+                  android:paddingTop="-1dp"
+                  android:src="@drawable/xp_icon" />
+
+              <TextView
+                  android:id="@+id/mw_remaingXpTextView"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textSize="@dimen/personal_bar_needed_XP_text_size"
+                  android:layout_marginLeft="3dp"
+                  android:text="100"
+                  android:textColor="#4792C6" />
+
+              <TextView
+                  android:id="@+id/mw_nextXpLevelRankTextView"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="4dp"
+                  android:paddingRight="4dp"
+                  android:textSize="@dimen/personal_bar_needed_XP_text_size"
+                  android:text="@string/mw_needed_to_reach_level"
+                  android:textColor="@android:color/white" />
+          </LinearLayout>
+
+      </RelativeLayout>
+
+	<include layout="@layout/mission_wall" />
+</LinearLayout>

@@ -4,6 +4,7 @@ using System.Collections;
 using UnityEditor;
 using System;
 using System.IO;
+using System.Xml;
 using Playscape.Internal;
 
 namespace Playscape.Editor {
@@ -24,13 +25,27 @@ namespace Playscape.Editor {
 
 		}
 
-		[MenuItem ("Window/" + CommonConsts.CONFIGURE_PUBLISHING_KIT_MENU_ITEM)]
-		public static void ConfigurePublishingKit() {
-			var window = EditorWindow.GetWindow<ConfigurationWindow>(new Type[] {EditorWindow.GetWindow(typeof(SceneView)).GetType()});
-			window.Show(true);
+		[MenuItem ("Window/Playscape/" + CommonConsts.CONFIGURE_PUBLISHING_KIT_MENU_ITEM)]
+				public static void OpenConfigurePublishingKitWindow() {
+					var window = EditorWindow.GetWindow<ConfigurationWindow>(new Type[] {EditorWindow.GetWindow(typeof(SceneView)).GetType()});
+					window.Show(true);
 		}
 
-		static void OnPlayModeStateChanged () { 
+		[MenuItem ("Window/Playscape/About")]
+		public static void OpenAbout() {
+				var version = "1.0";
+				var configDoc = new XmlDocument();
+				configDoc.LoadXml(File.ReadAllText("Assets/StreamingAssets/playscape/PlayscapeConfig.xml"));
+
+				version = configDoc.SelectSingleNode("resources/string[@name='playscape_publishing_kit_version']").InnerText;
+
+				EditorUtility.DisplayDialog (
+					"Playscape SDK Plugin",
+					string.Format("For more information, visit the official site on GitHub:\n\nhttps://github.com/Playscape/Documentation-internal/wiki\n\nPlugin version: {0}", version),
+					"OK");
+		}
+
+		static void OnPlayModeStateChanged () {
 			if (EditorApplication.isPlayingOrWillChangePlaymode) {
 				var go = GameObject.Find(PlayscapeManager.PLAYSCAPE_MANAGER_GAMEOBJECT_NAME);
 

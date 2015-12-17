@@ -524,9 +524,11 @@ namespace UnityEditor.XCodeEditor
 				this.AddHeaderSearchPaths( absoluteHeaderPath );
 			}
 
-			foreach( string librarypath in mod.librarysearchpaths ) {
-				string absolutePath = AddXcodeQuotes(System.IO.Path.Combine( mod.path, librarypath ));
-				this.AddLibrarySearchPaths( absolutePath );
+			if (mod.librarysearchpaths != null) {
+				foreach (string librarypath in mod.librarysearchpaths) {
+					string absolutePath = AddXcodeQuotes (System.IO.Path.Combine (mod.path, librarypath));
+					this.AddLibrarySearchPaths (absolutePath);
+				}
 			}
 
 			if(mod.frameworksearchpath != null)

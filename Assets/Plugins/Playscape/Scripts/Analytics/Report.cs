@@ -333,6 +333,23 @@ namespace Playscape.Analytics
 			NativeReport.playscape_report_ReportEvent(customEvent);
 #endif
 		}
+    
+    /// <summary>
+		/// Analytics bible section: 5.04
+		/// </summary>
+		/// <param name="customEvent">
+		/// The custom Event.
+		/// </param>
+    /// <paran name="eventAttrs">
+    /// The custom event attributes
+    /// </param>
+		public void ReportEvent(string customEvent, IDictionary<string, string> eventAttrs) {
+#if !UNITY_EDITOR
+			var keysAndValues = eventAttrs.ToKeysAndValues();
+			NativeReport.playscape_report_ReportAttrEvent(customEvent, eventAttrs.Count, keysAndValues.Keys, keysAndValues.Values);
+#endif
+		}
+
 
 		#region Custom Analyics
 
