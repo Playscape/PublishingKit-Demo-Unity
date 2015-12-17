@@ -1,7 +1,8 @@
 {
     "group":       "",
     "libs":        [
-    "libz.dylib:weak"
+    "libz.dylib:weak",
+    "libstdc++.6.dylib"
     ],
     "frameworks":  [
     "StoreKit.framework",
