@@ -85,16 +85,16 @@
 				            android:tag="top_toolbar_my_games" />
 
                         <ImageView
-                           android:id="@+id/top_toolbar_settings"
-                           android:layout_width="wrap_content"
-                           android:layout_height="fill_parent"
-                           android:layout_alignParentRight="true"
-                           android:layout_centerVertical="true"
-                           android:layout_gravity="center"
-                           android:adjustViewBounds="false"
-                           android:src="@drawable/ic_action_navigation_more_vert"
-                           android:tag="top_toolbar_settings" />
-                           
+                                android:id="@+id/top_toolbar_settings"
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:layout_alignParentRight="true"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:adjustViewBounds="false"
+                                android:src="@drawable/ic_action_navigation_more_vert"
+                                android:tag="top_toolbar_settings" />
+
 					</RelativeLayout>
 
 				<!-- Categories Toolbar -->

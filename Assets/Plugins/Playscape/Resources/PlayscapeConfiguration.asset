@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Name: PlayscapeConfiguration
   m_EditorClassIdentifier: 
   MyABTesting:
-    EnableABTestingSystem: 0
-    NumberOfCustomExperiments: 0
-    AmazonPublicKey: 
-    AmazonPrivateKey: 
+    EnableABTestingSystem: 1
+    NumberOfCustomExperiments: 2
+    AmazonPublicKey: 969522db5ff4489ab825e641550fc159
+    AmazonPrivateKey: bAWjJn2vBhvntkKWraQScUwyH6CD9ldrHYqlWpAtCGk=
     MyCustomExperimentConfig:
-    - ExperimentName: 
+    - ExperimentName: Experiment 1
       ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
-      - 
-      - 
-      - 
-      - 
+      - Roll A Ball 1
+      - Roll A Ball 2
+      - Exp1Var3
+      - Exp1Var4
       - 
       - 
       - 
@@ -71,9 +71,11 @@ MonoBehaviour:
       - 
       - 
       NumberOfVarsInExperiment: 1
-    - ExperimentName: 
+    - ExperimentName: Experiment 2
       ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
+      - Roll A Ball 1
+      - Roll A Ball 2
       - 
       - 
       - 
@@ -122,12 +124,16 @@ MonoBehaviour:
       - 
       - 
       - 
-      - 
-      - 
-      NumberOfVarsInExperiment: 1
-    - ExperimentName: 
+      NumberOfVarsInExperiment: 2
+    - ExperimentName: Exp3
       ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
+      - Exp3Var1
+      - Exp3Var2
+      - Exp3Var3
+      - Exp3Var4
+      - Exp3Var5
+      - Exp3Var6
       - 
       - 
       - 
@@ -172,13 +178,7 @@ MonoBehaviour:
       - 
       - 
       - 
-      - 
-      - 
-      - 
-      - 
-      - 
-      - 
-      NumberOfVarsInExperiment: 1
+      NumberOfVarsInExperiment: 6
     - ExperimentName: 
       ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
@@ -1104,28 +1104,28 @@ MonoBehaviour:
   IncludePlayscapeExchange: 1
   _gameConfiguration:
     MyAdsConfig:
-      Url: 
+      Url: http://server.ads.mominis.com.s3.amazonaws.com/Services/CompressedAdService/json/RollABallMultiplayer_Pubkit_Demo_AdsConfig.json
     MyAdMobIds:
-      InterstitialsAdUnitId: 
-      BannersAdUnitId: 
+      InterstitialsAdUnitId: ca-app-pub-6855635722675667/3604954833
+      BannersAdUnitId: ca-app-pub-6855635722675667/8801184031
       TestDeviceId: 
     MyChartboostIds:
-      AppId: 
-      AppSignature: 
+      AppId: 5369e2cec26ee409e1f7ed6f
+      AppSignature: 38ed2b6271bd82cfd4b0a673058ff7cc5bffe762
     MyVungle:
-      AppId: 
+      AppId: 5369e21389c713e308000211
     MyMillennialMedia:
-      AppId: 
+      AppId: 163708
     MyStartAppIds:
-      DeveloperId: 
-      AppId: 
+      DeveloperId: 105840068
+      AppId: 205418137
     MyAdColonyIds:
-      AppId: 
-      VideoZoneId: 
-      IncentivisedVideoZoneId: 
+      AppId: app8dbfb639f7564b4399
+      VideoZoneId: vz80e0ea32fdf64b63a2
+      IncentivisedVideoZoneId: vzdc652d7a595345b5ab
     MyAnalyticsReport:
-      ReporterId: 
+      ReporterId: RollABallMultiplayer
     PublishedByPlayscape: 0
-  ReporterId: 
-  PushWooshIosId: 
+  ReporterId: RollABallMultiplayer
+  PushWooshIosId: D63D7-7BE5E
   MergeAndroidManifests: 1
