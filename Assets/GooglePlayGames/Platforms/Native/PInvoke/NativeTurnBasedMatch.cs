@@ -133,7 +133,7 @@ namespace GooglePlayGames.Native.PInvoke
         {
             if (!C.TurnBasedMatch_HasData(SelfPtr()))
             {
-                Logger.d("Match has no data.");
+                GooglePlayGames.OurUtils.Logger.d("Match has no data.");
                 return null;
             }
 

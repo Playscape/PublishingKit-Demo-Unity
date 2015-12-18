@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 4112c61bd236c48e1a0eea89c7c6d0e9
-timeCreated: 1450360629
+guid: 05376eec7144c4320b2cac2d9c2881f0
+timeCreated: 1450426324
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName: {}
@@ -23,7 +23,7 @@ TextureImporter:
   grayScaleToAlpha: 0
   generateCubemap: 0
   cubemapConvolution: 0
-  cubemapConvolutionSteps: 8
+  cubemapConvolutionSteps: 7
   cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
   textureFormat: -1

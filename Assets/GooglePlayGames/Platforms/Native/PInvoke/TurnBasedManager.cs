@@ -97,7 +97,7 @@ namespace GooglePlayGames.Native.PInvoke
         internal void AcceptInvitation(MultiplayerInvitation invitation,
                                    Action<TurnBasedMatchResponse> callback)
         {
-            Logger.d("Accepting invitation: " + invitation.AsPointer().ToInt64());
+            GooglePlayGames.OurUtils.Logger.d("Accepting invitation: " + invitation.AsPointer().ToInt64());
             C.TurnBasedMultiplayerManager_AcceptInvitation(mGameServices.AsHandle(),
                 invitation.AsPointer(), InternalTurnBasedMatchCallback, ToCallbackPointer(callback));
         }
@@ -141,7 +141,7 @@ namespace GooglePlayGames.Native.PInvoke
         [AOT.MonoPInvokeCallback(typeof(C.MultiplayerStatusCallback))]
         internal static void InternalMultiplayerStatusCallback(MultiplayerStatus status, IntPtr data)
         {
-            Logger.d("InternalMultiplayerStatusCallback: " + status);
+            GooglePlayGames.OurUtils.Logger.d("InternalMultiplayerStatusCallback: " + status);
             var callback = Callbacks.IntPtrToTempCallback<Action<MultiplayerStatus>>(data);
 
             try
@@ -150,7 +150,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered executing InternalMultiplayerStatusCallback. " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered executing InternalMultiplayerStatusCallback. " +
                     "Smothering to avoid passing exception into Native: " + e);
             }
         }
