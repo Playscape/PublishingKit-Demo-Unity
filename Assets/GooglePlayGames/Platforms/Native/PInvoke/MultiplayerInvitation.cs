@@ -80,7 +80,7 @@ namespace GooglePlayGames.Native.PInvoke
                 case Types.MultiplayerInvitationType.TURN_BASED:
                     return Invitation.InvType.TurnBased;
                 default:
-                    Logger.d("Found unknown invitation type: " + invitationType);
+                    GooglePlayGames.OurUtils.Logger.d("Found unknown invitation type: " + invitationType);
                     return Invitation.InvType.Unknown;
             }
         }

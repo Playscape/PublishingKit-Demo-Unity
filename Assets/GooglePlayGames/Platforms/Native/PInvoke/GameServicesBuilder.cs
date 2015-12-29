@@ -69,7 +69,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered executing InternalAuthFinishedCallback. " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered executing InternalAuthFinishedCallback. " +
                     "Smothering to avoid passing exception into Native: " + e);
             }
         }
@@ -95,7 +95,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered executing InternalAuthStartedCallback. " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered executing InternalAuthStartedCallback. " +
                     "Smothering to avoid passing exception into Native: " + e);
             }
         }
@@ -122,7 +122,7 @@ namespace GooglePlayGames.Native.PInvoke
                 }
                 catch (Exception e)
                 {
-                    Logger.e("Error encountered executing InternalOnTurnBasedMatchEventCallback. " +
+                    GooglePlayGames.OurUtils.Logger.e("Error encountered executing InternalOnTurnBasedMatchEventCallback. " +
                         "Smothering to avoid passing exception into Native: " + e);
                 }
             }
@@ -154,7 +154,7 @@ namespace GooglePlayGames.Native.PInvoke
                 }
                 catch (Exception e)
                 {
-                    Logger.e("Error encountered executing " +
+                    GooglePlayGames.OurUtils.Logger.e("Error encountered executing " +
                         "InternalOnMultiplayerInvitationEventCallback. " +
                         "Smothering to avoid passing exception into Native: " + e);
                 }

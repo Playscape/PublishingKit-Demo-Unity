@@ -53,7 +53,7 @@ namespace GooglePlayGames.Native.PInvoke
 
             if (callback == null)
             {
-                Logger.w("Callback for Initialization is null. Received status: " + status);
+                GooglePlayGames.OurUtils.Logger.w("Callback for Initialization is null. Received status: " + status);
                 return;
             }
 
@@ -63,7 +63,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered executing " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered executing " +
                     "NearbyConnectionsManagerBuilder#InternalOnInitializationFinishedCallback. " +
                     "Smothering exception: " + e);
             }
