@@ -182,7 +182,7 @@ public class DummyClient : IPlayGamesClient
 
     private static void LogUsage()
     {
-      Logger.d("Received method call on DummyClient - using stub implementation.");
+      GooglePlayGames.OurUtils.Logger.d("Received method call on DummyClient - using stub implementation.");
     }
   }
 }

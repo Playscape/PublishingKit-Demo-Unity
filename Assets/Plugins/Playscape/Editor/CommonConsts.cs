@@ -11,6 +11,5 @@ namespace Playscape.Editor
 		public const string MANIFEST_FRAGMENTS_PATH = PLUGINS_PATH + "/Android/PlayscapeManifestFragments";
 		public const string PLAYSCAPE_MANIFEST_PATH = MANIFEST_FRAGMENTS_PATH + "/PlayscapeAndroidManifest.xml";
 		public const string PLAYSCAPE_WITHOUT_EXCHANGE_MANIFEST_PATH = MANIFEST_FRAGMENTS_PATH + "/PlayscapeWithoutExchangeAndroidManifest.xml";
-		public const string GAME_CONFIGURATION_API_URL = "https://playscape-backend-prod.appspot.com";
 	}
 }

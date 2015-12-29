@@ -4,13 +4,13 @@ using System;
 using System.IO;
 using System.Text;
 using System.Reflection;
-using Playscape.Editor;
 using Pathfinding.Serialization.JsonFx;
 
 namespace Playscape.Internal {
 
 	[Serializable]
 	public class Configuration : ScriptableObject {
+		public const string GAME_CONFIGURATION_API_URL = "https://playscape-backend-prod.appspot.com";
 		public const string CONFIGURATION_ASSET_NAME = "PlayscapeConfiguration";
 		public const string CONFIGURATION_PATH = "Assets/Plugins/Playscape/Resources/" + CONFIGURATION_ASSET_NAME + ".asset";
 		public static int MAX_NUMBER_OF_EXPERIMENTS = 20;
@@ -167,7 +167,7 @@ namespace Playscape.Internal {
 		 **/
 		public GameConfigurationResponse FetchGameConfigurationForApiKey(string apikey) {
 			if (!string.IsNullOrEmpty (apikey)) {
-				string url = string.Format ("{0}/config", CommonConsts.GAME_CONFIGURATION_API_URL);
+				string url = string.Format ("{0}/config", GAME_CONFIGURATION_API_URL);
 				
 				// Star synchronous request for getting game configuration
 				GameConfigurationResponse gameConfiguration = null;

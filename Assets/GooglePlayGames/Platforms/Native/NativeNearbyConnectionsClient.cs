@@ -78,7 +78,7 @@ namespace GooglePlayGames.Native
 
             if (recipientEndpointIds.Count == 0)
             {
-                Logger.w("Attempted to send a reliable message with no recipients");
+                GooglePlayGames.OurUtils.Logger.w("Attempted to send a reliable message with no recipients");
                 return;
             }
 
@@ -191,9 +191,9 @@ namespace GooglePlayGames.Native
             Misc.CheckNotNull(payload, "payload");
             Misc.CheckNotNull(listener, "listener");
 
-            Logger.d("Calling AcceptConncectionRequest");
+            GooglePlayGames.OurUtils.Logger.d("Calling AcceptConncectionRequest");
             mManager.AcceptConnectionRequest(remoteEndpointId, payload, ToMessageListener(listener));
-            Logger.d("Called!");
+            GooglePlayGames.OurUtils.Logger.d("Called!");
         }
 
         public void StartDiscovery(string serviceId, TimeSpan? advertisingTimeout,
