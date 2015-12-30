@@ -34,6 +34,8 @@ namespace Playscape.Editor
         /// The location of the patch file (aspectj hooks and logic)
         /// </summary>
         private const string PATCH_FILE = "Assets/Plugins/Playscape/Editor/ThirdParty/playscape_lifecycle.jar";
+        private const string PATCH_FILE_FB_V3 = "Assets/Plugins/Playscape/Editor/ThirdParty/playscape_facebook_v3.jar";
+        private const string PATCH_FILE_FB_V4 = "Assets/Plugins/Playscape/Editor/ThirdParty/playscape_facebook_v4.jar";
 
         /// <summary>
         /// A delegate used to report the build progress
@@ -192,7 +194,9 @@ namespace Playscape.Editor
 				OnProgress("Unifying libraries", 35);
 				mLogger.V("BuildProcess - Build - unify libs " + sw.ElapsedMilliseconds);
 				apkCreator.unifyLibs(classesJarFile, PATCH_FILE, unifiedLibJarFile);
-				
+                apkCreator.unifyLibs(classesJarFile, PATCH_FILE_FB_V3, unifiedLibJarFile);
+                apkCreator.unifyLibs(classesJarFile, PATCH_FILE_FB_V4, unifiedLibJarFile);
+
 				OnProgress("Applying analytics", 40);
 				mLogger.V("BuildProcess - Build - Apply Patch " + sw.ElapsedMilliseconds);
 				apkCreator.applyPatch(unifiedLibJarFile, unifiedLibJarFile, patchedClassesJarFile);

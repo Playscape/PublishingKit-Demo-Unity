@@ -18,6 +18,7 @@ public class MenuController : MonoBehaviour {
 	const string OPEN_REPORT_EVENT = "Open Report Scene";
 	const string SHOW_CATALOG = "Show Catalog";
 	const string GET_A_TESTING_VALUES = "Get AB Testing Values";
+	const string OPEN_FACEBOOK = "Open Facebook tests";
 	const string QUIT = "QUIT";
 
 
@@ -118,7 +119,12 @@ public class MenuController : MonoBehaviour {
             Playscape.Catalog.Catalog.Instance.showCatalog();
         }
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 10 + marginTop * 2.6f, buttonWidth, buttonHeight), QUIT)) {
+		if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth / 2, buttonHeight * 10 + marginTop * 2.6f, buttonWidth, buttonHeight), OPEN_FACEBOOK))
+		{
+			Application.LoadLevel("facebook_tests");
+		}
+
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 11 + marginTop * 2.8f, buttonWidth, buttonHeight), QUIT)) {
 			Application.Quit ();
 		}
 	}
