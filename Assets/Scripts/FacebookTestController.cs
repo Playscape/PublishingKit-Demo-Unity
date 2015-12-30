@@ -9,6 +9,7 @@ public class FacebookTestController : MonoBehaviour {
 	const string LOGOUT = "LOGOUT";
 	const string SHARE = "SHARE";
 	const string APP_REQUEST = "APP REQUEST";
+	const string GET_APP_REQUEST = "GET APP REQUEST";
 
 	// Use this for initialization
 	void Start () {
@@ -49,8 +50,13 @@ public class FacebookTestController : MonoBehaviour {
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 2 + marginTop, buttonWidth, buttonHeight), SHARE)) {
 			Share();
 		}
+
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 3 + marginTop, buttonWidth, buttonHeight), APP_REQUEST)) {
 			AppRequest();
+		}
+
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop, buttonWidth, buttonHeight), GET_APP_REQUEST)) {
+			GetAppRequest();
 		}
 	}
 
@@ -64,7 +70,15 @@ public class FacebookTestController : MonoBehaviour {
 	}
 
 	void AppRequest() {
-		FB.AppRequest ("I'd like to invite you in this awesome app!", new string[] {"449443455241537", "971381496268038"}, null, null, 50, "", "Just title for test invite", null);
+//		FB.AppRequest ("I'd like to invite you in this awesome app!", new string[] {"449443455241537", "971381496268038"}, null, null, 50, "", "Just title for test invite", null);
+		FB.AppRequest ("I'd like to invite you in this awesome app!", new string[] {}, null, null, 50, "", "Just title for test invite", null);
+	}
+
+	void GetAppRequest() {
+		SocialController socialController = GameObject.Find("menu").GetComponent<SocialController> ();
+		if (socialController != null) {
+			socialController.CheckForIncomingRequests ();
+		}
 	}
 
 	void LoginCallback(FBResult result)                                                        
