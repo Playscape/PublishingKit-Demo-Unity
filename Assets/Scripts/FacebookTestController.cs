@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Playscape.Internal;
+using Facebook;
 
 public class FacebookTestController : MonoBehaviour {
 
@@ -8,7 +9,8 @@ public class FacebookTestController : MonoBehaviour {
 	const string LOGIN = "LOGIN";
 	const string LOGOUT = "LOGOUT";
 	const string SHARE = "SHARE";
-	const string APP_REQUEST = "APP REQUEST";
+	const string APP_REQUEST = "SEND REQUEST";
+	const string SEND_GO_REQUEST = "SEND GRAPH OBJECT REQUEST";
 	const string GET_APP_REQUEST = "GET APP REQUEST";
 
 	// Use this for initialization
@@ -55,7 +57,11 @@ public class FacebookTestController : MonoBehaviour {
 			AppRequest();
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop, buttonWidth, buttonHeight), GET_APP_REQUEST)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop, buttonWidth, buttonHeight), SEND_GO_REQUEST)) {
+			SendGraphObject();
+		}
+
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop, buttonWidth, buttonHeight), GET_APP_REQUEST)) {
 			GetAppRequest();
 		}
 	}
@@ -80,6 +86,21 @@ public class FacebookTestController : MonoBehaviour {
 			socialController.CheckForIncomingRequests ();
 		}
 	}
+
+	void SendGraphObject() {
+		FB.AppRequest ("Here, take this life!", // A message for the user
+			OGActionType.Send, // Can be .Send or .AskFor depending on what you want to do with the object.
+			"" + 1195628997131345, // Here we put the object id we got as a result before.		             
+			new string[]{}, // The id of the sender.
+			"", // Here you can put in any data you want
+			"Send a life to your friend", // A title
+			AppRequestCallback);
+	}
+
+	void AppRequestCallback(FBResult result)                                                        
+	{                                                                                          
+		L.I("AppRequestCallback: " + result.ToString());                                                                                                                                        
+	}  
 
 	void LoginCallback(FBResult result)                                                        
 	{                                                                                          
