@@ -2,6 +2,7 @@
 using System.Collections;
 using Playscape.Internal;
 using Facebook;
+using System.Collections.Generic;
 
 public class FacebookTestController : MonoBehaviour {
 
@@ -13,9 +14,15 @@ public class FacebookTestController : MonoBehaviour {
 	const string SEND_GO_REQUEST = "SEND GRAPH OBJECT REQUEST";
 	const string GET_APP_REQUEST = "GET APP REQUEST";
 
+	private bool fbInitialized = false;
+
 	// Use this for initialization
 	void Start () {
-	
+		FB.Init (OnInitComplete, null, null); 
+	}
+
+	void OnInitComplete() {
+		fbInitialized = true;
 	}
 	
 	// Update is called once per frame
@@ -67,6 +74,10 @@ public class FacebookTestController : MonoBehaviour {
 	}
 
 	void Share () {
+		if (!fbInitialized) {
+			L.I ("Facebook didn't init");
+			return;
+		}
 		FB.Feed(                                                                                                                 
 		        linkCaption: "I just smashed 1000 friends! Can you beat it?",               
 		        picture: "http://www.friendsmash.com/images/logo_large.jpg",                                                     
@@ -76,11 +87,21 @@ public class FacebookTestController : MonoBehaviour {
 	}
 
 	void AppRequest() {
+		if (!fbInitialized) {
+			L.I ("Facebook didn't init");
+			return;
+		}
 //		FB.AppRequest ("I'd like to invite you in this awesome app!", new string[] {"449443455241537", "971381496268038"}, null, null, 50, "", "Just title for test invite", null);
-		FB.AppRequest ("I'd like to invite you in this awesome app!", new string[] {}, null, null, 50, "", "Just title for test invite", null);
+		FB.AppRequest ("I'd like to invite you in this awesome app!", 
+			new string[] {}, 
+			null, null, 50, "", "Just title for test invite", null);
 	}
 
 	void GetAppRequest() {
+		if (!fbInitialized) {
+			L.I ("Facebook didn't init");
+			return;
+		}
 		SocialController socialController = GameObject.Find("menu").GetComponent<SocialController> ();
 		if (socialController != null) {
 			socialController.CheckForIncomingRequests ();
@@ -88,13 +109,18 @@ public class FacebookTestController : MonoBehaviour {
 	}
 
 	void SendGraphObject() {
+		if (!fbInitialized) {
+			L.I ("Facebook didn't init");
+			return;
+		}
+		
 		FB.AppRequest ("Here, take this life!", // A message for the user
-			OGActionType.Send, // Can be .Send or .AskFor depending on what you want to do with the object.
-			"" + 1195628997131345, // Here we put the object id we got as a result before.		             
-			new string[]{}, // The id of the sender.
-			"", // Here you can put in any data you want
-			"Send a life to your friend", // A title
-			AppRequestCallback);
+				OGActionType.Send, // Can be .Send or .AskFor depending on what you want to do with the object.
+				"804653492990357", // Here we put the object id we got as a result before.		             
+				new string[]{ }, // The id of the sender.
+				"", // Here you can put in any data you want
+				"Send a life to your friend", // A title
+				AppRequestCallback);
 	}
 
 	void AppRequestCallback(FBResult result)                                                        
