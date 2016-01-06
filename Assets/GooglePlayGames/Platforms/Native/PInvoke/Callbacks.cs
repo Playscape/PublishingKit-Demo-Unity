@@ -28,7 +28,7 @@ namespace GooglePlayGames.Native.PInvoke
         
         internal static readonly Action<CommonErrorStatus.UIStatus> NoopUICallback = status =>
         {
-            Logger.d("Received UI callback: " + status);
+            GooglePlayGames.OurUtils.Logger.d("Received UI callback: " + status);
         };
 
         internal delegate void ShowUICallbackInternal(CommonErrorStatus.UIStatus status,IntPtr data);
@@ -105,7 +105,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (System.InvalidCastException e)
             {
-                Logger.e("GC Handle pointed to unexpected type: " + gcHandle.Target.ToString() +
+                GooglePlayGames.OurUtils.Logger.e("GC Handle pointed to unexpected type: " + gcHandle.Target.ToString() +
                     ". Expected " + typeof(T));
                 throw e;
             }
@@ -127,7 +127,7 @@ namespace GooglePlayGames.Native.PInvoke
         [AOT.MonoPInvokeCallback(typeof(ShowUICallbackInternal))]
         internal static void InternalShowUICallback(CommonErrorStatus.UIStatus status, IntPtr data)
         {
-            Logger.d("Showing UI Internal callback: " + status);
+            GooglePlayGames.OurUtils.Logger.d("Showing UI Internal callback: " + status);
             var callback = IntPtrToTempCallback<Action<CommonErrorStatus.UIStatus>>(data);
             
             try
@@ -136,7 +136,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered executing InternalShowAllUICallback. " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered executing InternalShowAllUICallback. " +
                     "Smothering to avoid passing exception into Native: " + e);
             }
         }
@@ -151,7 +151,7 @@ namespace GooglePlayGames.Native.PInvoke
         internal static void PerformInternalCallback(string callbackName, Type callbackType,
                                                      IntPtr response, IntPtr userData)
         {
-            Logger.d("Entering internal callback for " + callbackName);
+            GooglePlayGames.OurUtils.Logger.d("Entering internal callback for " + callbackName);
             
             Action<IntPtr> callback = callbackType == Type.Permanent
                 ? IntPtrToPermanentCallback<Action<IntPtr>>(userData)
@@ -168,7 +168,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered executing " + callbackName + ". " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered executing " + callbackName + ". " +
                     "Smothering to avoid passing exception into Native: " + e);
             }
         }
@@ -176,7 +176,7 @@ namespace GooglePlayGames.Native.PInvoke
         internal static void PerformInternalCallback<T>(string callbackName, Type callbackType,
                                                         T param1, IntPtr param2, IntPtr userData)
         {
-            Logger.d("Entering internal callback for " + callbackName);
+            GooglePlayGames.OurUtils.Logger.d("Entering internal callback for " + callbackName);
             Action<T, IntPtr> callback = null;
             try
             {
@@ -186,12 +186,12 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered converting " + callbackName + ". " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered converting " + callbackName + ". " +
                     "Smothering to avoid passing exception into Native: " + e);
                 return;
             }
 
-            Logger.d("Internal Callback converted to action");
+            GooglePlayGames.OurUtils.Logger.d("Internal Callback converted to action");
             if (callback == null)
             {
                 return;
@@ -203,7 +203,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered executing " + callbackName + ". " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered executing " + callbackName + ". " +
                     "Smothering to avoid passing exception into Native: " + e);
             }
         }

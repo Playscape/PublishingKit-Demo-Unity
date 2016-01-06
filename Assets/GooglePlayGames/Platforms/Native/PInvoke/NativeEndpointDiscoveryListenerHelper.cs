@@ -84,7 +84,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered executing " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered executing " +
                     "NativeEndpointDiscoveryListenerHelper#InternalOnEndpointLostCallback. " +
                     "Smothering to avoid passing exception into Native: " + e);
             }

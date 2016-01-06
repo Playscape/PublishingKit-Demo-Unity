@@ -35,9 +35,7 @@ namespace Playscape.Editor {
 
 		public override void Run()
 		{
-			var plistFragment = 
-				pathToProjectSources + "/Libraries/playscape_config.plist_fragment";
-
+			var plistFragment = "Assets/Plugins/iOS/playscape_config.plist_fragment";
 			var infoAppender = new PlistAppender(pathToProjectSources + "/Info.plist");
 
 			infoAppender.AddString(
@@ -56,24 +54,18 @@ namespace Playscape.Editor {
 			infoAppender.AppendFragment(plistFragment);
 			infoAppender.Save();
 
-			File.Delete(plistFragment);
-
-//			AddRequiredFrameworks(pathToProjectSources);
-
 			if (PlayerSettings.iOS.sdkVersion == iOSSdkVersion.SimulatorSDK) {
 				FixRegisterMonoModules(pathToProjectSources);
 			}
 
 			UnityEditor.XCodeEditor.XCProject project = new UnityEditor.XCodeEditor.XCProject(pathToProjectSources);
-			
+
 			// Find and run through all projmods files to patch the project
 			var files = System.IO.Directory.GetFiles(Application.dataPath, "*.projmods", System.IO.SearchOption.AllDirectories);
 			foreach (var file in files)
 			{
 				project.ApplyMod(file);
 			}
-
-			RunPushNotificationBashScript();
 
 			project.Save();
 		}
