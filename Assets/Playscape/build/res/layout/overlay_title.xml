@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/overlay_title"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/overlay_title_height" >
+
+    <RelativeLayout
+        android:id="@+id/overlay_inner_title"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/overlay_inner_title_height"
+        android:layout_alignParentBottom="true"
+        android:background="@color/overlay_transparency_level" >
+
+        <ImageView
+            android:id="@+id/separator_portrait"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/overlay_separator_height"
+            android:layout_alignParentTop="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/separator_portrait"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/playscape_button"
+            android:layout_width="@dimen/overlay_playscape_button_width"
+            android:layout_height="@dimen/overlay_playscape_button_height"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/overlay_playscape_button_margin_left"
+            android:background="@drawable/logo_idle"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/mission_notification_icon"
+            android:layout_width="@dimen/overlay_level_notif_icon_size"
+            android:layout_height="@dimen/overlay_level_notif_icon_size"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="@dimen/overlay_mission_notif_icon_margin_right"
+            android:layout_toLeftOf="@+id/level_notification_icon"
+            android:background="@drawable/mission_notification_icon"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/level_notification_icon"
+            android:layout_width="@dimen/overlay_level_notif_icon_size"
+            android:layout_height="@dimen/overlay_level_notif_icon_size"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/overlay_level_notif_icon_margin_right"
+            android:background="@drawable/level_notification_icon"
+            android:scaleType="fitXY"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/overlay_notification_counter"
+            android:layout_width="@dimen/overlay_level_notif_counter_width"
+            android:layout_height="@dimen/overlay_level_notif_counter_height"
+            android:layout_alignLeft="@+id/mission_notification_icon"
+            android:layout_alignTop="@+id/playscape_button"
+            android:background="@drawable/notification_counter" />
+
+        <ImageView
+            android:id="@+id/overlay_level_counter"
+            android:layout_width="@dimen/overlay_level_notif_counter_width"
+            android:layout_height="@dimen/overlay_level_notif_counter_height"
+            android:layout_alignLeft="@+id/level_notification_icon"
+            android:layout_alignTop="@+id/playscape_button"
+            android:background="@drawable/notification_counter" />
+
+        <TextView
+            android:id="@+id/overlay_level_counterText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/overlay_level_counter"
+            android:layout_alignTop="@+id/overlay_level_counter"
+            android:layout_alignRight="@+id/overlay_level_counter"
+            android:layout_alignBottom="@+id/overlay_level_counter"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:text="!"
+            android:textSize="@dimen/overlay_counter_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/overlay_notification_counterText"
+            android:layout_width="@dimen/overlay_level_notif_counter_width"
+            android:layout_height="@dimen/overlay_level_notif_counter_height"
+            android:layout_alignLeft="@+id/overlay_notification_counter"
+            android:layout_alignTop="@+id/overlay_notification_counter"
+            android:gravity="center"
+            android:text="15"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/overlay_counter_text_size"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/separator_portrait"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/overlay_separator_height"
+            android:layout_alignParentBottom="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/separator_portrait"
+            android:visibility="visible" />
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/close_btn"
+        android:layout_width="@dimen/overlay_x_button_size"
+        android:layout_height="@dimen/overlay_x_button_size"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/overlay_inner_title"
+        android:layout_marginRight="@dimen/overlay_x_button_margin_right"
+        android:layout_marginTop="@dimen/overlay_x_button_margin_top"
+        android:background="@drawable/overlay_close_buttons" />
+
+</RelativeLayout>

@@ -180,7 +180,7 @@ public class SocialController : MonoBehaviour {
 		}
 	}
 
-	void CheckForIncomingRequests ()
+	public void CheckForIncomingRequests ()
 	{
 		FB.GetDeepLink(delegate (FBResult data) {
 			if(!string.IsNullOrEmpty(data.Text)) {

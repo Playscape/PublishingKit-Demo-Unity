@@ -136,7 +136,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
                 }
             }
 
-            Logger.w("Participant not found in turn-based match: " + participantId);
+            GooglePlayGames.OurUtils.Logger.w("Participant not found in turn-based match: " + participantId);
             return null;
         }
 

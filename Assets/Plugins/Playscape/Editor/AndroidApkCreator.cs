@@ -22,12 +22,10 @@ namespace Playscape.Editor
 		private const string ZIPALIGN_TOOL_PATH = "/Assets/Plugins/Playscape/Editor/ThirdParty/zipalign";
 		private const string DEX_2_JAR_TOOL_HOME_PATH = "Assets/Plugins/Playscape/Editor/ThirdParty/dex2jar";
 		private const string ASPECT_HOME_PATH = "Assets/Plugins/Playscape/Editor/ThirdParty/aspectsj/";
-		private const string DEFAULT_ANDROID_PLATFORM = "android-19";
+		private const string DEFAULT_ANDROID_PLATFORM = "19";			
 		
-		private static string ANDROID_HOME = PlatformUtils.isWindows() ? System.Environment.GetEnvironmentVariable("ANDROID_HOME") : AndroidSDKFolder.Path;
-		
-		private static string sJavaCommand = (PlatformUtils.isWindows()) ? string.Format("\"{0}\"", System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/java.exe") : "/usr/bin/java";
-		private static string sDelimeter = (PlatformUtils.isWindows()) ? ";" : ":";
+		private static string sJavaCommand = JDKFolder.JavaPath;
+		private static string sDelimeter = PlatformUtils.PathDelimeter;
 		private static string sClasspath = Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/asm-all-3.3.1.jar") + sDelimeter
 			+ Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/commons-lite-1.15.jar") + sDelimeter
 				+ Path.Combine(DEX_2_JAR_TOOL_HOME_PATH, "lib/dex-ir-1.12.jar") + sDelimeter
@@ -364,27 +362,26 @@ namespace Playscape.Editor
 			string GOOGLE_PLAY_SERVICES_JAR;
 			
 			//Getting android platform jar for minSDK setted in PlayerSettings
-			string platform = string.Format("{0}-{1}", "android", Regex.Match(buildParams.sdkVersion, @"\d+").Value);
-			ANDROID_JAR = Path.Combine(ANDROID_HOME, string.Format("platforms/{0}/android.jar", platform));
+			string platform = Regex.Match(buildParams.sdkVersion, @"\d+").Value;
+			ANDROID_JAR = AndroidSDKFolder.GetAndroidAPIJarPath (UInt16.Parse(platform));
 			
 			//if android platform jar getted from PlayerSettings doesn't exist will use default
 			if (!File.Exists(ANDROID_JAR))
 			{
-				ANDROID_JAR = Path.Combine(ANDROID_HOME, string.Format("platforms/{0}/android.jar", DEFAULT_ANDROID_PLATFORM));
+				ANDROID_JAR = AndroidSDKFolder.GetAndroidAPIJarPath (UInt16.Parse(DEFAULT_ANDROID_PLATFORM)); 
 				
 				if (!File.Exists(ANDROID_JAR)) {
 					throw new Exception(string.Format("Looks like you don't have required version of android API. Required version is {0} version. Please, download it.", DEFAULT_ANDROID_PLATFORM));
 				}
 			}
 			
-			GOOGLE_PLAY_SERVICES_JAR = Path.Combine(ANDROID_HOME,
-			                                        "extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar");
+			GOOGLE_PLAY_SERVICES_JAR = AndroidSDKFolder.GooglePlayServicesJarPath;
 																							
 			if (!File.Exists (GOOGLE_PLAY_SERVICES_JAR)) {
 				throw new Exception("Looks like you don't have \"Google Play Services\" library in your Android SDK folder. Please download it.");
 			}
 			
-			string delimeter = (PlatformUtils.isWindows()) ? ";" : ":";
+			string delimeter = sDelimeter;
 			string classpath = Path.Combine(ASPECT_HOME_PATH, "aspectjtools.jar") + delimeter
 				+ Path.Combine(ASPECT_HOME_PATH, "aspectjrt.jar") + delimeter
 					+ ANDROID_JAR + delimeter
@@ -437,18 +434,10 @@ namespace Playscape.Editor
 				zipFile.Save();
 			}
 			
-			
-			string command;
-			if (PlatformUtils.isWindows())
-			{
-				command = System.Environment.GetEnvironmentVariable("JAVA_HOME") + @"/bin/jarSigner.exe";
-			}
-			else
-			{
-				command = "/usr/bin/jarsigner";
-			}
-			
+
+			string command = JDKFolder.JarSignerPath;
 			string arguments = "-sigalg SHA1withRSA -digestalg SHA1 -keystore \"" + keysotre_path + "\" -storepass " + storepass + " -keypass " + keypass + " \"" + unsignedAPKPath + "\"  \"" + alias + "\"";
+
 			logger.V("command: {0}", command);
 			logger.V("arguments: {0}", arguments);
 			
@@ -551,7 +540,8 @@ namespace Playscape.Editor
             configDoc.SelectSingleNode("resources/string[@name='playscape_ads_api_key']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey);
             configDoc.SelectSingleNode("resources/string[@name='playscape_ads_config_enable_ads_system']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.MyAds.MyAdsConfig.EnableAdsSystem).ToLower();
             configDoc.SelectSingleNode("resources/string[@name='playscape_reporter_id']").InnerText = Convert.ToString(ConfigurationInEditor.Instance.ReporterId);
-			configDoc.SelectSingleNode("resources/string[@name='playscape_is_published_by_playscape']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyGameConfiguration.PublishedByPlayscape);
+						configDoc.SelectSingleNode("resources/string[@name='playscape_is_published_by_playscape']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.MyGameConfiguration.PublishedByPlayscape);
+						configDoc.SelectSingleNode("resources/string[@name='playscape_config_exchange_enabled']").InnerText =  Convert.ToString(ConfigurationInEditor.Instance.IncludePlayscapeExchange).ToLower();
 		}
 		
 		private static void injectABTestingConfig(XmlDocument configDoc)
@@ -617,6 +607,10 @@ namespace Playscape.Editor
 
 		private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
 		{
+			if (Directory.Exists (destDirName)) {
+				DeleteDirectory(destDirName);
+			}
+
 			// Get the subdirectories for the specified directory.
 			DirectoryInfo dir = new DirectoryInfo(sourceDirName);
 			DirectoryInfo[] dirs = dir.GetDirectories();
@@ -650,6 +644,66 @@ namespace Playscape.Editor
 					string temppath = Path.Combine(destDirName, subdir.Name);
 					DirectoryCopy(subdir.FullName, temppath, copySubDirs);
 				}
+			}
+		}
+
+		public static void DeleteDirectory(string target_dir)
+		{
+			string[] files = Directory.GetFiles(target_dir);
+			string[] dirs = Directory.GetDirectories(target_dir);
+			
+			foreach (string file in files)
+			{
+				File.SetAttributes(file, FileAttributes.Normal);
+				File.Delete(file);
+			}
+			
+			foreach (string dir in dirs)
+			{
+				DeleteDirectory(dir);
+			}
+			
+			Directory.Delete(target_dir, false);
+		}
+
+		public static void FileCopy(string sourceFilename, string destFilename, bool overwrite) {
+			if (overwrite) {
+				if (File.Exists (destFilename)) {
+					File.Delete(destFilename);
+				}
+			} 
+
+			string dirs = Path.GetDirectoryName (destFilename);
+			if (!Directory.Exists (dirs)) {
+				Directory.CreateDirectory(dirs);
+			}
+
+			File.Copy (sourceFilename, destFilename);
+		}
+
+		public static void IncludePlayscapeExchange(bool include) {
+			string playscapeBackupPath = "/Assets/Playscape/";
+
+			if (include) {
+				DeleteDirectory("Assets/Plugins/Android/PlayscapePublishingKit/res");
+				DirectoryCopy("Assets/Playscape/build/res", "Assets/Plugins/Android/PlayscapePublishingKit/res", true);
+				DirectoryCopy("Assets/Playscape/build/assets/fonts", "Assets/StreamingAssets/fonts", true);
+				DirectoryCopy("Assets/Playscape/build/assets/level_up_icons", "Assets/StreamingAssets/level_up_icons", true);
+				DirectoryCopy("Assets/Playscape/build/assets/playscape_bootstrap", "Assets/StreamingAssets/playscape_bootstrap", true);
+				FileCopy("Assets/Playscape/build/assets/predefined_badges.json", "Assets/StreamingAssets/predefined_badges.json", true);
+				FileCopy("Assets/Playscape/build/assets/ranks.json", "Assets/StreamingAssets/ranks.json", true);
+				FileCopy("Assets/Playscape/build/assets/WelcomeMessage", "Assets/StreamingAssets/WelcomeMessage", true);
+				FileCopy("Assets/Playscape/build/libs/PlayscapeCPSDK", "Assets/Plugins/Android/PlayscapePublishingKit/libs/PlayscapeCPSDK.jar", true);
+			} else {
+				DeleteDirectory("Assets/Plugins/Android/PlayscapePublishingKit/res");
+				DeleteDirectory("Assets/StreamingAssets/fonts");
+				DeleteDirectory("Assets/StreamingAssets/level_up_icons");
+				DeleteDirectory("Assets/StreamingAssets/playscape_bootstrap");
+				File.Delete("Assets/StreamingAssets/predefined_badges.json");
+				File.Delete("Assets/StreamingAssets/ranks.json");
+				File.Delete("Assets/StreamingAssets/WelcomeMessage");
+				File.Delete("Assets/Plugins/Android/PlayscapePublishingKit/libs/PlayscapeCPSDK.jar");
+				FileCopy("Assets/Playscape/build/res/values/config_strings.xml", "Assets/Plugins/Android/PlayscapePublishingKit/res/values/config_strings.xml", true);
 			}
 		}
 	}

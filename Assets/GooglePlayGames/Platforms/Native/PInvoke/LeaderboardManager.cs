@@ -39,7 +39,7 @@ namespace GooglePlayGames.Native
         internal void SubmitScore(string leaderboardId, long score)
         {
             Misc.CheckNotNull(leaderboardId);
-            Logger.d("Native Submitting score: " + score + " for lb " + leaderboardId);
+            GooglePlayGames.OurUtils.Logger.d("Native Submitting score: " + score + " for lb " + leaderboardId);
             // Note, we pass empty-string as the metadata - this is ignored by the native SDK.
             C.LeaderboardManager_SubmitScore(mServices.AsHandle(), leaderboardId, (ulong)score, "");
         }

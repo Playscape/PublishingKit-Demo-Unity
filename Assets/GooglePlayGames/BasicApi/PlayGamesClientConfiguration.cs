@@ -102,7 +102,7 @@ namespace GooglePlayGames.BasicApi
             /// <returns>The builder instance</returns>
             public Builder EnableDeprecatedCloudSave()
             {
-                Logger.w("Cloud save is deprecated and is not available for new games. " +
+                GooglePlayGames.OurUtils.Logger.w("Cloud save is deprecated and is not available for new games. " +
                     "Please migrate to Saved Games as soon as possible.");
                 mEnableDeprecatedCloudSave = true;
                 return this;

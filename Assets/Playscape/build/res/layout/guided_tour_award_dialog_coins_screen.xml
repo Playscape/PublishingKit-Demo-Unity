@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+
+ <ImageView
+     android:layout_width="fill_parent"
+     android:layout_height="fill_parent"
+     android:layout_gravity="bottom"
+     android:layout_marginBottom="@dimen/personal_bar_height"     
+     android:background="@color/semi_transparent_black" />
+     
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <ImageView
+            android:id="@+id/gt_arrow_pointer_coins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="@dimen/guided_tour_award_dialog_arrow_margin_left"
+            android:layout_marginBottom="@dimen/guided_tour_award_dialog_arrow_margin_bottom"
+            android:src="@drawable/gt_arrow_down" />
+
+        <TextView
+            android:gravity="center"
+            android:id="@+id/gt_coins_text"
+            android:layout_width="@dimen/gt_coins_web_view_container_width"
+            android:layout_height="@dimen/gt_coins_web_view_container_height"
+            android:layout_above="@id/gt_arrow_pointer_coins"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/gt_welcome_dialog_box"
+            android:textSize="@dimen/gt_coins_text_size"
+            >
+
+        </TextView>
+
+    </RelativeLayout>
+
+</FrameLayout>

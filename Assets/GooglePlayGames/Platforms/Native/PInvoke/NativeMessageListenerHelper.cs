@@ -67,7 +67,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered executing " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered executing " +
                     "NativeMessageListenerHelper#InternalOnMessageReceivedCallback. " +
                     "Smothering to avoid passing exception into Native: " + e);
             }
@@ -100,7 +100,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
             catch (Exception e)
             {
-                Logger.e("Error encountered executing " +
+                GooglePlayGames.OurUtils.Logger.e("Error encountered executing " +
                     "NativeMessageListenerHelper#InternalOnDisconnectedCallback. " +
                     "Smothering to avoid passing exception into Native: " + e);
             }

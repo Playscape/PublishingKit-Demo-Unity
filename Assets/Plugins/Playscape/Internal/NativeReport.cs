@@ -100,6 +100,7 @@ public class NativeReport : MonoBehaviour {
 		RegisterGenerateGuid(generateGuid);
 		RegisterGetCurrentTimeMillis(getCurrentTimeMillis);
 		RegisterReport(report);
+		RegisterReportAttr(reportAttr);
 		RegisterSetNetSessionId(setNetSessionId);
 		RegisterSetLevelSessionId(setLevelSessionId);
 		RegisterSetGameAuxVars(setGameAuxVars);
@@ -176,6 +177,9 @@ public class NativeReport : MonoBehaviour {
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_ReportEvent(string customEvent);
+	
+	[DllImport(SHARED_LIBRARY)]
+	public static extern void playscape_report_ReportAttrEvent(string customEvent, int attrCount, string[] eventAttrsKeys, string[] eventAttrsValues);
 	
 	[DllImport(SHARED_LIBRARY)]
 	public static extern void playscape_report_setCustomVariable(string key, string value);
@@ -470,6 +474,10 @@ public class NativeReport : MonoBehaviour {
 		RemoteLogger.Log(RemoteLogger.LogLevel.Info, "RemoteLogger-Unity", text);
 	}
 	
+	private static void reportAttr(string text, string attrs) {
+		RemoteLogger.Log (RemoteLogger.LogLevel.Info, "RemoteLogger-Unity", text, attrs);
+	}
+	
 	private static void setNetSessionId(string text) {
 		RemoteLogger.SetNetSessionId(text);
 	}
@@ -489,6 +497,7 @@ public class NativeReport : MonoBehaviour {
 	private delegate string ReturnStringCallback();
 	private delegate long ReturnLongCallback();
 	private delegate void StringCallback(string value);
+	private delegate void StringStringCallback(string log, string attrs);
 	private delegate void IntCallback(int value);
 
 	[DllImport(SHARED_LIBRARY, EntryPoint="playscape_report_register_getConnectivityReport")]
@@ -502,6 +511,9 @@ public class NativeReport : MonoBehaviour {
 	
 	[DllImport(SHARED_LIBRARY, EntryPoint="playscape_report_register_report")]
 	private static extern void RegisterReport(StringCallback callback);
+	
+	[DllImport(SHARED_LIBRARY, EntryPoint="playscape_report_register_reportAttr")]
+	private static extern void RegisterReportAttr(StringStringCallback callback);
 	
 	[DllImport(SHARED_LIBRARY, EntryPoint="playscape_report_register_setGameSessionId")]
 	private static extern void RegisterSetGameSessionId(StringCallback callback);
