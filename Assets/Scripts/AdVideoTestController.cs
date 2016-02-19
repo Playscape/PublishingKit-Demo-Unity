@@ -31,7 +31,7 @@ public class AdVideoTestController : MonoBehaviour {
 				L.I ("Unity. OnDisplayVideoEnded(state: {0}, kind: {1})", state, kind);
 			};
 
-			Videos.Instance.Display(Videos.Kind.Incentivised, "main-menu");
+			Videos.Instance.Display(Videos.Kind.NonIncentivised, "main-menu");
 		}
 	}
 }
