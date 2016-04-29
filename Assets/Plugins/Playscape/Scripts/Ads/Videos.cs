@@ -53,6 +53,10 @@ namespace Playscape.Ads {
 				mPlayscapeAds = (PlayscapeAdsBase) go.GetComponent(typeof(PlayscapeAdsAndroid));
 				
 				mPlayscapeAds.OnVideoDisplayEndedInternal += (payload) => dispatchVideoDisplayEnded(payload);
+				#elif UNITY_IPHONE && !UNITY_EDITOR
+				mPlayscapeAds = (PlayscapeAdsBase) go.GetComponent(typeof(PlayscapeAdsIOS));
+				
+				mPlayscapeAds.OnVideoDisplayEndedInternal += (payload) => dispatchVideoDisplayEnded(payload);
 				#else
 				mPlayscapeAds = (PlayscapeAdsBase) go.GetComponent(typeof(PlayscapeAdsMock));
 				#endif
@@ -116,7 +120,7 @@ namespace Playscape.Ads {
 						L.I("Missed event with payload: {0}", payload);
 					}
 				} else {
-					L.E ("Payload parse failure, parsed state from '{0}' to '{1}', kind from '{2}' to '{3}'", 
+					L.E ("Payload parse failure, parsed state from '{0}' to '{1}', kind from '{2}' to '{3}'",
 					     payloadParts[0], state, payloadParts[1], kind);
 				}
 			} else {

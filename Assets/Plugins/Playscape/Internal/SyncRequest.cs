@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 using System.IO;
 using Pathfinding.Serialization.JsonFx;
 using System.Threading;
-using System.Net.NetworkInformation;
 
 namespace Playscape.Internal
 {

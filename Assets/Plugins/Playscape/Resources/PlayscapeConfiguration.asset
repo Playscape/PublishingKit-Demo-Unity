@@ -14,16 +14,16 @@ MonoBehaviour:
   MyABTesting:
     EnableABTestingSystem: 1
     NumberOfCustomExperiments: 2
-    AmazonPublicKey: 3936393532326462356666343438396162383235653634313535306663313539
-    AmazonPrivateKey: 6241576a4a6e32764268766e746b4b57726151536355777948364344396c64724859716c5770417443476b3d
+    AmazonPublicKey: 969522db5ff4489ab825e641550fc159
+    AmazonPrivateKey: bAWjJn2vBhvntkKWraQScUwyH6CD9ldrHYqlWpAtCGk=
     MyCustomExperimentConfig:
-    - ExperimentName: 4578706572696d656e742031
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+    - ExperimentName: Experiment 1
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
-      - 526f6c6c20412042616c6c2031
-      - 526f6c6c20412042616c6c2032
-      - 4578703156617233
-      - 4578703156617234
+      - Roll A Ball 1
+      - Roll A Ball 2
+      - Exp1Var3
+      - Exp1Var4
       - 
       - 
       - 
@@ -71,11 +71,11 @@ MonoBehaviour:
       - 
       - 
       NumberOfVarsInExperiment: 1
-    - ExperimentName: 4578706572696d656e742032
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+    - ExperimentName: Experiment 2
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
-      - 526f6c6c20412042616c6c2031
-      - 526f6c6c20412042616c6c2032
+      - Roll A Ball 1
+      - Roll A Ball 2
       - 
       - 
       - 
@@ -125,15 +125,15 @@ MonoBehaviour:
       - 
       - 
       NumberOfVarsInExperiment: 2
-    - ExperimentName: 45787033
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+    - ExperimentName: Exp3
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
-      - 4578703356617231
-      - 4578703356617232
-      - 4578703356617233
-      - 4578703356617234
-      - 4578703356617235
-      - 4578703356617236
+      - Exp3Var1
+      - Exp3Var2
+      - Exp3Var3
+      - Exp3Var4
+      - Exp3Var5
+      - Exp3Var6
       - 
       - 
       - 
@@ -180,7 +180,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 6
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -234,7 +234,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -288,7 +288,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -342,7 +342,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -396,7 +396,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -450,7 +450,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -504,7 +504,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -558,7 +558,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -612,7 +612,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -666,7 +666,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -720,7 +720,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -774,7 +774,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -828,7 +828,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -882,7 +882,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -936,7 +936,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -990,7 +990,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -1044,7 +1044,7 @@ MonoBehaviour:
       - 
       NumberOfVarsInExperiment: 1
     - ExperimentName: 
-      ExperimentType: 636f6d2e706c617973636170652e616274657374696e672e556e697479414254657374696e67437573746f6d53756273637269626572
+      ExperimentType: com.playscape.abtesting.UnityABTestingCustomSubscriber
       ExperimentVars:
       - 
       - 
@@ -1104,28 +1104,29 @@ MonoBehaviour:
   IncludePlayscapeExchange: 1
   _gameConfiguration:
     MyAdsConfig:
-      Url: 687474703a2f2f7365727665722e6164732e6d6f6d696e69732e636f6d2e73332e616d617a6f6e6177732e636f6d2f53657276696365732f436f6d707265737365644164536572766963652f6a736f6e2f526f6c6c4142616c6c4d756c7469706c617965725f5075626b69745f44656d6f5f416473436f6e6669672e6a736f6e
+      Url: http://server.ads.mominis.com.s3.amazonaws.com/Services/CompressedAdService/json/RollABallMultiplayer_Pubkit_Demo_AdsConfig.json
     MyAdMobIds:
-      InterstitialsAdUnitId: 63612d6170702d7075622d363835353633353732323637353636372f33363034393534383333
-      BannersAdUnitId: 63612d6170702d7075622d363835353633353732323637353636372f38383031313834303331
+      InterstitialsAdUnitId: ca-app-pub-6855635722675667/3604954833
+      BannersAdUnitId: ca-app-pub-6855635722675667/8801184031
       TestDeviceId: 
     MyChartboostIds:
-      AppId: 353336396532636563323665653430396531663765643666
-      AppSignature: 33386564326236323731626438326366643462306136373330353866663763633562666665373632
+      AppId: 5369e2cec26ee409e1f7ed6f
+      AppSignature: 38ed2b6271bd82cfd4b0a673058ff7cc5bffe762
     MyVungle:
-      AppId: 353336396532313338396337313365333038303030323131
+      AppId: 5369e21389c713e308000211
     MyMillennialMedia:
-      AppId: 313633373038
+      AppId: 163708
     MyStartAppIds:
-      DeveloperId: 313035383430303638
-      AppId: 323035343138313337
+      DeveloperId: 105840068
+      AppId: 205418137
     MyAdColonyIds:
-      AppId: 617070386462666236333966373536346234333939
-      VideoZoneId: 767a383065306561333266646636346236336132
-      IncentivisedVideoZoneId: 767a646336353264376135393533343562356162
+      AppId: app8dbfb639f7564b4399
+      VideoZoneId: vz80e0ea32fdf64b63a2
+      IncentivisedVideoZoneId: vzdc652d7a595345b5ab
     MyAnalyticsReport:
-      ReporterId: 526f6c6c4142616c6c4d756c7469706c61796572
+      ReporterId: RollABallMultiplayer
     PublishedByPlayscape: 0
-  ReporterId: 526f6c6c4142616c6c4d756c7469706c61796572
-  PushWooshIosId: 44363344372d3742453545
+  JavaHeapSize: 1536
+  ReporterId: RollABallMultiplayer
+  PushWooshIosId: D63D7-7BE5E
   MergeAndroidManifests: 1

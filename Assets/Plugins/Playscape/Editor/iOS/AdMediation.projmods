@@ -1,0 +1,28 @@
+{
+	"group":       "",
+	"libs":        [
+		"libz.dylib:weak"
+	],
+	"frameworks":  [
+		"AdSupport.framework",
+		"AudioToolbox.framework",
+		"AVFoundation.framework",
+		"CoreGraphics.framework",
+		"CoreMedia.framework",
+		"CoreTelephony.framework",
+		"EventKit.framework",
+		"EventKitUI.framework",
+		"MessageUI.framework",
+		"StoreKit.framework"
+		"SystemConfiguration.framework",
+		"QuartzCore.framework"
+	],
+	"headerpaths": [],
+	"files":       [
+		"../ThirdParty/iOS/GoogleMobileAds.framework",
+		"../ThirdParty/iOS/StartApp.bundle",
+		"../ThirdParty/iOS/StartApp.framework"
+	],
+	"folders":     [],
+	"excludes":    ["^.*.meta$", "^.*.mdown^", "^.*.pdf$"]
+}

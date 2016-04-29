@@ -15,6 +15,28 @@
     
 	<key>PlayscapeDebugMode</key>
 	<true/>
-    
-    <key>Pushwoosh_SHOW_ALERT</key>
-    <false/>
+
+	<key>PlayscapeAdsMaxDelayIntervalBetweenFailuresMs</key>
+	<integer>60000</integer>
+
+	<key>PlayscapeAdsDelayIntervalBetweenFailuresMs</key>
+	<integer>15000</integer>
+
+	<key>PlayscapeAdsRetryWaitSecs</key>
+	<integer>10</integer>
+
+	<key>PlayscapeAdsRefreshIntervalSecs</key>
+	<integer>15</integer>
+
+	<key>PlayscapeAdsMinIntervalBetweenSyncs</key>
+	<integer>900000</integer>
+
+	<key>NSLocationAlwaysUsageDescription</key>
+    <string>Location is required to find out where you are</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Location is required to find out where you are</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <true/>
+    </dict>

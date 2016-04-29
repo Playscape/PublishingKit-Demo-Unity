@@ -29,6 +29,7 @@ public class ReportMenuController : MonoBehaviour {
 	{
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, marginTop, buttonWidth, buttonHeight), REPORT_EVENT)) {
 			Report.Instance.ReportEvent("custom_event");
+			AppsFlyer.trackEvent ("custom_event", "custom_event_value");
 		}
 		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight + marginTop * 1.4f, buttonWidth, buttonHeight), REPORT_ATTR_EVENT)) {
 			Dictionary<string, string> eventAttrs = new Dictionary<string, string>()
@@ -38,6 +39,7 @@ public class ReportMenuController : MonoBehaviour {
 			};
 
 			Report.Instance.ReportEvent("custom_event", eventAttrs);
+			AppsFlyer.trackRichEvent ("custom_event", eventAttrs);
 		}
 	}
 }

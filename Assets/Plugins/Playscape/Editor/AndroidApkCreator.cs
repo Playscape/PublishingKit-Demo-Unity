@@ -181,8 +181,9 @@ namespace Playscape.Editor
 			
 			string mainClass = "com.googlecode.dex2jar.tools.Dex2jarCmd";
 			string mainClassParams = "-f -o " + PlatformUtils.qualifyPath(dst) + " " + PlatformUtils.qualifyPath(src);
+			string javaArguments = string.Format (" -Xms1024m -Xmx{0}m ", ConfigurationInEditor.Instance.JavaHeapSize);
 			
-			string arguments = "-classpath " + classpath + " -Xms1024m -Xmx2048m " + mainClass + " " + mainClassParams;
+			string arguments = "-classpath " + classpath + javaArguments + mainClass + " " + mainClassParams;
 			
 			logger.V("Command " + command);
 			logger.V("Argumnets " + arguments);
@@ -212,12 +213,13 @@ namespace Playscape.Editor
 			
 			string mainClass = "com.googlecode.dex2jar.tools.Jar2Dex";
 			string mainClassParams = "-f -o " + PlatformUtils.qualifyPath(outputPath) + " " + PlatformUtils.qualifyPath(targetPath);
+			string javaArguments = string.Format (" -Xms1024m -Xmx{0}m ", ConfigurationInEditor.Instance.JavaHeapSize);
 			
-			string arguments = "-classpath " + classpath + " -Xms1024m -Xmx2048m " + mainClass + " " + mainClassParams;
+			string arguments = "-classpath " + classpath + javaArguments + mainClass + " " + mainClassParams;
 			
 			logger.V("Command " + command);
 			logger.V("Argumnets " + arguments);
-			
+						
 			Output output = mCommandLineExecutor.Execute (command, arguments);
 			string message = "executeLib2dex was" + (output.ExitCode == 0 ? "" : " not") + " successfully with code " + output.ExitCode;
 			logger.V(message);
@@ -386,8 +388,9 @@ namespace Playscape.Editor
 				+ Path.Combine(ASPECT_HOME_PATH, "aspectjrt.jar") + delimeter
 					+ ANDROID_JAR + delimeter
 					+ GOOGLE_PLAY_SERVICES_JAR;
+			string javaArguments = string.Format (" -Xms512m -Xmx{0}m ", ConfigurationInEditor.Instance.JavaHeapSize);
 
-			string arguments = "-classpath \"" + classpath + "\" -Xmx8g org.aspectj.tools.ajc.Main -source 1.5 -Xlint:ignore -inpath \""
+			string arguments = "-classpath \"" + classpath + javaArguments + "\" org.aspectj.tools.ajc.Main -source 1.5 -Xlint:ignore -inpath \""
 				+ inpath + "\" -aspectpath \"" + aspectpath + "\" -outjar \"" + outjar + "\"";
 
 			logger.V("Command " + command);

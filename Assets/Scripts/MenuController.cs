@@ -29,6 +29,37 @@ public class MenuController : MonoBehaviour {
 	void Start () {
 		SocialController.Instance.OnSocialRequestReceived += HandleOnSocialRequestReceived;
 		Banners.Instance.Hide ();
+
+		AppsFlyer.setAppsFlyerKey ("xzQXacE7g3HYRRWrGPNySC");
+
+		#if UNITY_IOS 
+
+		AppsFlyer.setAppID ("97f13d72-9a73-4d08-919e-51de221792e3");
+
+		// For detailed logging
+		AppsFlyer.setIsDebug (true); 
+
+		// For getting the conversion data will be triggered on AppsFlyerTrackerCallbacks.cs file
+		AppsFlyer.getConversionData (); 
+
+		// For testing validate in app purchase (test against Apple's sandbox environment
+		AppsFlyer.setIsSandbox(true);         
+
+		AppsFlyer.trackAppLaunch ();
+
+		#elif UNITY_ANDROID
+
+		// All Initialization occur in the override activity defined in the mainfest.xml, 
+		// including the track app launch
+		// For your convinence (if your manifest is occupied) you can define AppsFlyer library
+		// here, use this commented out code.
+
+		AppsFlyer.setAppID ("com.playscape.rollaball.customtest"); 
+		AppsFlyer.setIsDebug (true);
+		AppsFlyer.createValidateInAppListener ("AppsFlyerTrackerCallbacks", "onInAppBillingSuccess", "onInAppBillingFailure");
+		AppsFlyer.loadConversionData("AppsFlyerTrackerCallbacks","didReceiveConversionData", "didReceiveConversionDataWithError");
+
+		#endif
 	}
 
 	void Destroy() {
