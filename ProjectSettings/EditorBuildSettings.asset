@@ -23,3 +23,11 @@ EditorBuildSettings:
     path: Assets/_Scenes/report_screen.unity
   - enabled: 1
     path: Assets/_Scenes/facebook_tests.unity
+  - enabled: 1
+    path: Assets/_Scenes/ad_interstitial_test.unity
+  - enabled: 1
+    path: Assets/_Scenes/ad_test.unity
+  - enabled: 1
+    path: Assets/_Scenes/ad_banner_ad_test.unity
+  - enabled: 1
+    path: Assets/_Scenes/ad_video_ad_test.unity

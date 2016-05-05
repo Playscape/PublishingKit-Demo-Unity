@@ -22,7 +22,10 @@ namespace Playscape.Editor {
 		private const string CLOSE = "Apply Changes";
         private const string TEST_BUILD = "Test";
         private const string PLAYSCAPE_CONFIGURATION_TITLE = "Playscape Configuration";
-        private const string INCLUDE_ARCHITECTURE_TITLE = "Include Architectures";
+		private const string API_KEY_TITLE = "API Key";
+		private const string JAVA_HEAP_SIZE_TITLE = "Java Heap Size (MB)";
+		private const string ENABLE_ADS_TITLE = "Enable Ads System";
+        private const string INCLUDE_ARCHITECTURE_TITLE = "Include ARMEABI Architecture";
 		private const string INCLUDE_PL_EXCHANGE_TITLE = "Include Playscape Exchange";
 		private Vector2  scrollPos;
 
@@ -190,25 +193,16 @@ namespace Playscape.Editor {
 
 		void OnAdsGUI ()
 		{
-			var categories = new Dictionary<object, bool> ();
-			ConfigurationInEditor.Instance.TraverseAdsUIConfig ((category, fieldInfo) =>
-						{
-							if (!categories.ContainsKey(category)) {
-								GUILayout.Label (PLAYSCAPE_CONFIGURATION_TITLE, EditorStyles.boldLabel);
-								categories.Add(category, true);
-							}
+			GUILayout.Label (PLAYSCAPE_CONFIGURATION_TITLE, EditorStyles.boldLabel);
 
-                            if (fieldInfo.FieldType == typeof(string)) {
-                                string result = EditorGUILayout.TextField (fieldInfo.Name, fieldInfo.GetValue(category) as string);
-                                if (result != null) {
-								fieldInfo.SetValue(category, result);
-                                }
-                            } else if (fieldInfo.FieldType == typeof(bool)) {
-                                bool currentValue =  (bool) fieldInfo.GetValue(category);
-                                bool result  = EditorGUILayout.ToggleLeft (fieldInfo.Name,currentValue);
-                                fieldInfo.SetValue(category, result);
-                            }
-						});
+			string apiKey = EditorGUILayout.TextField (API_KEY_TITLE, ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey);
+			ConfigurationInEditor.Instance.MyAds.MyAdsConfig.ApiKey = apiKey;
+
+			int javaHeapSize = EditorGUILayout.IntField (JAVA_HEAP_SIZE_TITLE, ConfigurationInEditor.Instance.JavaHeapSize);
+			ConfigurationInEditor.Instance.JavaHeapSize = javaHeapSize;
+
+			bool enableAdsSystem = EditorGUILayout.ToggleLeft (ENABLE_ADS_TITLE, Configuration.Instance.MyAds.MyAdsConfig.EnableAdsSystem);
+			Configuration.Instance.MyAds.MyAdsConfig.EnableAdsSystem = enableAdsSystem;
 
             bool includeArchitectures = EditorGUILayout.ToggleLeft (INCLUDE_ARCHITECTURE_TITLE, Configuration.Instance.IncludeArchitectures);
 			Configuration.Instance.IncludeArchitectures = includeArchitectures;

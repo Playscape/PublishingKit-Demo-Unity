@@ -89,6 +89,9 @@ namespace Playscape.Internal {
 			}
 		}
 
+		/* -- Java Heap Size -- */
+		public int JavaHeapSize = 1536;
+
 		/* -- Analytics Reporting -- */
 		public string ReporterId;
 

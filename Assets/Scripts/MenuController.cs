@@ -12,9 +12,7 @@ public class MenuController : MonoBehaviour {
 	const string PLAY_A_RANDOM_GAME = "PLAY A RANDOM GAME";
 	const string PLAY_WITH_FRIENDS = "PLAY GAME WITH FRIENDS";
 	const string STORE = "STORE";
-	const string SHOW_INTESITIAL = "Show Interstitial";
-	const string DISABLE_ADS = "Disable ads";
-	const string ENABLE_ADS = "Enable ads";
+	const string OPEN_AD_TEST_SCENE = "OPEN AD TEST SCENE";
 	const string OPEN_REPORT_EVENT = "Open Report Scene";
 	const string SHOW_CATALOG = "Show Catalog";
 	const string GET_A_TESTING_VALUES = "Get AB Testing Values";
@@ -94,37 +92,29 @@ public class MenuController : MonoBehaviour {
 			Application.LoadLevel ("store");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop * 1.4f, buttonWidth, buttonHeight), SHOW_INTESITIAL)) {
-			Playscape.Ads.Interstitials.Instance.Display("main-menu");
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 4 + marginTop * 1.4f, buttonWidth, buttonHeight), OPEN_AD_TEST_SCENE)) {
+			Application.LoadLevel("ad_test");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 1.4f, buttonWidth, buttonHeight), DISABLE_ADS)) {
-			AdManager.Instance.DisableAds();
-		}
-
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 6 + marginTop * 1.4f, buttonWidth, buttonHeight), ENABLE_ADS)) {
-			AdManager.Instance.EnableAds();
-		}
-
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 1.4f, buttonWidth, buttonHeight), OPEN_REPORT_EVENT)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 5 + marginTop * 1.4f, buttonWidth, buttonHeight), OPEN_REPORT_EVENT)) {
 			Application.LoadLevel("report_screen");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 8 + marginTop * 1.4f, buttonWidth, buttonHeight), GET_A_TESTING_VALUES)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 6 + marginTop * 1.4f, buttonWidth, buttonHeight), GET_A_TESTING_VALUES)) {
 			Application.LoadLevel("ab_testing");
 		}
 
-        if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth / 2, buttonHeight * 9 + marginTop * 2.4f, buttonWidth, buttonHeight), SHOW_CATALOG))
+        if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth / 2, buttonHeight * 7 + marginTop * 2.4f, buttonWidth, buttonHeight), SHOW_CATALOG))
         {
             Playscape.Catalog.Catalog.Instance.showCatalog();
         }
 
-		if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth / 2, buttonHeight * 10 + marginTop * 2.6f, buttonWidth, buttonHeight), OPEN_FACEBOOK))
+		if (GUI.Button(new Rect(Screen.width / 2 - buttonWidth / 2, buttonHeight * 8 + marginTop * 2.6f, buttonWidth, buttonHeight), OPEN_FACEBOOK))
 		{
 			Application.LoadLevel("facebook_tests");
 		}
 
-		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 11 + marginTop * 2.8f, buttonWidth, buttonHeight), QUIT)) {
+		if (GUI.Button (new Rect (Screen.width / 2 - buttonWidth / 2, buttonHeight * 9 + marginTop * 2.8f, buttonWidth, buttonHeight), QUIT)) {
 			Application.Quit ();
 		}
 	}
