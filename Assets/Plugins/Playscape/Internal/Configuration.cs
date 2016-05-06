@@ -89,6 +89,9 @@ namespace Playscape.Internal {
 			}
 		}
 
+		/* -- Java Heap Size -- */
+		public int JavaHeapSize = 1536;
+
 		/* -- Analytics Reporting -- */
 		public string ReporterId;
 
@@ -171,7 +174,7 @@ namespace Playscape.Internal {
 				
 				// Star synchronous request for getting game configuration
 				GameConfigurationResponse gameConfiguration = null;
-				SyncRequest<GameConfigurationResponse> request = new SyncRequest<GameConfigurationResponse> (url, System.Net.WebRequestMethods.Http.Get);
+				SyncRequest<GameConfigurationResponse> request = new SyncRequest<GameConfigurationResponse> (url, "GET");
 				request.addHeader ("X-API-Key", apikey);
 				
 				gameConfiguration = request.Start ();

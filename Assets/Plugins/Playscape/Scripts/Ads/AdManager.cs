@@ -22,6 +22,8 @@ namespace Playscape.Ads {
 
 				#if UNITY_ANDROID && !UNITY_EDITOR
 				mPlayscapeAds = (PlayscapeAdsBase) go.GetComponent(typeof(PlayscapeAdsAndroid));
+				#elif UNITY_IPHONE && !UNITY_EDITOR
+				mPlayscapeAds = (PlayscapeAdsBase) go.GetComponent(typeof(PlayscapeAdsIOS));
 				#else
 				mPlayscapeAds = (PlayscapeAdsBase) go.GetComponent(typeof(PlayscapeAdsMock));
 				#endif

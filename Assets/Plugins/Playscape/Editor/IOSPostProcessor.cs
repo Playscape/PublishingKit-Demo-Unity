@@ -11,7 +11,6 @@ using System.Xml;
 using System.Text;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Playscape.Editor {
@@ -22,52 +21,37 @@ namespace Playscape.Editor {
 		
 		public IOSPostProcessor(string pathToProjectSources) {
 			this.pathToProjectSources = pathToProjectSources;
+		}			
+
+
+		public void build(bool async, BuildProcess.BuildCompleted completedCallback, BuildProcess.BuildProgressChanged progressCallback, BuildProcess.BuildFailed failedCallback) {
+			BuildParams bp = new BuildParams {
+				isDebug = UnityEngine.Debug.isDebugBuild
+			};
+			BuildProcess process = new IOSBuildProcess(bp, new UnityDebugLogger(), completedCallback, progressCallback, failedCallback);
+
+			if (async) {
+				process.BuildAsync(pathToProjectSources);
+			} else
+			{
+				process.Build(pathToProjectSources);
+			}
 		}
 
-		public override void CheckForWarnings(WarningAccumulator warnings)
-		{
-			base.CheckForWarnings (warnings);
-
-			warnings.WarnIfStringIsEmpty(
-				ConfigurationInEditor.Instance.PushWooshIosId,
-				Warnings.PUSH_WOOSH_APP_ID_NOT_SET_IOS);
-		}
 
 		public override void Run()
 		{
-			var plistFragment = "Assets/Plugins/iOS/playscape_config.plist_fragment";
-			var infoAppender = new PlistAppender(pathToProjectSources + "/Info.plist");
+			EditorUtility.ClearProgressBar();
+			EditorUtility.DisplayProgressBar("Publishing kit post-process", "Applying publishing kit logic", 0);
 
-			infoAppender.AddString(
-				"Pushwoosh_APPID",
-				ConfigurationInEditor.Instance.PushWooshIosId);
-
-			infoAppender.AddString(
-				"PlayscapeReporterId",
-				ConfigurationInEditor.Instance.ReporterId);
-
-			infoAppender.AddString(
-				"PlayscapeRemoteLoggerUrl",
-				UnityEngine.Debug.isDebugBuild ? Settings.DebugRemoteLoggerUrl
-								   : Settings.ReleaseRemoteLoggerUrl);
-
-			infoAppender.AppendFragment(plistFragment);
-			infoAppender.Save();
-
-			if (PlayerSettings.iOS.sdkVersion == iOSSdkVersion.SimulatorSDK) {
-				FixRegisterMonoModules(pathToProjectSources);
-			}
-
-			UnityEditor.XCodeEditor.XCProject project = new UnityEditor.XCodeEditor.XCProject(pathToProjectSources);
-
-			// Find and run through all projmods files to patch the project
-			var files = System.IO.Directory.GetFiles(Application.dataPath, "*.projmods", System.IO.SearchOption.AllDirectories);
-			foreach (var file in files)
+			try
 			{
-				project.ApplyMod(file);
+				build(false, onComplete, onProgress, OnFailed);
 			}
-
-			project.Save();
+			catch (Exception e)
+			{
+				EditorUtility.DisplayDialog("Publishing Kit Error", "An error occured while applying post-build logic: " + e.Message, "OK");
+			}				
 		}
 
 		static string ConvertStringArrayToString(string[] array)
@@ -83,56 +67,24 @@ namespace Playscape.Editor {
 			return builder.ToString();
 		}
 
-
-		/// <summary>
-		/// By default, external native plugin functions are not available to mono in iOS simulator - you will get EntryNotFoundException.
-		/// This enable them by modifying RegisterMonoModules.cpp, for more info read this http://tech.enekochan.com/2012/05/28/using-the-xcode-simulator-with-a-unity-3-native-ios-plug-in/
-		/// </summary>
-		void FixRegisterMonoModules (string targetPath)
+		public static void onProgress(object sender, string info, int percentage)
 		{
-			var files = Directory.GetFiles(targetPath, "RegisterMonoModules.cpp", SearchOption.AllDirectories);
-
-			if (files.Length > 0) {
-				
-				var filePath = files[0];
-				
-				var lines = File.ReadAllLines(filePath);
-				var newLines = new List<string>();
-
-				int step = 0;
-				for (int i = 0; i < lines.Length; ++i) {
-					bool appendLine = true;
-
-					if (step == 0) {
-
-						if (lines[i].Contains("TARGET_IPHONE_SIMULATOR")) {
-							newLines.Add(@"void mono_dl_register_symbol(const char* name, void *addr);");
-							step = 1;
-						}
-					} else if (step == 1) {
-						if (lines[i].Contains("RegisterMonoModules()")) {
-							step = 2;
-						}
-					} else if (step == 2) {
-						if (lines[i].Contains("mono_dl_register_symbol")) {
-							newLines.Add("#endif // !(TARGET_IPHONE_SIMULATOR)");
-							step = 3;
-						}
-					} else if (step == 3) {
-						if (lines[i].Contains("#endif") && lines[i].Contains("TARGET_IPHONE_SIMULATOR")) {
-							appendLine = false;
-						}
-					}
-
-					if (appendLine) {
-						newLines.Add(lines[i]);
-					}
-				}
-
-				string contents = string.Join("\n", newLines.ToArray());
-				File.WriteAllText(filePath, contents);
-			}
+			EditorUtility.DisplayProgressBar("Publishing kit post-process", info, percentage);
 		}
+
+		public static void onComplete(object sender)
+		{
+			EditorUtility.ClearProgressBar();
+		}
+
+		public static void OnFailed(object sender, string message) {
+			EditorUtility.DisplayDialog (
+				"Playscape Post Proccessor",
+				message,
+				"OK"
+			);
+		}
+			
 
 		void AddRequiredFrameworks (string targetPath)
 		{
@@ -160,13 +112,9 @@ namespace Playscape.Editor {
 				// Make CoreLocation.Framework optional
 				contents = contents.Replace("/* CoreLocation.framework */; };", "/* CoreLocation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };");
 
-
-
 				// TODO add warning if failed
 				File.WriteAllText(filePath, contents);
-			}
-
-		
+			}				
 		}
 
 		/// <summary>
@@ -193,43 +141,7 @@ namespace Playscape.Editor {
 			}
 
 			return contents;
-		}
-
-		private void RunPushNotificationBashScript() {
-			string scriptName = "Push_Notification_Script.sh";
-			string[] files = Directory.GetFiles(Application.dataPath, scriptName, System.IO.SearchOption.AllDirectories);
-
-			string scriptFile = "";
-
-			if (files.Length > 0)
-			{
-				scriptFile = files[0];
-			}
-			
-			if (!String.IsNullOrEmpty(scriptFile)) 
-			{
-				string destScriptFile = Path.Combine(pathToProjectSources, scriptName);
-
-				File.Copy(scriptFile, destScriptFile, true);
-
-				if (File.Exists(destScriptFile)) {
-					Process process = new System.Diagnostics.Process();
-					process.StartInfo.FileName = destScriptFile;
-
-					string argumentsPath = "\"" + pathToProjectSources + "\"";
-					process.StartInfo.Arguments = argumentsPath;
-					process.StartInfo.UseShellExecute = false; 
-					process.StartInfo.RedirectStandardError = true;
-					process.StartInfo.RedirectStandardInput = true;
-					process.StartInfo.RedirectStandardOutput = true;
-					process.Start();
-					var output = process.StandardOutput.ReadToEnd ();
-					L.I ("stdout: {0}", output);
-				}
-
-				System.IO.File.Delete(destScriptFile);
-			}
-		}
+		}			
 	}
 }
 #endif

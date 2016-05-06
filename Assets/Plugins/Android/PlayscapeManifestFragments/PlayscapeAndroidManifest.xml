@@ -3,13 +3,9 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="PACKAGE_NAME.permission.C2D_MESSAGE" />
@@ -21,7 +17,7 @@
     <application
         android:icon="@drawable/app_icon"
         android:label="@string/app_name">
-        
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -56,6 +52,14 @@
                 <action android:name="com.mominis.gameconsole.logger.START_LOGGER_SERVICE" />
             </intent-filter>
         </service>
+
+        <receiver android:enabled="true" android:name="com.google.android.gms.analytics.AnalyticsReceiver">
+            <intent-filter>
+                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH" />
+            </intent-filter>
+        </receiver>
+        <service android:enabled="true" android:exported="false" android:name="com.google.android.gms.analytics.AnalyticsService" />
+
         <service android:name="com.mominis.logger.IsAliveService" >
         </service>
 
@@ -68,18 +72,6 @@
         <receiver android:name="com.mominis.logger.ConnectivityChangedReceiver" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
-
-        <!-- Adience Sdk -->
-        <service android:name="com.adience.sdk.SdkService" android:process=":dsservice" >
-            <meta-data android:name="com.adience.appKey" android:value="​@string/playscape_adience_key"/>
-        </service>
-
-        <receiver android:name="com.adience.sdk.SdkBootReceiver" android:process=":dsservice"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
@@ -208,6 +200,8 @@
 			>
         </activity>
 
+        <activity android:name="com.soomla.store.billing.google.GooglePlayIabService$IabActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+          <meta-data android:name="billing.service" android:value="google.GooglePlayIabService"/>
         <!-- Our Services -->
 
         <service android:name="mominis.common.services.sync.impl.SyncIntentService">
