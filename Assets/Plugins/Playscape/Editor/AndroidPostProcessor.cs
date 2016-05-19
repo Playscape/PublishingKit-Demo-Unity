@@ -58,7 +58,7 @@ namespace Playscape.Editor {
 		
 		public void build(bool async, BuildProcess.BuildCompleted completedCallback, BuildProcess.BuildProgressChanged progressCallback, BuildProcess.BuildFailed failedCallback) {
 			BuildParams bp = ConstructBuildParams();
-			BuildProcess process = new BuildProcess(bp, new UnityDebugLogger(), completedCallback, progressCallback, failedCallback);
+			BuildProcess process = new AndroidBuildProcess(bp, new UnityDebugLogger(), completedCallback, progressCallback, failedCallback);
 
             if (async) {
                 process.BuildAsync(mTargetPath);

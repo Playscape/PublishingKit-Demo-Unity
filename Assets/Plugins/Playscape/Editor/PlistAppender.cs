@@ -71,7 +71,12 @@ namespace Playscape.Editor {
 
 		private void AppendRawText(string addedText)
 		{
-			plistContents = plistContents.Replace("</dict>", "\n" + addedText + "\n</dict>");
+			string dictCloseTag = "</dict>";
+			int lastIndex = plistContents.LastIndexOf (dictCloseTag);
+
+			if (lastIndex != -1) {
+				plistContents = plistContents.Insert (lastIndex, "\n" + addedText + "\n");
+			}				
 		}
 
 	}

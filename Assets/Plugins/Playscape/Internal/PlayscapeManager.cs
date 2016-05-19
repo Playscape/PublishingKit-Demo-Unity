@@ -81,6 +81,8 @@ namespace Playscape.Internal
 		{
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			gameObject.AddComponent(typeof(PlayscapeAdsAndroid));
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			gameObject.AddComponent(typeof(PlayscapeAdsIOS));
 			#else
 			gameObject.AddComponent(typeof(PlayscapeAdsMock));
 			#endif

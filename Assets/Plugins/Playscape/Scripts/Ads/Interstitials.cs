@@ -63,6 +63,11 @@ namespace Playscape.Ads {
 				
 				mPlayscapeAds.OnInterstitialDisplayEndedInternal += (payload) => dispatchInterstitialDisplayEnded(payload);
 				mPlayscapeAds.OnInterstitialShownInternal += (payload) => dispatchInterstitialShown(payload);
+				#elif UNITY_IPHONE && !UNITY_EDITOR
+				mPlayscapeAds = (PlayscapeAdsBase) go.GetComponent(typeof(PlayscapeAdsIOS));
+				
+				mPlayscapeAds.OnInterstitialDisplayEndedInternal += (payload) => dispatchInterstitialDisplayEnded(payload);
+				mPlayscapeAds.OnInterstitialShownInternal += (payload) => dispatchInterstitialShown(payload);
 				#else
 				mPlayscapeAds = (PlayscapeAdsBase) go.GetComponent(typeof(PlayscapeAdsMock));
 				#endif
@@ -135,7 +140,7 @@ namespace Playscape.Ads {
 						L.I("Missed event with payload: {0}", payload);
 					}
 				} else {
-					L.E ("Payload parse failure, parsed state from '{0}' to '{1}', kind from '{2}' to '{3}'", 
+					L.E ("Payload parse failure, parsed state from '{0}' to '{1}', kind from '{2}' to '{3}'",
 					     payloadParts[0], state, payloadParts[1], kind);
 				}
 			} else {
@@ -158,7 +163,7 @@ namespace Playscape.Ads {
 					L.I("Missed event with payload: {0}", payload);
 				}
 			} else {
-				L.E ("Payload parse failure, kind from '{0}' to '{1}'", 
+				L.E ("Payload parse failure, kind from '{0}' to '{1}'",
 				     payload, kind);
 			}
 
@@ -175,9 +180,9 @@ namespace Playscape.Ads {
 
 		/// <summary>
 		/// Notifies an open Overlay interstitial on Android that the back button has been pressed.
-		/// 
+		///
 		/// You should call this method like this:
-		/// 
+		///
 		/// public void Update() {
 		///   if (Input.GetKeyUp(KeyCode.Escape)) {
 		//	       if (Interstitials.Instance.OnBackPressed()) {
