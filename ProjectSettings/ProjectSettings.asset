@@ -158,7 +158,7 @@ PlayerSettings:
   AndroidTargetDevice: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: /Users/mac/Desktop/stuff/MoMinis.keystore
+  AndroidKeystoreName: 
   AndroidKeyaliasName: android_market
   AndroidTVCompatibility: 1
   AndroidIsGame: 1
