@@ -589,11 +589,13 @@ void iosFeedRequest(int requestId,
        ^(FBAppCall *call, NSDictionary *results, NSError *error) {
          HandleDictionaryResponse(requestId, error != nil, results);
        }];
+       NSLog(@"Did present native share dialog");
       return;
     }
   }
 
   // Invoke the dialog
+  NSLog(@"Invoke web dialog");
   [FBWebDialogs presentFeedDialogModallyWithSession:nil
                                          parameters:params
                                             handler:
