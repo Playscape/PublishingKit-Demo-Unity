@@ -31,14 +31,14 @@ public class MenuController : MonoBehaviour {
 
 	void Destroy() {
 		SocialController.Instance.OnSocialRequestReceived -= HandleOnSocialRequestReceived;
-		StopCoroutine( "ChangeLoadChar" );
+//		StopCoroutine( "ChangeLoadChar" );
 	}
 
 	void HandleOnSocialRequestReceived ()
 	{
 		if (SocialController.Instance.IsLoggedIn) {
 			mSocialRequestReceived = true;
-			StartCoroutine( ChangeLoadChar());
+//			StartCoroutine( ChangeLoadChar());
 		}
 	}
 

@@ -18,7 +18,11 @@ public class FacebookTestController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		FB.Init (OnInitComplete, null, null); 
+		if (FB.IsInitialized && FB.IsLoggedIn) {
+			fbInitialized = true;
+		} else {
+			FB.Init (OnInitComplete, null, null); 
+		}
 	}
 
 	void OnInitComplete() {
